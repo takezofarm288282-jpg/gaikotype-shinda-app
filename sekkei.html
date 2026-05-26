@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>外構設計 料金表</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--brown-deep:#7a5540;--brown-mid:#a07868;--brown-warm:#c4a48a;--beige:#f7f2ed;--beige-dark:#ede4da;--cream:#fefcfa;--text:#4a3828;--muted:#b09a8a;--accent:#c47a5a;--white:#ffffff;}
+body{background:var(--cream);font-family:'Noto Sans JP',sans-serif;color:var(--text);min-height:100vh;}
+.hero{background:#c8b4a2;position:relative;overflow:hidden;padding:60px 24px 52px;text-align:center;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 20% 50%,rgba(160,98,42,.18) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 80% 40%,rgba(192,68,12,.12) 0%,transparent 60%);pointer-events:none;}
+.hero-tag{display:inline-block;letter-spacing:.25em;font-size:.7em;color:#fff;text-transform:uppercase;border:1px solid rgba(255,255,255,.6);padding:4px 14px;border-radius:2px;margin-bottom:20px;}
+.hero h1{font-family:'Noto Serif JP',serif;font-size:clamp(1.9em,5vw,3em);font-weight:900;color:#fff;line-height:1.25;letter-spacing:.03em;margin-bottom:12px;}
+.hero-sub{font-size:.85em;color:rgba(255,255,255,.7);letter-spacing:.05em;}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px 60px;}
+.note-box{margin:36px 0 0;background:var(--beige);border-left:4px solid var(--brown-warm);border-radius:0 8px 8px 0;padding:18px 22px;font-size:.84em;line-height:1.95;color:var(--brown-mid);}
+.note-box strong{display:block;font-size:.95em;font-weight:700;color:var(--brown-deep);margin-bottom:6px;}
+.section-title{display:flex;align-items:center;gap:12px;margin:48px 0 20px;font-family:'Noto Serif JP',serif;font-size:1.05em;font-weight:700;color:var(--brown-deep);letter-spacing:.05em;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--beige-dark);}
+.section-num{font-size:.72em;background:var(--brown-warm);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.plan-card{background:var(--white);border:1px solid var(--beige-dark);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;}
+.plan-card-header{padding:24px 22px 18px;border-bottom:1px solid var(--beige-dark);}
+.plan-badge{display:inline-block;font-size:.68em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border-radius:3px;padding:3px 10px;margin-bottom:14px;background:var(--beige);color:var(--muted);}
+.plan-card.premium .plan-badge{background:var(--brown-deep);color:var(--beige);}
+.plan-name{font-family:'Noto Serif JP',serif;font-size:1.08em;font-weight:700;color:var(--text);margin-bottom:14px;}
+.plan-price{font-size:2.1em;font-weight:900;color:var(--brown-deep);line-height:1;}
+.plan-price .unit{font-size:.38em;font-weight:400;color:var(--muted);margin-left:2px;}
+.plan-note-small{margin-top:10px;font-size:.76em;color:var(--muted);line-height:1.75;}
+.plan-card-body{padding:18px 22px 22px;flex:1;}
+.deliverables-label{font-size:.72em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.plan-card-body ul{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.plan-card-body ul li{font-size:.84em;color:var(--text);padding-bottom:8px;border-bottom:1px solid var(--beige);display:flex;align-items:center;gap:8px;}
+.plan-card-body ul li:last-child{border-bottom:none;}
+.plan-card-body ul li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--brown-warm);flex-shrink:0;}
+.plan-card.premium{border-color:var(--brown-mid);}
+.plan-card.premium .plan-card-header{background:#fcf8f4;}
+.kooji-hint{font-size:.82em;color:var(--muted);margin-bottom:16px;}
+.kooji-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.kooji-card{background:var(--white);border:1px solid var(--beige-dark);border-radius:8px;padding:14px 10px;text-align:center;}
+.k-label{font-size:.68em;color:var(--muted);margin-bottom:6px;font-weight:500;}
+.k-price{font-size:.95em;font-weight:700;color:var(--brown-deep);}
+.option-box{background:var(--white);border:1px solid var(--beige-dark);border-radius:10px;overflow:hidden;}
+.option-row{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;font-size:.88em;gap:16px;}
+.opt-label{color:var(--text);line-height:1.6;flex:1;}
+.opt-price{font-size:1.05em;font-weight:700;color:var(--accent);white-space:nowrap;flex-shrink:0;}
+.cad-box{background:var(--white);border:1px solid var(--beige-dark);border-radius:10px;overflow:hidden;}
+.cad-top{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid var(--beige-dark);}
+.cad-desc{font-size:.88em;color:var(--text);line-height:1.6;flex:1;}
+.cad-rate{text-align:right;flex-shrink:0;}
+.cad-rate-num{font-size:1.9em;font-weight:900;color:var(--brown-deep);}
+.cad-rate-unit{font-size:.78em;color:var(--muted);margin-left:2px;}
+.cad-meta{padding:14px 24px;display:flex;flex-direction:column;gap:8px;}
+.cad-meta-row{display:flex;align-items:baseline;gap:16px;font-size:.84em;}
+.cad-meta-label{font-weight:700;color:var(--muted);white-space:nowrap;min-width:72px;}
+.cad-meta-val{color:var(--text);}
+.ref-section{margin-top:24px;background:var(--beige);border:1px solid var(--beige-dark);border-radius:14px;padding:32px 28px 28px;position:relative;overflow:hidden;}
+.ref-header{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;}
+.ref-label-en{font-size:.65em;letter-spacing:.22em;text-transform:uppercase;color:var(--brown-warm);font-weight:700;}
+.ref-heading{font-family:'Noto Serif JP',serif;font-size:1em;font-weight:700;color:var(--brown-deep);margin:0;}
+.ref-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.ref-card{border-radius:8px;overflow:hidden;background:var(--white);border:1px solid var(--beige-dark);}
+.ref-card-wide{grid-column:1/-1;}
+.ref-photo{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-bottom:1px solid var(--beige-dark);background:#f0ebe4;}
+.ref-info{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;}
+.ref-time{font-size:.85em;font-weight:700;color:var(--brown-deep);}
+.ref-items{font-size:.72em;color:var(--muted);line-height:1.7;}
+.caution-box{background:var(--beige);border:1px solid var(--beige-dark);border-radius:10px;padding:20px 24px;font-size:.82em;line-height:1.95;color:var(--brown-mid);}
+.caution-box ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:6px;}
+.caution-box ul li{display:flex;align-items:flex-start;gap:8px;}
+.caution-box ul li::before{content:'・';flex-shrink:0;}
+.foot{text-align:center;font-size:.75em;color:var(--muted);padding:24px 0 0;border-top:1px solid var(--beige-dark);margin-top:48px;}
+@media(max-width:700px){.plan-grid{grid-template-columns:1fr;}.kooji-grid{grid-template-columns:repeat(2,1fr);}.hero{padding:44px 20px 40px;}.option-row{flex-direction:column;align-items:flex-start;gap:8px;}.cad-top{flex-direction:column;align-items:flex-start;}.ref-grid{grid-template-columns:repeat(2,1fr);}.ref-card-wide{grid-column:1/-1;}}
+</style>
+<header class="hero">
+  <div class="hero-tag">Fee Schedule</div>
+  <h1>外構設計／製図 料金</h1>
+  <p class="hero-sub">外構エクステリア設計／製図のみご依頼の場合の料金プランです</p>
+</header>
+<div class="wrap">
+  <div class="note-box"><strong>料金プランの見方</strong>料金プランは、コース別の概算金額を記載しています。実際のご依頼によっては下記と異なることがあります。複数の現場や特別な内容については追加費用が発生する場合があります。</div>
+  <div class="section-title"><span class="section-num">1</span>外構プラン</div>
+  <div class="plan-grid">
+    <div class="plan-card light"><div class="plan-card-header"><div class="plan-badge">Light</div><div class="plan-name">ライトプラン</div><div class="plan-price">110,000<span class="unit">円（税込）</span></div><div class="plan-note-small">現地調査料は別途（地域による）<br>基本時間：20時間<br>超過分は 5,500円／時間</div></div><div class="plan-card-body"><div class="deliverables-label">Deliverables</div><ul><li>平面図（CAD）</li><li>3Dパース・イメージ</li></ul></div></div>
+    <div class="plan-card standard"><div class="plan-card-header"><div class="plan-badge">Standard</div><div class="plan-name">スタンダードプラン</div><div class="plan-price">165,000<span class="unit">円（税込）</span></div><div class="plan-note-small">現地調査料は別途（地域による）<br>基本時間：20時間<br>超過分は 5,500円／時間</div></div><div class="plan-card-body"><div class="deliverables-label">Deliverables</div><ul><li>平面図（CAD）</li><li>3Dパース・イメージ</li><li>素材・商品リスト</li><li>施工業者向け仕様書</li></ul></div></div>
+    <div class="plan-card premium"><div class="plan-card-header"><div class="plan-badge">Premium</div><div class="plan-name">プレミアムプラン</div><div class="plan-price">275,000<span class="unit">円（税込）</span></div><div class="plan-note-small">現地調査料は別途（地域による）<br>基本時間：20時間<br>超過分は 5,500円／時間</div></div><div class="plan-card-body"><div class="deliverables-label">Deliverables</div><ul><li>平面図（CAD）</li><li>3Dパース・イメージ</li><li>素材・商品リスト</li><li>施工業者向け仕様書</li><li>複数案提案（A・B案）</li></ul></div></div>
+  </div>
+  <div class="section-title"><span class="section-num">2</span>工事金額・設計料金目安</div>
+  <p class="kooji-hint">スタンダードプランを基準とした場合の参考金額です。</p>
+  <div class="kooji-grid">
+    <div class="kooji-card"><div class="k-label">100万円規模</div><div class="k-price">165,000円</div></div>
+    <div class="kooji-card"><div class="k-label">200万円規模</div><div class="k-price">286,000円</div></div>
+    <div class="kooji-card"><div class="k-label">300万円規模</div><div class="k-price">330,000円</div></div>
+    <div class="kooji-card"><div class="k-label">400万円規模</div><div class="k-price">440,000円</div></div>
+    <div class="kooji-card"><div class="k-label">450万円規模</div><div class="k-price">495,000円</div></div>
+    <div class="kooji-card"><div class="k-label">540万円規模</div><div class="k-price">594,000円</div></div>
+    <div class="kooji-card"><div class="k-label">560万円規模</div><div class="k-price">616,000円</div></div>
+    <div class="kooji-card"><div class="k-label">620万円規模</div><div class="k-price">704,000円</div></div>
+    <div class="kooji-card"><div class="k-label">720万円規模</div><div class="k-price">792,000円</div></div>
+    <div class="kooji-card"><div class="k-label">800万円規模</div><div class="k-price">880,000円</div></div>
+  </div>
+  <div class="section-title"><span class="section-num">3</span>オプション</div>
+  <div class="option-box">
+    <div class="option-row"><span class="opt-label">お急ぎ対応（2週間以内の納品）<br><small style="color:#aaa">※内容によっては対応できない場合があります。</small></span><span class="opt-price">＋33,000円<small style="font-weight:400;font-size:.72em;color:var(--muted)">（税込）</small></span></div>
+    <div class="option-row" style="border-top:1px solid var(--beige-dark)"><span class="opt-label">設計監理（工事の着工後の現場チェック業務）<br><small style="color:#aaa">※交通費別途</small></span><span class="opt-price">＋工事費×5％<small style="font-weight:400;font-size:.72em;color:var(--muted)">（税込）</small></span></div>
+    <div class="option-row" style="border-top:1px solid var(--beige-dark)"><span class="opt-label">建築士チェック（建築士による法適合確認）<br><small style="color:#aaa">※設計図面のみ</small></span><span class="opt-price">＋33,000円<small style="font-weight:400;font-size:.72em;color:var(--muted)">（税込）</small></span></div>
+    <div class="option-row" style="border-top:1px solid var(--beige-dark)"><span class="opt-label">ブロック塀診断（診断士による既存ブロック診断）<br><small style="color:#aaa">※交通費別途</small></span><span class="opt-price">＋22,000円<small style="font-weight:400;font-size:.72em;color:var(--muted)">（税込）</small></span></div>
+    <div class="option-row" style="border-top:1px solid var(--beige-dark)"><span class="opt-label">樹木医診断（樹木医による樹勢診断）<br><small style="color:#aaa">※交通費別途</small></span><span class="opt-price">＋33,000円<small style="font-weight:400;font-size:.72em;color:var(--muted)">（税込）</small></span></div>
+  </div>
+  <div class="section-title"><span class="section-num">4</span>3DCAD 製図業務</div>
+  <div class="cad-box">
+    <div class="cad-top"><div class="cad-desc">3DCAD（3次元コンピューター支援設計）による3Dパース図製図業務</div><div class="cad-rate"><span class="cad-rate-num">6,600</span><span class="cad-rate-unit">円／時間（税込）</span></div></div>
+    <div class="cad-meta">
+      <div class="cad-meta-row"><span class="cad-meta-label">使用ソフト</span><span class="cad-meta-val">RIKCAD</span></div>
+      <div class="cad-meta-row"><span class="cad-meta-label">資　　格</span><span class="cad-meta-val">RIKCADオペレーション技能検定1級　/　RIKCADパースマイスター</span></div>
+    </div>
+  </div>
+  <div class="ref-section">
+    <div class="ref-header"><span class="ref-label-en">Time Reference</span><p class="ref-heading">時間参考</p></div>
+    <div class="ref-grid">
+      <div class="ref-card"><img class="ref-photo" src="https://takezofarm.co.jp/wp-content/uploads/2026/05/original-2.jpg" alt="4時間 作例"><div class="ref-info"><span class="ref-time">4時間</span><span class="ref-items">平面図</span></div></div>
+      <div class="ref-card"><img class="ref-photo" src="https://takezofarm.co.jp/wp-content/uploads/2026/05/original-3.jpg" alt="8時間 作例"><div class="ref-info"><span class="ref-time">8時間</span><span class="ref-items">平面図</span></div></div>
+      <div class="ref-card"><img class="ref-photo" src="https://takezofarm.co.jp/wp-content/uploads/2026/05/original-4.jpg" alt="16時間 作例"><div class="ref-info"><span class="ref-time">16時間</span><span class="ref-items">平面図　パース図</span></div></div>
+      <div class="ref-card"><img class="ref-photo" src="https://takezofarm.co.jp/wp-content/uploads/2026/05/original.jpg" alt="32時間 作例"><div class="ref-info"><span class="ref-time">32時間</span><span class="ref-items">平面図　断面図　パース図</span></div></div>
+      <div class="ref-card ref-card-wide"><img class="ref-photo" src="https://takezofarm.co.jp/wp-content/uploads/2026/05/original-5.jpg" alt="50時間 作例" style="aspect-ratio:4/3;"><div class="ref-info"><span class="ref-time">50時間</span><span class="ref-items">平面図　断面図　立面図　パース図</span></div></div>
+    </div>
+  </div>
+  <div class="section-title"><span class="section-num">5</span>注意事項</div>
+  <div class="caution-box"><ul>
+    <li>納品は基本的にPDFデータでのお渡しとなります。</li>
+    <li>打合せはオンラインまたは来店にて承ります。</li>
+    <li>お支払いは基本料金を前払い、追加料金が発生した場合は納品後のお支払いとなります。</li>
+    <li>現地調査料は地域別料金表を参照。</li>
+    <li>敷地面積・設計内容が複雑な場合や修正回数が多い場合など、想定時間を超過する際は超過分につき5,500円/時間の追加費用が発生します。</li>
+    <li>表示金額はすべて税込みです。</li>
+    <li>建築確認申請の要否、建ぺい率・容積率などの法的制約については関与しません。専門の建築士にお問い合わせください。</li>
+  </ul></div>
+  <div class="foot">© 外構エクステリア設計　料金表</div>
+</div>
+<script>
+function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},'*');}
+window.addEventListener('load',sendHeight);
+window.addEventListener('resize',sendHeight);
+setInterval(sendHeight,500);
+</script>
+</body>
+</html>
