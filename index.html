@@ -35,7 +35,7 @@
         /* 背景テクスチャ */
         body::before {
             content: '';
-            position: fixed;
+            position: absolute;
             inset: 0;
             background-image:
                 radial-gradient(ellipse at 20% 20%, rgba(61,107,79,.07) 0%, transparent 60%),
@@ -634,7 +634,8 @@
 <script>
 // iframe高さ自動調整（画面切替時のみ）
 function sendHeight(){
-    var h = document.body.scrollHeight;
+    var app = document.querySelector('.app');
+    var h = app ? (app.offsetHeight + 60) : document.body.scrollHeight;
     window.parent.postMessage({frameHeight: h}, '*');
 }
 window.addEventListener('load', sendHeight);
@@ -736,7 +737,7 @@ function shuffle(arr) {
 function switchTo(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    setTimeout(sendHeight, 100);
+    setTimeout(sendHeight, 300);
 }
 
 function startQuiz() {
@@ -818,6 +819,7 @@ function showResult() {
     const type = calcResult();
     fillResult(typeData[type], 'r');
     switchTo('resultScreen');
+    setTimeout(sendHeight, 300);
 }
 
 function showAllTypes() { switchTo('typesScreen'); }
