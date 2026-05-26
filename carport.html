@@ -158,5 +158,11 @@
     if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",carportUpdateCarSections);}else{carportUpdateCarSections();}
 })();
 </script>
+<script>
+function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},"*");}
+window.addEventListener("load",sendHeight);
+window.addEventListener("resize",sendHeight);
+setInterval(sendHeight,500);
+</script>
 </body>
 </html>
