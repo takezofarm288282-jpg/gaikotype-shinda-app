@@ -632,11 +632,13 @@
 </div>
 
 <script>
-// iframe高さ自動調整
-function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},'*');}
-window.addEventListener('load',sendHeight);
-window.addEventListener('resize',sendHeight);
-setInterval(sendHeight,500);
+// iframe高さ自動調整（画面切替時のみ）
+function sendHeight(){
+    var h = document.body.scrollHeight;
+    window.parent.postMessage({frameHeight: h}, '*');
+}
+window.addEventListener('load', sendHeight);
+window.addEventListener('resize', sendHeight);
 
 const questions = [
     {
@@ -734,6 +736,7 @@ function shuffle(arr) {
 function switchTo(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    setTimeout(sendHeight, 100);
 }
 
 function startQuiz() {
