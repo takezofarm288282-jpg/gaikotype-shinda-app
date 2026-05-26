@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カーポート最適サイズ自動計算</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+    .carport-calculator-wp * { margin: 0; padding: 0; box-sizing: border-box; }
+    .carport-calculator-wp { font-family: "Noto Sans JP", "Meiryo", sans-serif; max-width: 720px; margin: 40px auto; color: #3a2e22; line-height: 1.7; }
+    .carport-calc-header { background: #6b4c2a; color: #f7eedd; padding: 32px 36px; border-radius: 4px 4px 0 0; }
+    .carport-calc-header h2 { font-family: "Noto Serif JP", serif; font-size: 21px; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .carport-calc-header p { font-size: 13px; opacity: 0.75; letter-spacing: 0.08em; }
+    .carport-calc-body { background: #fdf8f2; border: 1px solid #d4c4b0; border-top: none; border-radius: 0 0 4px 4px; padding: 36px; }
+    .carport-section-title { font-family: "Noto Serif JP", serif; font-size: 15px; font-weight: 700; color: #6b4c2a; letter-spacing: 0.08em; margin-bottom: 22px; padding-bottom: 10px; border-bottom: 2px solid #c8a882; display: flex; align-items: center; gap: 8px; }
+    .carport-section-title::before { content: ""; display: inline-block; width: 4px; height: 18px; background: #6b4c2a; border-radius: 2px; flex-shrink: 0; }
+    .carport-input-area { background: #ffffff; border: 1px solid #d4c4b0; border-radius: 4px; padding: 28px; margin-bottom: 28px; }
+    .carport-form-group { margin-bottom: 20px; }
+    .carport-form-group label { display: block; font-size: 13px; font-weight: 700; color: #3a2e22; margin-bottom: 7px; letter-spacing: 0.04em; }
+    .carport-form-group select, .carport-form-group input[type="number"] { width: 100%; padding: 10px 14px; border: 1px solid #cbb89a; border-radius: 3px; background: #fdfaf5; font-size: 14px; font-family: "Noto Sans JP", "Meiryo", sans-serif; color: #3a2e22; }
+    .carport-form-group select:focus, .carport-form-group input[type="number"]:focus { outline: none; border-color: #6b4c2a; box-shadow: 0 0 0 3px rgba(74,93,68,0.12); background-color: #fff; }
+    .carport-help-box { background: #fdf4ea; border-left: 3px solid #b08060; border-radius: 0 3px 3px 0; padding: 10px 14px; margin-top: 8px; font-size: 12px; line-height: 1.75; color: #6b4c2a; }
+    .carport-help-text { display: block; font-size: 12px; color: #9a7a5a; margin-top: 6px; line-height: 1.6; }
+    .carport-car-section { background: #fdf8f2; border: 1px solid #d4c4b0; border-radius: 4px; padding: 20px; margin-bottom: 16px; margin-top: 4px; }
+    .carport-car-section h4 { font-family: "Noto Serif JP", serif; font-size: 14px; font-weight: 700; color: #6b4c2a; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #d4c4b0; }
+    .carport-car-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .carport-car-inputs label { font-size: 11px; color: #8a8078; display: block; margin-bottom: 4px; font-weight: 500; }
+    .carport-car-inputs input[type="number"] { width: 100%; padding: 10px 14px; border: 1px solid #cbb89a; border-radius: 3px; background: #fdfaf5; font-size: 14px; font-family: "Noto Sans JP","Meiryo",sans-serif; color: #3a2e22; box-sizing: border-box; }
+    .carport-size-note { background: #f5ede0; border: 1px solid #ccbba0; border-radius: 3px; padding: 12px; margin-top: 12px; font-size: 11.5px; }
+    .carport-size-note strong { font-size: 12px; color: #6b4c2a; display: block; margin-bottom: 8px; }
+    .carport-size-note table { width: 100%; border-collapse: collapse; }
+    .carport-size-note th, .carport-size-note td { padding: 5px 8px; text-align: left; border-bottom: 1px solid #d4c4b0; font-size: 11.5px; }
+    .carport-size-note th { background: #e0cdb8; color: #4a3020; font-weight: 700; }
+    .carport-size-note tr:last-child td { border-bottom: none; }
+    .carport-size-note tr:nth-child(even) td { background: #f0e0cc; }
+    .carport-calc-button { width: 100%; padding: 14px 24px; background: #6b4c2a; color: #f7eedd; border: none; border-radius: 3px; font-family: "Noto Sans JP","Meiryo",sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.1em; cursor: pointer; margin-top: 22px; transition: background 0.2s; }
+    .carport-calc-button:hover { background: #4e3418; }
+    .carport-result-section { background: #ffffff; border: 1px solid #d4c4b0; border-radius: 4px; padding: 28px; }
+    .carport-result-value { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; margin-bottom: 10px; background: #f5ede0; border: 1px solid #d4c4b0; border-radius: 3px; }
+    .carport-result-label { font-size: 14px; font-weight: 700; color: #5a4030; letter-spacing: 0.05em; }
+    .carport-result-number { font-family: "Noto Serif JP", serif; font-size: 26px; font-weight: 700; color: #6b4c2a; }
+    .carport-note { margin-top: 18px; padding: 14px 16px; background: #fdf4ea; border-left: 3px solid #b08060; border-radius: 0 3px 3px 0; font-size: 12px; line-height: 1.75; color: #6b4c2a; }
+    .carport-note strong { color: #4e3418; display: block; margin-bottom: 4px; }
+    @media (max-width: 600px) { .carport-calc-body { padding: 22px 18px; } .carport-input-area { padding: 20px 16px; } .carport-calc-header { padding: 24px 20px; } .carport-car-inputs { grid-template-columns: 1fr; } .carport-result-number { font-size: 22px; } }
+</style>
+</head>
+<body>
+<div class="carport-calculator-wp">
+    <div class="carport-calc-header">
+        <h2>カーポート最適サイズ自動計算</h2>
+        <p>Takezo Farm ｜ カーポート推奨規程</p>
+    </div>
+    <div class="carport-calc-body">
+        <div class="carport-input-area">
+            <div class="carport-section-title">入力項目</div>
+            <div class="carport-form-group">
+                <label>① 前面道路幅カテゴリ</label>
+                <select id="carport_roadWidth">
+                    <option value="6m以上">6m以上</option>
+                    <option value="4-5m">4〜5m</option>
+                    <option value="3m以下">3m以下</option>
+                </select>
+                <div class="carport-help-box">💡 前面道路が狭いほど、車の出し入れに余裕が必要です<br>• 6m以上：補正なし(+0m)　• 4〜5m：やや余裕を追加(+0.4m)　• 3m以下：十分な余裕を追加(+0.7m)</div>
+            </div>
+            <div class="carport-form-group">
+                <label>② 進入方式</label>
+                <select id="carport_entryMethod">
+                    <option value="直進">直進</option>
+                    <option value="斜め">斜め</option>
+                </select>
+                <div class="carport-help-box">💡 カーポートへの進入方法で必要な長さが変わります<br>• 直進：前方余裕(+0.6m)　• 斜め：切り返し余裕(+0.8m)</div>
+            </div>
+            <div class="carport-form-group">
+                <label>③ 利用シーン</label>
+                <select id="carport_usageScene">
+                    <option value="なし">なし</option>
+                    <option value="子育て">乳幼児の乗降りを重視</option>
+                    <option value="高齢者">ご高齢者の乗降りを重視</option>
+                    <option value="高級">車幅の広い車の場合</option>
+                </select>
+                <div class="carport-help-box">💡 ライフスタイルに応じた余裕を追加<br>• 乳幼児：幅+0.3m、長さ+0.2m、高さ+0.2m　• 高齢者：幅+0.3m　• 広い車：幅+0.4m</div>
+            </div>
+            <div class="carport-form-group">
+                <label>④ 台数</label>
+                <select id="carport_carCount" onchange="carportUpdateCarSections()">
+                    <option value="1">1台</option>
+                    <option value="2">2台</option>
+                    <option value="3">3台</option>
+                </select>
+            </div>
+            <div id="carport_carSections"></div>
+            <div class="carport-form-group" style="margin-top:20px;">
+                <label>⑦ サイドパネルの有無</label>
+                <select id="carport_sidePanel">
+                    <option value="なし">なし</option>
+                    <option value="片側">片側に設置予定</option>
+                    <option value="両側">両側に設置予定</option>
+                </select>
+            </div>
+            <button class="carport-calc-button" onclick="carportCalculate()">計算する</button>
+        </div>
+        <div class="carport-result-section">
+            <div class="carport-section-title">推奨サイズ</div>
+            <div class="carport-result-value"><span class="carport-result-label">幅</span><span class="carport-result-number" id="carport_resultWidth">—</span></div>
+            <div class="carport-result-value"><span class="carport-result-label">長さ</span><span class="carport-result-number" id="carport_resultLength">—</span></div>
+            <div class="carport-result-value"><span class="carport-result-label">高さ</span><span class="carport-result-number" id="carport_resultHeight">—</span></div>
+            <div class="carport-note"><strong>📋 計算について</strong>この計算結果は推奨サイズです。実際の設置には敷地状況や建築基準法等の確認が必要です。</div>
+        </div>
+    </div>
+</div>
+<script>
+(function(){
+    var COEF={door_clearance:{"ヒンジ":1.4,"クーペ":1.8,"スライド":1.0},road_correction:{"6m以上":0,"4-5m":0.4,"3m以下":0.7},scene_corr_w:{"なし":0,"子育て":0.3,"高齢者":0.3,"高級":0.4},length_margin:{"直進":0.6,"斜め":0.8},height_margin:{"ハッチ":0.9,"トランク":0.4},height_bonus:0.2,parallel_gap:0.6};
+    window.carportUpdateCarSections=function(){
+        var count=parseInt(document.getElementById("carport_carCount").value);
+        var container=document.getElementById("carport_carSections");
+        container.innerHTML="";
+        var labels=["A車","B車","C車"];
+        for(var i=0;i<count;i++){
+            var div=document.createElement("div");
+            div.className="carport-car-section";
+            div.innerHTML="<h4>"+labels[i]+"</h4><div class=\"carport-car-inputs\"><div><label>車幅[m]</label><input type=\"number\" id=\"carport_carWidth"+i+"\" step=\"0.1\" min=\"0\" placeholder=\"例: 1.7\"></div><div><label>車長[m]</label><input type=\"number\" id=\"carport_carLength"+i+"\" step=\"0.1\" min=\"0\" placeholder=\"例: 4.5\"></div><div><label>車高[m]</label><input type=\"number\" id=\"carport_carHeight"+i+"\" step=\"0.1\" min=\"0\" placeholder=\"例: 1.5\"></div></div><div class=\"carport-size-note\"><strong>📏 車種別サイズ参考例</strong><table><tr><th>車種</th><th>車幅</th><th>車長</th><th>車高</th></tr><tr><td>軽自動車</td><td>約1.48m</td><td>約3.4m</td><td>1.6〜1.8m</td></tr><tr><td>クーペ</td><td>1.75〜1.9m</td><td>4.3〜4.7m</td><td>1.25〜1.4m</td></tr><tr><td>RV(SUV)</td><td>1.8〜1.95m</td><td>4.4〜4.9m</td><td>1.65〜1.9m</td></tr><tr><td>セダン</td><td>1.75〜1.85m</td><td>4.6〜4.9m</td><td>1.4〜1.5m</td></tr><tr><td>ワンボックス</td><td>1.7〜1.9m</td><td>4.6〜5.3m</td><td>1.8〜2.0m</td></tr></table></div><div class=\"carport-form-group\" style=\"margin-top:14px;margin-bottom:10px;\"><label style=\"font-size:12px;\">⑤ ドア種類（後部座席）</label><select id=\"carport_doorType"+i+"\"><option value=\"ヒンジ\">ヒンジ（一般的な横開き）</option><option value=\"クーペ\">クーペ（ロングドア）</option><option value=\"スライド\">スライド</option></select></div><div class=\"carport-form-group\" style=\"margin-bottom:0;\"><label style=\"font-size:12px;\">⑥ ハッチバック有無</label><select id=\"carport_hatchback"+i+"\"><option value=\"有り\">有り</option><option value=\"無し\">無し</option></select></div>";
+            container.appendChild(div);
+        }
+    };
+    window.carportCalculate=function(){
+        var roadWidth=document.getElementById("carport_roadWidth").value;
+        var entryMethod=document.getElementById("carport_entryMethod").value;
+        var usageScene=document.getElementById("carport_usageScene").value;
+        var carCount=parseInt(document.getElementById("carport_carCount").value);
+        var sidePanel=document.getElementById("carport_sidePanel").value;
+        var cars=[];
+        for(var i=0;i<carCount;i++){
+            var w=parseFloat(document.getElementById("carport_carWidth"+i).value);
+            var l=parseFloat(document.getElementById("carport_carLength"+i).value);
+            var h=parseFloat(document.getElementById("carport_carHeight"+i).value);
+            var dt=document.getElementById("carport_doorType"+i).value;
+            var hb=document.getElementById("carport_hatchback"+i).value;
+            if(isNaN(w)||isNaN(l)||isNaN(h)){alert(["A車","B車","C車"][i]+"の寸法を正しく入力してください。");return;}
+            cars.push({width:w,length:l,height:h,doorType:dt,hatchback:hb});
+        }
+        var totalWidth=0;
+        for(var i=0;i<cars.length;i++) totalWidth+=cars[i].width+COEF.door_clearance[cars[i].doorType];
+        if(carCount>=2) totalWidth+=COEF.parallel_gap*(carCount-1);
+        totalWidth+=COEF.road_correction[roadWidth]+COEF.scene_corr_w[usageScene];
+        var maxCarH=Math.max.apply(null,cars.map(function(c){return c.height;}));
+        if(sidePanel!=="なし"&&maxCarH>1.8) totalWidth+=0.1;
+        var totalLength=Math.max.apply(null,cars.map(function(c){return c.length;}))+COEF.length_margin[entryMethod];
+        if(usageScene!=="なし") totalLength+=0.2;
+        var maxHeight=0;
+        for(var i=0;i<cars.length;i++){var m=cars[i].hatchback==="有り"?COEF.height_margin["ハッチ"]:COEF.height_margin["トランク"];if(cars[i].height+m>maxHeight) maxHeight=cars[i].height+m;}
+        if(usageScene!=="なし") maxHeight+=COEF.height_bonus;
+        if(sidePanel!=="なし"&&maxCarH>1.8) maxHeight+=0.1;
+        document.getElementById("carport_resultWidth").textContent=totalWidth.toFixed(2)+" m";
+        document.getElementById("carport_resultLength").textContent=totalLength.toFixed(2)+" m";
+        document.getElementById("carport_resultHeight").textContent=maxHeight.toFixed(2)+" m";
+    };
+    if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",carportUpdateCarSections);}else{carportUpdateCarSections();}
+})();
+</script>
+</body>
+</html>
