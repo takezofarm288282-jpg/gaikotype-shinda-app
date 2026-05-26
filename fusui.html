@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>風水で幸運なガーデンの作り方</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<style>
+:root{--cream:#faf5ee;--cream2:#ede3d4;--cream3:#d9c9b4;--brown:#8b5e3c;--brown-dark:#6b4028;--brown-mid:#a87850;--brown-light:#c8a882;--brown-pale:#f0e4d4;--mocha:#7a5040;--sand:#c8b090;--sand-light:#e8dcc8;--gold:#b8882a;--gold-light:#d4aa58;--ivory:#fff8f0;--text:#2e1f10;--text-soft:#7a5c40;--shadow-sm:0 2px 14px rgba(107,64,40,0.10);--shadow-md:0 6px 28px rgba(107,64,40,0.16);--shadow-lg:0 16px 48px rgba(107,64,40,0.20);--radius:18px;--green-dark:#6b4028;--green-mid:#8b5e3c;--green-light:#c8a882;--accent:#8b5e3c;--accent-dark:#6b4028;--accent-light:#c8a882;--teal:#7a5040;--teal-mid:#8b5e3c;--teal-light:#c8b090;--blush:#c8a882;--blush-light:#e8dcc8;--sage:#8b5e3c;--sage-dark:#6b4028;--sage-light:#c8a882;--sage-pale:#f0e4d4;}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{background:var(--cream);font-family:'Noto Sans JP',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;}
+.hero{position:relative;background:linear-gradient(150deg,#6b4028 0%,#8b5e3c 35%,#a87850 65%,#c8b090 100%);padding:60px 24px 80px;text-align:center;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+.hero-petals{position:absolute;inset:0;pointer-events:none}
+.petal{position:absolute;font-size:1.4rem;opacity:0.18;animation:floatPetal linear infinite;}
+.hero h1{font-family:'Noto Serif JP',serif;font-size:clamp(1.8rem,5.5vw,3rem);font-weight:900;color:#fff8f0;line-height:1.3;margin-bottom:12px;text-shadow:0 2px 16px rgba(0,0,0,0.3);}
+.hero-sub{font-size:clamp(0.85rem,2.5vw,1.05rem);color:rgba(255,248,240,0.82);letter-spacing:0.12em;margin-bottom:40px;}
+.hero-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;}
+.hero-nav-btn{background:rgba(255,248,240,0.18);border:1.5px solid rgba(255,248,240,0.50);border-radius:40px;padding:11px 24px;color:#fff8f0;font-size:0.85rem;cursor:pointer;font-family:'Noto Sans JP',sans-serif;text-decoration:none;display:flex;align-items:center;gap:7px;transition:all 0.22s ease;backdrop-filter:blur(4px);font-weight:500;}
+.hero-nav-btn:hover{background:rgba(255,248,240,0.32);transform:translateY(-3px);}
+.section{max-width:960px;margin:0 auto;padding:60px 20px;}
+.section-header{text-align:center;margin-bottom:40px;}
+.section-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:0.78rem;color:var(--sage-dark);letter-spacing:0.12em;margin-bottom:10px;text-transform:uppercase;}
+.section-eyebrow::before,.section-eyebrow::after{content:'';display:block;width:32px;height:1px;background:var(--sage-light);}
+.section-title{font-family:'Noto Serif JP',serif;font-size:clamp(1.5rem,4vw,2.2rem);font-weight:700;color:var(--teal);margin-bottom:8px;}
+.section-desc{font-size:0.9rem;color:var(--text-soft);line-height:1.8;}
+.divider{border:none;height:1px;background:linear-gradient(to right,transparent,var(--cream3),transparent);margin:0;}
+#intro .intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:640px){#intro .intro-grid{grid-template-columns:1fr}}
+.intro-card{background:#fff;border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm);border:1.5px solid var(--cream2);}
+.intro-card-num{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--green-dark);color:#fff;font-weight:700;font-size:0.9rem;margin-bottom:12px;}
+.intro-card h3{font-family:'Noto Serif JP',serif;font-size:1.1rem;color:var(--teal);margin-bottom:14px;}
+.intro-card ul{list-style:none;}
+.intro-card ul li{padding:5px 0;font-size:0.85rem;color:var(--text-soft);line-height:1.7;display:flex;gap:8px;align-items:flex-start;}
+.intro-card ul li::before{content:'●';color:var(--blush);font-size:0.6rem;margin-top:6px;flex-shrink:0}
+.gogyo-card{background:#fff;border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm);border:1.5px solid var(--cream2);grid-column:1/-1;}
+.gogyo-card h3{font-family:'Noto Serif JP',serif;font-size:1.1rem;color:var(--teal);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.yinyang-row{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-bottom:20px}
+.yy-box{flex:1;min-width:130px;background:var(--cream);border-radius:12px;padding:14px 16px;text-align:center;border:1.5px solid var(--cream3);}
+.yy-box .yy-icon{font-size:2rem;margin-bottom:6px}.yy-box .yy-title{font-weight:700;font-size:0.95rem;margin-bottom:4px}.yy-box .yy-desc{font-size:0.78rem;color:var(--text-soft);line-height:1.6}
+.gogyo-section{margin-top:8px;}
+.gogyo-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.gogyo-tab{padding:7px 18px;border-radius:30px;font-size:0.82rem;font-family:'Noto Sans JP',sans-serif;cursor:pointer;border:2px solid var(--cream3);background:#fff;color:var(--text-soft);transition:all 0.2s;font-weight:500;}
+.gogyo-tab.active-soushou{background:var(--brown-dark);border-color:var(--brown-dark);color:#fff8f0;}
+.gogyo-tab.active-soukoku{background:#c0392b;border-color:#c0392b;color:#fff;}
+.gogyo-layout{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;}
+.gogyo-diagram-wrap{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.gogyo-svg-wrap{position:relative;width:260px;height:260px;}
+.gogyo-svg-wrap svg{width:100%;height:100%;}
+.gogyo-node{position:absolute;width:60px;height:60px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Noto Serif JP',serif;font-weight:700;font-size:0.9rem;border:3px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,0.15);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;z-index:2;user-select:none;}
+.gogyo-node:hover{transform:scale(1.1);}
+.gogyo-node .node-emoji{font-size:1.3rem;line-height:1;}
+.gogyo-node .node-label{font-size:0.78rem;line-height:1;margin-top:2px;}
+.node-moku{background:linear-gradient(135deg,#4a9e6a,#2e7d56);color:#fff;}
+.node-hi{background:linear-gradient(135deg,#e05c2a,#c0392b);color:#fff;}
+.node-do{background:linear-gradient(135deg,#c49a3c,#a07828);color:#fff;}
+.node-kin{background:linear-gradient(135deg,#a0a8b0,#6c7880);color:#fff;}
+.node-sui{background:linear-gradient(135deg,#3a80c0,#1a5a9a);color:#fff;}
+.gogyo-legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:4px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-soft);}
+.legend-line{width:28px;height:3px;border-radius:2px;}
+.legend-soushou{background:var(--brown-mid);}
+.gogyo-explain{flex:1;min-width:220px;}
+.gogyo-mode-label{font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;margin-bottom:12px;padding:8px 14px;border-radius:10px;display:inline-block;}
+.label-soushou{background:var(--brown-pale);color:var(--brown-dark);border:1.5px solid var(--brown-light);}
+.label-soukoku{background:#fdf0ee;color:#c0392b;border:1.5px solid #f0b8b0;}
+.gogyo-relation-list{display:flex;flex-direction:column;gap:8px;}
+.gogyo-rel-item{background:var(--cream);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;border-left:4px solid transparent;font-size:0.83rem;line-height:1.65;color:var(--text-soft);}
+.gogyo-rel-item.soushou{border-left-color:var(--brown-mid);}
+.gogyo-rel-item.soukoku{border-left-color:#c0392b;}
+.gogyo-rel-arrow{font-size:1rem;flex-shrink:0;}
+.gogyo-rel-text strong{color:var(--text);}
+.gogyo-summary{margin-top:16px;padding:14px 16px;background:var(--cream);border-radius:12px;font-size:0.82rem;color:var(--text-soft);line-height:1.8;border-left:3px solid var(--sage-light);}
+.gogyo-summary strong{color:var(--text);}
+.luck-tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:28px;}
+.luck-tab{padding:8px 20px;border-radius:30px;background:#fff;border:1.5px solid var(--cream3);font-size:0.85rem;color:var(--text-soft);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s;}
+.luck-tab.active,.luck-tab:hover{background:var(--brown-dark);color:#fff8f0;border-color:var(--brown-dark);}
+.luck-panel{display:none;animation:fadeIn 0.35s ease both}
+.luck-panel.active{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:600px){.luck-panel.active{grid-template-columns:1fr}}
+.luck-card{background:#fff;border-radius:var(--radius);padding:24px 20px;box-shadow:var(--shadow-sm);border:2px solid var(--cream2);}
+.luck-card-icon{font-size:2rem;margin-bottom:10px;display:block}
+.luck-card h3{font-family:'Noto Serif JP',serif;font-size:1.15rem;color:var(--teal);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.luck-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--brown-dark);color:#fff8f0;font-size:0.8rem;font-weight:700;flex-shrink:0;}
+.luck-card ul{list-style:none}
+.luck-card ul li{padding:5px 0;font-size:0.83rem;color:var(--text-soft);line-height:1.7;display:flex;gap:8px;align-items:flex-start;border-bottom:1px dashed var(--cream2);}
+.luck-card ul li:last-child{border-bottom:none}
+.luck-card ul li::before{content:'●';color:var(--blush);font-size:0.55rem;margin-top:7px;flex-shrink:0}
+.dir-section{display:flex;flex-direction:column;gap:20px;}
+.dir-hint{text-align:center;font-size:0.82rem;color:var(--teal-mid);display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;}
+.dir-hint::before,.dir-hint::after{content:'';display:block;width:24px;height:1px;background:var(--teal-light);}
+.dir-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:480px){.dir-grid{grid-template-columns:repeat(2,1fr);gap:8px;}}
+.compass-dir-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;background:#fff;border:2px solid var(--cream3);border-radius:14px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all 0.2s ease;}
+.compass-dir-btn:hover{border-color:var(--green-mid);transform:translateY(-3px);}
+.compass-dir-btn.active{background:linear-gradient(135deg,var(--brown-dark),var(--brown-mid));border-color:var(--brown-dark);}
+.dir-btn-emoji{font-size:1.5rem;line-height:1;}
+.dir-label{font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;color:var(--green-dark);line-height:1;}
+.compass-dir-btn.active .dir-label{color:#fff;}
+.dir-btn-sub{font-size:0.7rem;color:var(--text-soft);line-height:1.2;text-align:center;}
+.compass-dir-btn.active .dir-btn-sub{color:rgba(255,255,255,0.75);}
+.direction-detail{background:#fff;border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow-sm);border:1.5px solid var(--cream2);}
+.dir-detail-title{font-family:'Noto Serif JP',serif;font-size:1.5rem;font-weight:700;color:var(--teal);margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.dir-detail-element{font-size:0.82rem;color:var(--teal-mid);margin-bottom:16px;}
+.dir-detail-list{list-style:none}
+.dir-detail-list li{padding:7px 0;font-size:0.85rem;color:var(--text-soft);line-height:1.75;display:flex;gap:10px;align-items:flex-start;border-bottom:1px dashed var(--cream2);}
+.dir-detail-list li:last-child{border-bottom:none}
+.dir-detail-list li::before{content:'✦';color:var(--blush);flex-shrink:0;font-size:0.7rem;margin-top:5px}
+.color-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:560px){.color-grid{grid-template-columns:1fr 1fr}}
+.color-card{background:#fff;border-radius:14px;padding:18px 14px;cursor:pointer;border:2px solid transparent;box-shadow:var(--shadow-sm);transition:all 0.22s;position:relative;overflow:hidden;}
+.color-card:hover,.color-card.selected{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:var(--card-border);}
+.color-card .inner{position:relative;z-index:1}
+.cc-emoji{font-size:2.2rem;display:block;margin-bottom:10px;}
+.cc-name{font-family:'Noto Serif JP',serif;font-size:1rem;font-weight:700;color:var(--card-c);margin-bottom:6px;}
+.cc-desc{font-size:0.78rem;color:var(--text-soft);line-height:1.7}
+.color-detail-drawer{background:#fff;border-radius:var(--radius);padding:0;overflow:hidden;max-height:0;box-shadow:none;border:0 solid var(--cream2);transition:max-height 0.5s ease,padding 0.3s ease,box-shadow 0.3s,border-width 0.3s,margin 0.3s;margin:0;}
+.color-detail-drawer.open{max-height:400px;padding:24px 24px;box-shadow:var(--shadow-sm);border-width:1.5px;margin:4px 0 4px;}
+.cdd-title{font-family:'Noto Serif JP',serif;font-size:1.3rem;font-weight:700;margin-bottom:8px;}
+.cdd-body{font-size:0.88rem;color:var(--text-soft);line-height:1.9;margin-bottom:14px}
+.cdd-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.cdd-tag{background:var(--cream);border:1px solid var(--cream3);border-radius:20px;padding:4px 14px;font-size:0.78rem;color:var(--green-dark);}
+.cdd-luck{background:var(--cream);border-radius:10px;padding:14px 16px;font-size:0.85rem;line-height:1.75;color:var(--text);}
+.tips-row{margin-top:48px;}
+.tips-section-title{font-family:'Noto Serif JP',serif;font-size:1.05rem;font-weight:700;color:var(--teal);text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px;}
+.tips-section-title::before,.tips-section-title::after{content:'';display:block;width:36px;height:1px;background:var(--sage-light);}
+.tips-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:640px){.tips-cards{grid-template-columns:1fr}}
+.tip-card{background:#fff;border-radius:14px;padding:22px 18px;border:1.5px solid var(--cream2);box-shadow:var(--shadow-sm);}
+.tip-icon{font-size:1.8rem;margin-bottom:10px;text-align:center;}
+.tip-card-title{font-family:'Noto Serif JP',serif;font-size:0.95rem;font-weight:700;color:var(--teal);margin-bottom:8px;text-align:center;}
+.tip-text{font-size:0.82rem;color:var(--text-soft);line-height:1.75;}
+footer{text-align:center;padding:40px 20px;background:linear-gradient(135deg,#4a2818,#6b4028);color:rgba(255,248,240,0.85);font-size:0.8rem;letter-spacing:0.05em;}
+footer .foot-title{font-family:'Noto Serif JP',serif;font-size:1.1rem;color:#fff;margin-bottom:8px;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes floatPetal{0%{transform:translateY(-20px) rotate(0deg);opacity:0}10%{opacity:0.18}90%{opacity:0.18}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
+.bg-alt{background:linear-gradient(180deg,#faf5ee 0%,#fff8f2 100%)}
+.bg-green{background:linear-gradient(160deg,#f5ede0 0%,#faf5ee 100%)}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:none}
+</style>
+<section class="hero">
+  <div class="hero-petals" id="petalsContainer"></div>
+  <div style="position:relative;z-index:1">
+    <h1>風水で幸運な<br>ガーデンの作り方</h1>
+    <p class="hero-sub">✦ 風水 / 家相 ✦</p>
+    <nav class="hero-nav">
+      <a class="hero-nav-btn" href="#intro">☯ 風水とは</a>
+      <a class="hero-nav-btn" href="#lucky">🌿 運気別ポイント</a>
+      <a class="hero-nav-btn" href="#direction">🧭 方位別ポイント</a>
+      <a class="hero-nav-btn" href="#colors">🌸 花の色ポイント</a>
+    </nav>
+  </div>
+</section>
+<section id="intro" class="bg-alt"><div class="section">
+  <div class="section-header reveal"><div class="section-eyebrow">CHAPTER 1</div><h2 class="section-title">🏡 幸運な庭づくりの基本</h2><p class="section-desc">風水・家相の考え方を取り入れて、運気の流れを整えましょう</p></div>
+  <div class="intro-grid">
+    <div class="intro-card reveal"><div class="intro-card-num" style="background:var(--teal)">1</div><h3>🌬️ 風水とは</h3><ul><li>「風水」とは、自然界に満ちる「気」のエネルギーを読み解き、環境を整えることで人の運気や健康・幸福を高める古代中国発祥の環境学・地理思想です</li><li>「風」は気の流れ、「水」は気を蓄える力を象徴しており、この二つのバランスが良い場所に良い気が集まると考えます</li><li>住まい・庭・インテリア・行動・言葉・色・形など、あらゆる環境要素が気に影響を与えると考えられています</li><li>起源は古代中国の地理思想で、約4000年以上の歴史を持ちます</li></ul></div>
+    <div class="intro-card reveal"><div class="intro-card-num" style="background:var(--gold-light)">2</div><h3>🏡 庭と風水の関係</h3><ul><li>庭は家の「気」の入口であり、玄関まわりの環境が家全体の運気を大きく左右すると考えられています</li><li>「生気」（良い気）を呼び込み、「殺気」（悪い気）を遠ざけることが庭づくりの基本です</li><li>植物は大地の気を吸い上げ、空間の気を浄化・循環させる力があります</li><li>庭を清潔に保ち、枯れた植物をすぐ取り除くことが、気の滞りを防ぐ最も大切な習慣です</li></ul></div>
+    <div class="intro-card reveal"><div class="intro-card-num" style="background:var(--accent)">3</div><h3>⚡ 気（き）について</h3><ul><li>「気」とは、宇宙・自然・人間すべてに流れる生命エネルギーのことです</li><li>気には「陽の気」と「陰の気」の二種類があり、このバランスが重要です</li><li>気は風で散らばり、水で留まる性質があります</li><li>庭の気を整えることで、家の中の気も自然と良くなっていくと考えられています</li></ul></div>
+    <div class="intro-card reveal"><div class="intro-card-num" style="background:var(--gold)">4</div><h3>📖 この資料の見方</h3><ul><li><strong>運気別ポイント</strong>：仕事運・恋愛運・金運など7つのテーマごとに解説します</li><li><strong>方位別ポイント</strong>：8つの方位それぞれの特徴を活かした庭づくりのポイントを解説します</li><li><strong>花の色ポイント</strong>：花や葉の色が持つ風水的効果を解説します</li><li>まずは「どんな運気を高めたいか」を決め、「その方位に何を植えるか」を考えると効果的です</li></ul></div>
+    <div class="gogyo-card reveal">
+      <h3><span style="font-size:1.4rem">☯</span> 陰陽五行説</h3>
+      <div class="yinyang-row"><div class="yy-box"><div class="yy-icon">🌑</div><div class="yy-title" style="color:#444">陰</div><div class="yy-desc">地・暗・女・旧・裏</div></div><div style="font-size:1.5rem;color:var(--cream3)">⇄</div><div class="yy-box"><div class="yy-icon">☀️</div><div class="yy-title" style="color:var(--gold)">陽</div><div class="yy-desc">天・明・男・新・表</div></div></div>
+      <div class="gogyo-section">
+        <div style="font-family:'Noto Serif JP',serif;font-size:0.95rem;color:var(--teal);font-weight:600;margin-bottom:12px;">五行の相性 ── 相生と相剋</div>
+        <div class="gogyo-tabs"><button class="gogyo-tab active-soushou" id="tab-soushou" onclick="setGogyoMode('soushou')">🟢 相生（そうせい）― 生み出す関係</button><button class="gogyo-tab" id="tab-soukoku" onclick="setGogyoMode('soukoku')">🔴 相剋（そうこく）― 抑制する関係</button></div>
+        <div class="gogyo-layout">
+          <div class="gogyo-diagram-wrap">
+            <div class="gogyo-svg-wrap">
+              <svg id="gogyoSvg" viewBox="0 0 260 260" style="position:absolute;inset:0;overflow:visible;"><defs><marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#a87850"></path></marker><marker id="arr-r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#c0392b"></path></marker></defs>
+              <g id="soushou-lines"><line x1="130" y1="42" x2="218" y2="172" stroke="#a87850" stroke-width="2.5" marker-end="url(#arr-g)" opacity="0.9"></line><line x1="218" y1="172" x2="163" y2="228" stroke="#a87850" stroke-width="2.5" marker-end="url(#arr-g)" opacity="0.9"></line><line x1="163" y1="228" x2="97" y2="228" stroke="#a87850" stroke-width="2.5" marker-end="url(#arr-g)" opacity="0.9"></line><line x1="97" y1="228" x2="42" y2="172" stroke="#a87850" stroke-width="2.5" marker-end="url(#arr-g)" opacity="0.9"></line><line x1="42" y1="172" x2="130" y2="42" stroke="#a87850" stroke-width="2.5" marker-end="url(#arr-g)" opacity="0.9"></line></g>
+              <g id="soukoku-lines" style="display:none;"><line x1="130" y1="42" x2="163" y2="228" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)" opacity="0.9"></line><line x1="163" y1="228" x2="42" y2="172" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)" opacity="0.9"></line><line x1="42" y1="172" x2="218" y2="172" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)" opacity="0.9"></line><line x1="218" y1="172" x2="97" y2="228" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)" opacity="0.9"></line><line x1="97" y1="228" x2="130" y2="42" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="6,3" marker-end="url(#arr-r)" opacity="0.9"></line></g>
+              </svg>
+              <div class="gogyo-node node-moku" style="left:100px;top:12px;"><span class="node-emoji">🌳</span><span class="node-label">木</span></div>
+              <div class="gogyo-node node-hi" style="left:188px;top:142px;"><span class="node-emoji">🔥</span><span class="node-label">火</span></div>
+              <div class="gogyo-node node-do" style="left:133px;top:198px;"><span class="node-emoji">🟤</span><span class="node-label">土</span></div>
+              <div class="gogyo-node node-kin" style="left:67px;top:198px;"><span class="node-emoji">🥇</span><span class="node-label">金</span></div>
+              <div class="gogyo-node node-sui" style="left:12px;top:142px;"><span class="node-emoji">💧</span><span class="node-label">水</span></div>
+            </div>
+            <div class="gogyo-legend"><div class="legend-item"><div class="legend-line legend-soushou"></div>相生（生み出す）</div><div class="legend-item"><div class="legend-line" style="border-top:3px dashed #c0392b;height:0;width:28px;"></div>相剋（抑制する）</div></div>
+          </div>
+          <div class="gogyo-explain" id="gogyoExplain"></div>
+        </div>
+        <div class="gogyo-summary"><strong>庭づくりへの活かし方：</strong><br><strong>相生</strong>の組み合わせは互いに気を高め合うため、隣り合わせに植えると運気が上がります。<br><strong>相剋</strong>の組み合わせは気がぶつかりやすいため、間にグリーン（木）や石（土）で緩衝すると良いとされます。</div>
+      </div>
+    </div>
+  </div>
+</div></section>
+<hr class="divider">
+<section id="lucky" class="bg-green"><div class="section">
+  <div class="section-header reveal"><div class="section-eyebrow">CHAPTER 2</div><h2 class="section-title">🌿 運気別ポイント</h2><p class="section-desc">テーマ別の庭づくりで、叶えたい運気を高めましょう</p></div>
+  <div class="luck-tabs reveal">
+    <button class="luck-tab active" data-panel="shigoto">💼 仕事運</button>
+    <button class="luck-tab" data-panel="ningen">👥 人間関係運</button>
+    <button class="luck-tab" data-panel="renai">💕 恋愛・結婚運</button>
+    <button class="luck-tab" data-panel="katei">🏠 家庭運</button>
+    <button class="luck-tab" data-panel="kenkou">💚 健康運</button>
+    <button class="luck-tab" data-panel="beauty">✨ ビューティー運</button>
+    <button class="luck-tab" data-panel="kinun">💰 金運</button>
+  </div>
+  <div class="luck-panels">
+    <div class="luck-panel panel-shigoto active" id="panel-shigoto"><div class="luck-card"><span class="luck-card-icon">🌲</span><h3><span class="luck-badge">🌿</span>仕事運 UP のポイント</h3><ul><li>「木」の気を高める背の高い植物が効果的</li><li>オベリスクや花台で高さを演出</li><li>上向きの照明で成長の気を後押し</li><li>バードハウスなど音のある演出も◎</li></ul></div><div class="luck-card"><span class="luck-card-icon">🎯</span><h3><span class="luck-badge">📌</span>おすすめ植物・スタイル</h3><ul><li>バンブー（竹）など上に伸びる植物</li><li>ローズツリーをトレリスで誘引</li><li>木製コンテナで「木」の気を補強</li><li>淡いブルーの花もおすすめ</li></ul></div></div>
+    <div class="luck-panel panel-ningen" id="panel-ningen"><div class="luck-card"><span class="luck-card-icon">🌬️</span><h3><span class="luck-badge">👥</span>人間関係運 UP のポイント</h3><ul><li>風通しのよい庭づくりが基本</li><li>パステルオレンジやベル形の花が好相性</li><li>ひと枝に花が多い庭木で華やかに</li><li>ホースは絡ませず、すっきり収納</li></ul></div><div class="luck-card"><span class="luck-card-icon">🌼</span><h3><span class="luck-badge">📌</span>おすすめ植物・スタイル</h3><ul><li>ラティスやウォールで通気性を演出</li><li>ベル形の花：カンパニュラ、フォックスグローブ</li><li>オレンジ系の多花性の庭木</li><li>清潔感のある白い壁や柵</li></ul></div></div>
+    <div class="luck-panel panel-renai" id="panel-renai"><div class="luck-card"><span class="luck-card-icon">🌹</span><h3><span class="luck-badge">💕</span>恋愛・結婚運 UP のポイント</h3><ul><li>ピンクのバラや淡い色の花で愛情運を潤す</li><li>香りのよいハーブや軽やかな草花を取り入れる</li><li>曲線デザインの立水栓や水まわりを美しく整える</li><li>アジサイは未婚女性には避ける考え方もある</li></ul></div><div class="luck-card"><span class="luck-card-icon">💐</span><h3><span class="luck-badge">📌</span>おすすめ植物・スタイル</h3><ul><li>ピンクバラ、ラベンダー、カスミソウ</li><li>アーチや曲線フェンスで優雅に演出</li><li>おしゃれな立水栓でロマンチックな雰囲気</li><li>夜のライトアップで雰囲気を高める</li></ul></div></div>
+    <div class="luck-panel panel-katei" id="panel-katei"><div class="luck-card"><span class="luck-card-icon">🏡</span><h3><span class="luck-badge">🏠</span>家庭運 UP のポイント</h3><ul><li>「土」の気を大切に、安定感のある庭へ</li><li>イエローやオレンジを中心に明るく</li><li>花木と緑木は半々くらいでバランスよく</li><li>テラコッタや陶器の雑貨を活用</li></ul></div><div class="luck-card"><span class="luck-card-icon">🌻</span><h3><span class="luck-badge">📌</span>おすすめ植物・スタイル</h3><ul><li>マリーゴールド、ルドベキア、コスモス</li><li>円形の花壇やテラコッタ鉢で統一感を</li><li>果樹や家庭菜園も取り入れて豊かに</li><li>レンガや石畳で温かみのある空間に</li></ul></div></div>
+    <div class="luck-panel panel-kenkou" id="panel-kenkou"><div class="luck-card"><span class="luck-card-icon">🍋</span><h3><span class="luck-badge">💚</span>健康運 UP のポイント</h3><ul><li>実のなる植物は豊かさと健康の象徴</li><li>黄色やオレンジの花が特に効果的</li><li>丸い花やテラコッタ鉢で安定感を</li><li>道具類は整理整頓し、収納を清潔に</li></ul></div><div class="luck-card"><span class="luck-card-icon">🌿</span><h3><span class="luck-badge">📌</span>おすすめ植物・スタイル</h3><ul><li>レモン、ミカンなどの果樹</li><li>ハーブガーデン（バジル、ミント等）</li><li>ポットマリーゴールドで虫よけにも</li><li>清潔感ある収納スペースを確保</li></ul></div></div>
+    <div class="luck-panel panel-beauty" id="panel-beauty"><div class="luck-card"><span class="luck-card-icon">🌷</span><h3><span class="luck-badge">✨</span>ビューティー運 UP のポイント</h3><ul><li>華やかで上品な花を主役にする</li><li>センスのよいガーデン雑貨を選ぶ</li><li>上向きに咲く花やアーチと好相性</li><li>外見には赤・オレンジ・白、内面にはピンク系も◎</li></ul></div><div class="luck-card"><span class="luck-card-icon">🌺</span><h3><span class="luck-badge">📌</span>おすすめ植物・スタイル</h3><ul><li>バラ（特にアーチ仕立て）</li><li>デルフィニウム、ルピナスで高さを演出</li><li>白のガーデンファニチャーでエレガントに</li><li>ランタンやガーデンライトでムード演出</li></ul></div></div>
+    <div class="luck-panel panel-kinun" id="panel-kinun"><div class="luck-card"><span class="luck-card-icon">🌟</span><h3><span class="luck-badge">💰</span>金運 UP のポイント</h3><ul><li>黄色く丸い花が金の気を育てる</li><li>代表はヒマワリ、白を組み合わせると効果的</li><li>収納は余裕をもって美しく</li><li>噴水や水の演出、上質な雑貨もおすすめ</li></ul></div><div class="luck-card"><span class="luck-card-icon">🌻</span><h3><span class="luck-badge">📌</span>おすすめ植物・スタイル</h3><ul><li>ヒマワリ、マリーゴールド、ルドベキア</li><li>白い噴水や水盤でフォーカルポイントに</li><li>アンティーク調の白いガーデン家具</li><li>西側に黄・白系の花をまとめて配置</li></ul></div></div>
+  </div>
+</div></section>
+<hr class="divider">
+<section id="direction" class="bg-alt"><div class="section">
+  <div class="section-header reveal"><div class="section-eyebrow">CHAPTER 3</div><h2 class="section-title">🧭 方位別ポイント</h2><p class="section-desc">方位をタップして、その方向の庭づくりのポイントをチェック</p></div>
+  <div class="dir-section reveal">
+    <div class="dir-hint">👆 方位ボタンを押すとポイントが表示されます</div>
+    <div class="dir-grid">
+      <button class="compass-dir-btn" data-dir="nw"><span class="dir-btn-emoji">👑</span><span class="dir-label">北西</span><span class="dir-btn-sub">金の気<br>発展・援助</span></button>
+      <button class="compass-dir-btn active" data-dir="n"><span class="dir-btn-emoji">💧</span><span class="dir-label">北</span><span class="dir-btn-sub">水の気<br>恋愛・金運</span></button>
+      <button class="compass-dir-btn" data-dir="ne"><span class="dir-btn-emoji">🟤</span><span class="dir-label">北東</span><span class="dir-btn-sub">土の気<br>変化・継続</span></button>
+      <button class="compass-dir-btn" data-dir="e"><span class="dir-btn-emoji">🌳</span><span class="dir-label">東</span><span class="dir-btn-sub">木の気<br>仕事・恋愛</span></button>
+      <button class="compass-dir-btn" data-dir="w"><span class="dir-btn-emoji">🥇</span><span class="dir-label">西</span><span class="dir-btn-sub">金の気<br>金運・貯蓄</span></button>
+      <button class="compass-dir-btn" data-dir="sw"><span class="dir-btn-emoji">🟫</span><span class="dir-label">南西</span><span class="dir-btn-sub">土の気<br>家庭・不動産</span></button>
+      <button class="compass-dir-btn" data-dir="s"><span class="dir-btn-emoji">🔥</span><span class="dir-label">南</span><span class="dir-btn-sub">火の気<br>美・人気運</span></button>
+      <button class="compass-dir-btn" data-dir="se"><span class="dir-btn-emoji">🌬️</span><span class="dir-label">南東</span><span class="dir-btn-sub">木の気<br>出会い・縁</span></button>
+    </div>
+    <div class="direction-detail" id="dirDetail"></div>
+  </div>
+</div></section>
+<hr class="divider">
+<section id="colors" class="bg-green"><div class="section">
+  <div class="section-header reveal"><div class="section-eyebrow">CHAPTER 4</div><h2 class="section-title">🌸 花の色ポイント</h2><p class="section-desc">ラッキーカラーを上手に取り入れる — カードをタップして詳細を見る</p></div>
+  <div class="color-grid reveal" id="colorGrid"></div>
+  <div class="color-detail-drawer" id="colorDrawer"><div class="cdd-title" id="cddTitle"></div><div class="cdd-body" id="cddBody"></div><div class="cdd-tags" id="cddTags"></div><div class="cdd-luck" id="cddLuck"></div></div>
+  <div class="tips-row reveal">
+    <div class="tips-section-title">🌸 花の色・組み合わせのヒント</div>
+    <div class="tips-cards">
+      <div class="tip-card"><div class="tip-icon">🎨</div><div class="tip-card-title">テーマカラーを決める</div><div class="tip-text">まず「この庭で高めたい運気」を1つ選び、それに対応する色を主役にしましょう。金運なら黄色、恋愛運ならピンクをメインに据えると効果的です。</div></div>
+      <div class="tip-card"><div class="tip-icon">✨</div><div class="tip-card-title">強い色はアクセント使いにする</div><div class="tip-text">赤・オレンジなど気の強い色は、庭全体に広げすぎると気が乱れます。花壇の一角や鉢1〜2個など、ポイント的に使うことで効果が生まれます。</div></div>
+      <div class="tip-card"><div class="tip-icon">🌿</div><div class="tip-card-title">白やグリーンで全体を整える</div><div class="tip-text">どんな色の組み合わせでも、白い花やグリーンの葉を間に入れると気の流れがなめらかになります。どの運気の庭にも馴染む万能カラーです。</div></div>
+    </div>
+  </div>
+</div></section>
+<footer><div class="foot-title">🌿 風水で幸運なガーデンの作り方</div><p>風水 / 家相</p></footer>
+<script>
+const soushouData=[{from:'木',to:'火',fromEmoji:'🌳',toEmoji:'🔥',desc:'<strong>木が火を生む</strong>：木は燃えて火を生み出します。植物の生命エネルギーが情熱・活力を高めます。'},{from:'火',to:'土',fromEmoji:'🔥',toEmoji:'🟤',desc:'<strong>火が土を生む</strong>：火が燃え尽きると灰（土）になります。情熱が安定・土台の気を育てます。'},{from:'土',to:'金',fromEmoji:'🟤',toEmoji:'🥇',desc:'<strong>土が金を生む</strong>：土の中から鉱石・金属が生まれます。安定した土台が金運・蓄財を生みます。'},{from:'金',to:'水',fromEmoji:'🥇',toEmoji:'💧',desc:'<strong>金が水を生む</strong>：金属の表面に水が結露します。金の気が水の流れ・恋愛運を育てます。'},{from:'水',to:'木',fromEmoji:'💧',toEmoji:'🌳',desc:'<strong>水が木を生む</strong>：水が木を育てます。水の気が植物・成長・仕事運を支えます。'}];
+const soukokuData=[{from:'木',to:'土',fromEmoji:'🌳',toEmoji:'🟤',desc:'<strong>木が土を剋する</strong>：木の根が土を割り崩します。過剰な木の気は土の安定・家庭運を乱します。'},{from:'土',to:'水',fromEmoji:'🟤',toEmoji:'💧',desc:'<strong>土が水を剋する</strong>：土が水をせき止め、濁らせます。土の気が水の流れ・恋愛運を妨げます。'},{from:'水',to:'火',fromEmoji:'💧',toEmoji:'🔥',desc:'<strong>水が火を剋する</strong>：水が火を消します。水の気が火の情熱・人気運を抑制します。'},{from:'火',to:'金',fromEmoji:'🔥',toEmoji:'🥇',desc:'<strong>火が金を剋する</strong>：火が金属を溶かします。強すぎる火の気が金運・蓄財を溶かしてしまいます。'},{from:'金',to:'木',fromEmoji:'🥇',toEmoji:'🌳',desc:'<strong>金が木を剋する</strong>：金属の斧が木を切り倒します。金の気が木の成長・仕事運を阻害します。'}];
+function renderGogyoExplain(mode){const data=mode==='soushou'?soushouData:soukokuData;const labelClass=mode==='soushou'?'label-soushou':'label-soukoku';const itemClass=mode==='soushou'?'soushou':'soukoku';const labelText=mode==='soushou'?'🟢 相生（そうせい）― 生み出す・助ける関係':'🔴 相剋（そうこく）― 抑制する・弱める関係';document.getElementById('gogyoExplain').innerHTML=`<div class="gogyo-mode-label ${labelClass}">${labelText}</div><div class="gogyo-relation-list">${data.map(d=>`<div class="gogyo-rel-item ${itemClass}"><span class="gogyo-rel-arrow">${d.fromEmoji} → ${d.toEmoji}</span><span class="gogyo-rel-text">${d.desc}</span></div>`).join('')}</div>`;}
+function setGogyoMode(mode){document.getElementById('soushou-lines').style.display=mode==='soushou'?'':'none';document.getElementById('soukoku-lines').style.display=mode==='soukoku'?'':'none';document.getElementById('tab-soushou').className='gogyo-tab'+(mode==='soushou'?' active-soushou':'');document.getElementById('tab-soukoku').className='gogyo-tab'+(mode==='soukoku'?' active-soukoku':'');renderGogyoExplain(mode);}
+renderGogyoExplain('soushou');
+const petalEmojis=['🌸','🌺','🌼','🍃','🌷','✿'];
+const pc=document.getElementById('petalsContainer');
+for(let i=0;i<14;i++){const p=document.createElement('div');p.className='petal';p.textContent=petalEmojis[Math.floor(Math.random()*petalEmojis.length)];p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=(Math.random()*10)+'s';p.style.fontSize=(0.9+Math.random()*1.2)+'rem';pc.appendChild(p);}
+const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+document.querySelectorAll('.luck-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.luck-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.luck-panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');document.getElementById('panel-'+tab.dataset.panel).classList.add('active');});});
+const dirData={n:{label:'北',emoji:'💧',element:'「水」の気',tips:['「水」の気を活かして恋愛運・金運を整える','S字のラインを意識した植栽や小道がポイント','パステルピンクの小花や甘い香りの花がおすすめ','赤い花や暗い植栽は避け、夜はやさしくライトアップ']},ne:{label:'北東',emoji:'🟤',element:'「土」の気（変化と継続）',tips:['変化と継続をもたらす「土」の方位','白をベースに赤やオレンジをアクセントに','丸鉢は変化、四角鉢は安定のイメージ','段差や高低差をつけたレイアウトが効果的']},e:{label:'東',emoji:'🌳',element:'「木」の気',tips:['「木」の気が強く、仕事運・人間関係運・恋愛運に','まっすぐ上に伸びる植物や竹のような姿が好相性','愛情運にはバラ、行動力には赤やオレンジの花','木製コンテナや淡いブルーの花もおすすめ']},se:{label:'南東',emoji:'🌬️',element:'「木」の気（風・縁）',tips:['風を呼び込む方位で、出会い運や人脈運に強い','ラティスやウォールバスケットで通気性を演出','香りの強いハーブや多色使いの花が効果的','スタンドやライトアップ、季節ごとの変化も◎']},s:{label:'南',emoji:'🔥',element:'「火」の気',tips:['「火」の気で美しさや人気運を高める','対になる飾り方や背の高い植物が効果的','葉もの中心にシンプルにまとめる','白やグリーン系の花が好相性、強すぎる赤は控えめに']},sw:{label:'南西',emoji:'🟫',element:'「土」の気（家庭・不動産）',tips:['「土」の大地の気で家庭運・不動産運を整える','低い位置の植栽や低木を重視','果樹や家庭菜園、四角い陶器鉢が好相性','クリーム、イエロー、オレンジで温かく素朴に']},w:{label:'西',emoji:'🥇',element:'「金」の気',tips:['「金」の気で金運・貯蓄運を高める','丸い形や低いレイアウトを意識','ヒマワリ、マリーゴールド、丸いトピアリーが有効','白から黄色のグラデーション、果樹もおすすめ']},nw:{label:'北西',emoji:'👑',element:'「金」の気（主人・発展）',tips:['主人の方位。発展運・援助運・金運に関わる','高級感・品のよさ・統一感がキーワード','上質なツールやコンテナで整える','盆栽や横に広がる安定感のある仕立てとも好相性']}};
+function renderDir(key){const d=dirData[key];const el=document.getElementById('dirDetail');el.innerHTML=`<div class="dir-detail-title"><span>${d.emoji}</span> ${d.label}</div><div class="dir-detail-element">✦ ${d.element}</div><ul class="dir-detail-list">${d.tips.map(t=>`<li>${t}</li>`).join('')}</ul>`;}
+renderDir('n');
+document.querySelectorAll('.compass-dir-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.compass-dir-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDir(btn.dataset.dir);});});
+const colors=[{key:'pink',name:'ピンク',emoji:'🌸',c:'#e8547a',bg:'rgba(255,230,238,0.6)',border:'#f4b8c8',short:'愛情・やさしさを象徴し、恋愛運に◎',body:'ピンクは愛と優しさのエネルギーを持つ色。人との絆を深め、温かな関係を育んでくれます。',tags:['恋愛運','やさしさ','美容運'],luck:'恋愛運を高め、出会いや縁結びに良いとされます。'},{key:'yellow',name:'イエロー',emoji:'🌻',c:'#c49000',bg:'rgba(255,248,210,0.6)',border:'#f5e088',short:'楽しく豊かな暮らし、金運に◎',body:'イエローは明るさと活力のシンボル。太陽のエネルギーを取り込み、金運や対人運をアップさせてくれます。',tags:['金運','明るさ','対人運'],luck:'金運・財運を引き寄せる力が強い色。玄関先や南東の方角に置くと効果的です。'},{key:'orange',name:'オレンジ',emoji:'🌼',c:'#d96020',bg:'rgba(255,235,210,0.6)',border:'#f6c48a',short:'気持ちを明るくし、新しい出会いを運ぶ',body:'オレンジは陽気さと積極性のエネルギー。新しい出会いや変化をもたらし、社交運を高めます。',tags:['社交運','出会い','行動力'],luck:'人との出会いや新しいチャンスを呼び込む色です。'},{key:'red',name:'レッド',emoji:'🌹',c:'#b82020',bg:'rgba(255,230,230,0.6)',border:'#f0b0a8',short:'強い陽の気と生命力のシンボル',body:'レッドは最も強い陽のエネルギーを持つ色。活力と情熱を象徴し、勝負運や仕事運を後押しします。',tags:['勝負運','情熱','生命力'],luck:'活力と強い意志をもたらします。玄関や南向きの場所に配置すると良いとされます。'},{key:'blue',name:'ブルー',emoji:'💙',c:'#2a6aaf',bg:'rgba(220,235,255,0.6)',border:'#a8c8f0',short:'仕事運を支え、やる気を促す',body:'ブルーは集中力と知性のエネルギー。仕事や学業での成功を後押しし、冷静な判断力を高めます。',tags:['仕事運','集中力','学業運'],luck:'知性と集中力を高め、仕事や試験での成功をサポートします。'},{key:'green',name:'グリーン',emoji:'🌿',c:'#2a7a40',bg:'rgba(215,245,220,0.6)',border:'#a0d4b0',short:'気を清浄化し、心身を健やかにする',body:'グリーンは自然と癒しのエネルギー。心と体のバランスを整え、健康運を高めます。',tags:['健康運','癒し','浄化'],luck:'心身を癒し、健康運を高める色。庭や室内植物として取り入れることで生命力が増します。'},{key:'purple',name:'パープル',emoji:'💜',c:'#7040b0',bg:'rgba(235,220,255,0.6)',border:'#c8a8f0',short:'自分を引き上げ、品格を高める',body:'パープルは高貴さと精神性のエネルギー。自己成長や品格の向上に働きかけ、直感力を磨きます。',tags:['精神力','品格','直感力'],luck:'自己成長と品格向上を促す色です。'},{key:'white',name:'ホワイト',emoji:'🌾',c:'#4a8060',bg:'rgba(240,250,240,0.6)',border:'#b8d8b8',short:'清浄化の力が強く、他の色も後押しする',body:'ホワイトは最も純粋な浄化のエネルギー。場のエネルギーをリセットし、他の色の効果を引き立てます。',tags:['浄化','純粋','空間整え'],luck:'場のエネルギーを浄化し、すべての運気の土台を整える色。どの色とも相性が良いです。'}];
+const grid=document.getElementById('colorGrid');const drawer=document.getElementById('colorDrawer');let openKey=null;
+colors.forEach((c,i)=>{const card=document.createElement('div');card.className='color-card';card.style.setProperty('--card-c',c.c);card.style.setProperty('--card-bg',c.bg);card.style.setProperty('--card-border',c.border);card.innerHTML=`<div class="inner"><span class="cc-emoji">${c.emoji}</span><div class="cc-name">${c.name}</div><div class="cc-desc">${c.short}</div></div>`;card.addEventListener('click',()=>{if(openKey===c.key){drawer.classList.remove('open');card.classList.remove('selected');openKey=null;return;}document.querySelectorAll('.color-card').forEach(cc=>cc.classList.remove('selected'));card.classList.add('selected');openKey=c.key;document.getElementById('cddTitle').innerHTML='<span style="margin-right:6px">'+c.emoji+'</span>'+c.name;document.getElementById('cddTitle').style.color=c.c;document.getElementById('cddBody').textContent=c.body;document.getElementById('cddTags').innerHTML=c.tags.map(t=>`<span class="cdd-tag">${t}</span>`).join('');document.getElementById('cddLuck').innerHTML='✦ 運気・効果：'+c.luck;drawer.classList.add('open');});grid.appendChild(card);});
+function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},'*');}
+window.addEventListener('load',sendHeight);window.addEventListener('resize',sendHeight);setInterval(sendHeight,1000);
+</script>
+</body>
+</html>
