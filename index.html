@@ -28,8 +28,8 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            padding: 16px 16px 40px;
+            align-items: center;
+            padding: 16px;
         }
 
         /* 背景テクスチャ */
@@ -70,10 +70,12 @@
         #topScreen {
             position: relative;
             min-height: 580px;
-            display: flex;
             flex-direction: column;
             overflow: hidden;
             background: #F5EFE6;
+        }
+        #topScreen.active {
+            display: flex !important;
         }
         .top-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
         .top-bg-circle1 {
@@ -468,8 +470,11 @@
         .btn-close:hover { background: #E0DDD8; transform: rotate(90deg); }
 
         /* scrollbar */
+        #resultScreen::-webkit-scrollbar,
         .modal-sheet::-webkit-scrollbar { width:6px; }
+        #resultScreen::-webkit-scrollbar-track,
         .modal-sheet::-webkit-scrollbar-track { background:#f1f1f1; }
+        #resultScreen::-webkit-scrollbar-thumb,
         .modal-sheet::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
 
         @media (max-width:480px) {
@@ -627,7 +632,11 @@
 </div>
 
 <script>
-
+// iframe高さ自動調整
+function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},'*');}
+window.addEventListener('load',sendHeight);
+window.addEventListener('resize',sendHeight);
+setInterval(sendHeight,500);
 
 const questions = [
     {
