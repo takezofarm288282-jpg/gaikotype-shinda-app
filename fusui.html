@@ -149,10 +149,10 @@ footer .foot-title{font-family:'Noto Serif JP',serif;font-size:1.1rem;color:#fff
     <h1>風水で幸運な<br>ガーデンの作り方</h1>
     <p class="hero-sub">✦ 風水 / 家相 ✦</p>
     <nav class="hero-nav">
-      <a class="hero-nav-btn" href="#intro">☯ 風水とは</a>
-      <a class="hero-nav-btn" href="#lucky">🌿 運気別ポイント</a>
-      <a class="hero-nav-btn" href="#direction">🧭 方位別ポイント</a>
-      <a class="hero-nav-btn" href="#colors">🌸 花の色ポイント</a>
+      <button class="hero-nav-btn" onclick="document.querySelector('#intro').scrollIntoView({behavior:'smooth'})">☯ 風水とは</button>
+      <button class="hero-nav-btn" onclick="document.querySelector('#lucky').scrollIntoView({behavior:'smooth'})">🌿 運気別ポイント</button>
+      <button class="hero-nav-btn" onclick="document.querySelector('#direction').scrollIntoView({behavior:'smooth'})">🧭 方位別ポイント</button>
+      <button class="hero-nav-btn" onclick="document.querySelector('#colors').scrollIntoView({behavior:'smooth'})">🌸 花の色ポイント</button>
     </nav>
   </div>
 </section>
@@ -267,6 +267,18 @@ const grid=document.getElementById('colorGrid');const drawer=document.getElement
 colors.forEach((c,i)=>{const card=document.createElement('div');card.className='color-card';card.style.setProperty('--card-c',c.c);card.style.setProperty('--card-bg',c.bg);card.style.setProperty('--card-border',c.border);card.innerHTML=`<div class="inner"><span class="cc-emoji">${c.emoji}</span><div class="cc-name">${c.name}</div><div class="cc-desc">${c.short}</div></div>`;card.addEventListener('click',()=>{if(openKey===c.key){drawer.classList.remove('open');card.classList.remove('selected');openKey=null;return;}document.querySelectorAll('.color-card').forEach(cc=>cc.classList.remove('selected'));card.classList.add('selected');openKey=c.key;document.getElementById('cddTitle').innerHTML='<span style="margin-right:6px">'+c.emoji+'</span>'+c.name;document.getElementById('cddTitle').style.color=c.c;document.getElementById('cddBody').textContent=c.body;document.getElementById('cddTags').innerHTML=c.tags.map(t=>`<span class="cdd-tag">${t}</span>`).join('');document.getElementById('cddLuck').innerHTML='✦ 運気・効果：'+c.luck;drawer.classList.add('open');});grid.appendChild(card);});
 function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},'*');}
 window.addEventListener('load',sendHeight);window.addEventListener('resize',sendHeight);setInterval(sendHeight,1000);
+
+// ナビボタンのスムーススクロール
+document.querySelectorAll('.hero-nav-btn').forEach(function(btn){
+  btn.addEventListener('click',function(e){
+    var href=this.getAttribute('href');
+    if(href&&href.startsWith('#')){
+      e.preventDefault();
+      var target=document.querySelector(href);
+      if(target){target.scrollIntoView({behavior:'smooth',block:'start'});}
+    }
+  });
+});
 </script>
 </body>
 </html>
