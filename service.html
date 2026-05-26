@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サービスの流れ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--br-darkest:#2c1a0e;--br-dark:#3b2314;--br-mid:#6b4030;--br-soft:#9b7355;--br-muted:#b8967e;--br-border:#d4bfb0;--br-light:#ede0d4;--br-pale:#f5ede4;--br-cream:#faf5f0;--br-white:#fffcfa;}
+.tf-section{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif;font-weight:400;color:var(--br-dark);background:#fff;padding:80px 24px 96px;}
+.tf-header{text-align:center;margin-bottom:68px}
+.tf-header-en{display:block;font-size:11px;letter-spacing:.45em;color:var(--br-soft);margin-bottom:12px;font-weight:500;}
+.tf-header-ja{display:block;font-size:26px;font-weight:700;color:var(--br-darkest);letter-spacing:.08em;margin-bottom:22px;}
+.tf-ornament{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:30px;}
+.tf-ornament::before,.tf-ornament::after{content:"";display:block;width:48px;height:1px;background:var(--br-border);}
+.tf-ornament-inner{display:flex;align-items:center;gap:6px;}
+.tf-ornament-dot{width:4px;height:4px;border-radius:50%;background:var(--br-muted);}
+.tf-ornament-long{width:20px;height:1px;background:var(--br-muted);}
+.tf-header-lead{max-width:680px;margin:0 auto;font-size:14.5px;line-height:2.1;color:var(--br-dark);text-align:left;}
+.tf-timeline{max-width:740px;margin:0 auto;position:relative;}
+.tf-timeline::before{content:"";position:absolute;top:0;bottom:0;left:19px;width:1px;background:linear-gradient(to bottom,transparent 0%,var(--br-border) 6%,var(--br-border) 94%,transparent 100%);}
+.tf-step{display:flex;padding-bottom:36px;position:relative;opacity:0;transform:translateY(18px);animation:tfIn .55s ease forwards;}
+.tf-step:last-child{padding-bottom:0}
+.tf-step:nth-child(1){animation-delay:.05s}.tf-step:nth-child(2){animation-delay:.12s}.tf-step:nth-child(3){animation-delay:.19s}.tf-step:nth-child(4){animation-delay:.26s}.tf-step:nth-child(5){animation-delay:.33s}.tf-step:nth-child(6){animation-delay:.40s}.tf-step:nth-child(7){animation-delay:.47s}
+@keyframes tfIn{to{opacity:1;transform:translateY(0)}}
+.tf-num{flex-shrink:0;width:39px;height:39px;border-radius:50%;border:1px solid var(--br-muted);background:var(--br-cream);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;margin-right:26px;margin-top:3px;}
+.tf-num span{font-size:13px;font-weight:700;color:var(--br-soft);letter-spacing:.06em;}
+.tf-card{flex:1;background:var(--br-white);border:1px solid var(--br-border);border-left:3px solid var(--br-muted);border-radius:0 3px 3px 0;padding:20px 26px 22px;}
+.tf-step-meta{display:flex;align-items:center;gap:12px;margin-bottom:9px;}
+.tf-step-badge{font-size:10px;letter-spacing:.2em;color:var(--br-muted);font-weight:500;text-transform:uppercase;}
+.tf-divider{width:1px;height:12px;background:var(--br-border);}
+.tf-step-title{font-size:16.5px;font-weight:700;color:var(--br-darkest);letter-spacing:.03em;}
+.tf-step-body{font-size:14px;line-height:2.0;color:var(--br-dark);}
+.tf-note{display:block;margin-top:6px;font-size:13px;color:var(--br-mid);}
+.tf-prices{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.tf-price{display:inline-block;font-size:12.5px;font-weight:500;color:var(--br-dark);background:var(--br-pale);border:1px solid var(--br-border);border-radius:2px;padding:5px 14px;}
+.tf-complete{display:flex;align-items:center;gap:12px;background:var(--br-cream);border:1px solid var(--br-border);border-radius:3px;padding:14px 18px;margin-top:4px;}
+.tf-complete-mark{width:26px;height:26px;border-radius:50%;background:var(--br-mid);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.tf-complete-text{font-size:14.5px;font-weight:700;color:var(--br-darkest);letter-spacing:.04em;}
+.tf-price-toggle{display:inline-flex;align-items:center;gap:7px;margin-top:13px;padding:7px 16px 7px 14px;background:var(--br-pale);border:1px solid var(--br-border);border-radius:3px;cursor:pointer;font-size:13px;font-weight:500;color:var(--br-mid);letter-spacing:.04em;transition:background .2s;user-select:none;}
+.tf-price-toggle:hover{background:var(--br-light);}
+.tf-toggle-arrow{display:inline-block;font-size:10px;color:var(--br-soft);transition:transform .25s;line-height:1;}
+.tf-toggle-arrow.open{transform:rotate(180deg);}
+.tf-price-table-wrap{overflow:hidden;max-height:0;transition:max-height .35s ease;}
+.tf-price-table-wrap.open{max-height:800px;}
+.tf-price-table-inner{margin-top:14px;border:1px solid var(--br-border);border-radius:3px;overflow:hidden;}
+.tf-ptable{width:100%;border-collapse:collapse;font-size:13px;}
+.tf-ptable-head{background:var(--br-mid);}
+.tf-ptable-head th{padding:10px 12px;color:#fff;font-weight:500;letter-spacing:.06em;border-right:1px solid rgba(255,255,255,.2);text-align:center;font-size:12.5px;}
+.tf-ptable-head th:last-child{border-right:none;}
+.tf-ptable tbody tr{border-bottom:1px solid var(--br-border);}
+.tf-ptable tbody tr:last-child{border-bottom:none;}
+.tf-ptable tbody tr:nth-child(even){background:var(--br-cream);}
+.tf-ptable tbody tr:nth-child(odd){background:var(--br-white);}
+.tf-ptable td{padding:9px 12px;color:var(--br-dark);border-right:1px solid var(--br-border);vertical-align:top;font-size:13px;line-height:1.75;}
+.tf-ptable td:last-child{border-right:none;}
+.td-region{font-weight:500;text-align:center;color:var(--br-darkest);vertical-align:middle;}
+.td-center{text-align:center;vertical-align:middle;}
+.td-price{text-align:right;vertical-align:middle;font-weight:500;white-space:nowrap;}
+.td-sub{font-size:12px;color:var(--br-soft);text-align:center;vertical-align:middle;background:var(--br-pale) !important;}
+.td-sub-price{text-align:right;vertical-align:middle;font-size:12.5px;color:var(--br-mid);background:var(--br-pale) !important;}
+.tf-ptable-foot{background:var(--br-cream);border-top:1px solid var(--br-border);padding:10px 14px;font-size:12px;color:var(--br-soft);line-height:1.7;}
+@media(max-width:600px){.tf-section{padding:60px 16px 70px}.tf-header-ja{font-size:22px}.tf-timeline::before{left:17px}.tf-num{width:35px;height:35px;margin-right:18px}.tf-card{padding:16px 18px 18px}.tf-step-title{font-size:15px}.tf-ptable th,.tf-ptable td{padding:8px 8px;font-size:12px;}}
+</style>
+</head>
+<body>
+<section class="tf-section">
+  <div class="tf-header">
+    <span class="tf-header-en">Service Flow</span>
+    <span class="tf-header-ja">サービスの流れ</span>
+    <div class="tf-ornament"><div class="tf-ornament-inner"><span class="tf-ornament-dot"></span><span class="tf-ornament-long"></span><span class="tf-ornament-dot"></span></div></div>
+    <p class="tf-header-lead">新築外構・お庭リフォームをご検討中の方へ。Takezo Farmでは、ご相談から工事完了までの流れをわかりやすくご説明します。</p>
+  </div>
+  <div class="tf-timeline">
+    <div class="tf-step"><div class="tf-num"><span>01</span></div><div class="tf-card"><div class="tf-step-meta"><span class="tf-step-badge">Step 1</span><span class="tf-divider"></span><span class="tf-step-title">体験展示場で自由見学</span></div><p class="tf-step-body">いつでも体験展示場で外構エクステリアや植栽を体験ください。無人なので気軽にお立ち寄りください。</p></div></div>
+    <div class="tf-step"><div class="tf-num"><span>02</span></div><div class="tf-card"><div class="tf-step-meta"><span class="tf-step-badge">Step 2</span><span class="tf-divider"></span><span class="tf-step-title">ご相談予約（完全予約制）</span></div><p class="tf-step-body">具体的なご相談内容は、専門プランナーが承ります。このサイトから予約してご要望や理想の生活スタイルについてお聞かせください。<br><span class="tf-note">※持ち物：図面・施工現場の写真</span></p></div></div>
+    <div class="tf-step"><div class="tf-num"><span>03</span></div><div class="tf-card"><div class="tf-step-meta"><span class="tf-step-badge">Step 3</span><span class="tf-divider"></span><span class="tf-step-title">現地調査</span></div><p class="tf-step-body" style="margin-bottom:0">地域によって料金が異なります。</p>
+      <div class="tf-price-toggle" id="tf-price-btn" onclick="tfTogglePrice()"><span>現地調査料金表を見る（税込）</span><span class="tf-toggle-arrow" id="tf-arrow">▼</span></div>
+      <div class="tf-price-table-wrap" id="tf-price-table"><div class="tf-price-table-inner"><table class="tf-ptable"><thead class="tf-ptable-head"><tr><th style="width:18%">地域</th><th style="width:38%">詳細</th><th style="width:22%">図面有</th><th style="width:22%">図面無</th></tr></thead><tbody><tr><td class="td-region">出雲市</td><td class="td-center">全域</td><td class="td-price">¥3,000</td><td class="td-price">¥5,000</td></tr><tr><td class="td-region" rowspan="2">松江市</td><td style="font-size:12.5px;line-height:1.85;color:var(--br-mid)">・宍道町・玉湯町・乃白町・田和山町・浜乃木・乃木福富町</td><td class="td-price">¥4,000</td><td class="td-price">¥8,000</td></tr><tr><td class="td-sub">その他</td><td class="td-sub-price">¥5,000</td><td class="td-sub-price">¥10,000</td></tr><tr><td class="td-region" rowspan="2">雲南市</td><td style="font-size:12.5px;line-height:1.85;color:var(--br-mid)">・加茂町・三刀屋町・大東町・木次町</td><td class="td-price">¥4,000</td><td class="td-price">¥8,000</td></tr><tr><td class="td-sub">その他</td><td class="td-sub-price">¥5,000</td><td class="td-sub-price">¥10,000</td></tr><tr><td class="td-region" rowspan="2">大田市</td><td style="font-size:12.5px;line-height:1.85;color:var(--br-mid)">・朝山町・波根町・久手町・大田町</td><td class="td-price">¥4,000</td><td class="td-price">¥8,000</td></tr><tr><td class="td-sub">その他</td><td class="td-sub-price">¥5,000</td><td class="td-sub-price">¥10,000</td></tr></tbody></table><div class="tf-ptable-foot">※上記以外の地域についてはお気軽にご相談ください。</div></div></div>
+    </div></div>
+    <div class="tf-step"><div class="tf-num"><span>04</span></div><div class="tf-card"><div class="tf-step-meta"><span class="tf-step-badge">Step 4</span><span class="tf-divider"></span><span class="tf-step-title">プランニング・概算お見積り</span></div><p class="tf-step-body">理想の暮らしやデザインに最適なプランニングの概略について概算を合わせてご提案します。</p></div></div>
+    <div class="tf-step"><div class="tf-num"><span>05</span></div><div class="tf-card"><div class="tf-step-meta"><span class="tf-step-badge">Step 5</span><span class="tf-divider"></span><span class="tf-step-title">プラン申し込み</span></div><div class="tf-prices"><span class="tf-price">VR無し　¥50,000-</span><span class="tf-price">VR有り　¥60,000-（準備中）</span></div><p class="tf-step-body" style="margin-top:13px">概算お見積りをご確認後、当社でお話を進めたいとご判断いただいた場合はプラン申し込みをしていただきます。<span class="tf-note">※申し込み料金は契約時は工事金額に含まれます。</span></p></div></div>
+    <div class="tf-step"><div class="tf-num"><span>06</span></div><div class="tf-card"><div class="tf-step-meta"><span class="tf-step-badge">Step 6</span><span class="tf-divider"></span><span class="tf-step-title">ご契約</span></div><p class="tf-step-body">重要事項説明書を説明・ご理解の上、ご契約となります。</p></div></div>
+    <div class="tf-step"><div class="tf-num"><span>07</span></div><div class="tf-card"><div class="tf-step-meta"><span class="tf-step-badge">Step 7</span><span class="tf-divider"></span><span class="tf-step-title">工事開始</span></div><div class="tf-complete"><div class="tf-complete-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div><span class="tf-complete-text">あなたの理想の庭づくりがスタート！</span></div></div></div>
+  </div>
+</section>
+<script>
+var tfPriceOpen=false;
+function tfTogglePrice(){
+  tfPriceOpen=!tfPriceOpen;
+  var t=document.getElementById("tf-price-table");
+  var a=document.getElementById("tf-arrow");
+  var b=document.getElementById("tf-price-btn");
+  if(tfPriceOpen){t.classList.add("open");a.classList.add("open");b.querySelector("span").textContent="料金表を閉じる";}
+  else{t.classList.remove("open");a.classList.remove("open");b.querySelector("span").textContent="現地調査料金表を見る（税込）";}
+}
+</script>
+</body>
+</html>
