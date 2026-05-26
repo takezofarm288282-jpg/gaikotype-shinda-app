@@ -149,10 +149,10 @@ footer .foot-title{font-family:'Noto Serif JP',serif;font-size:1.1rem;color:#fff
     <h1>風水で幸運な<br>ガーデンの作り方</h1>
     <p class="hero-sub">✦ 風水 / 家相 ✦</p>
     <nav class="hero-nav">
-      <button class="hero-nav-btn" onclick="document.querySelector('#intro').scrollIntoView({behavior:'smooth'})">☯ 風水とは</button>
-      <button class="hero-nav-btn" onclick="document.querySelector('#lucky').scrollIntoView({behavior:'smooth'})">🌿 運気別ポイント</button>
-      <button class="hero-nav-btn" onclick="document.querySelector('#direction').scrollIntoView({behavior:'smooth'})">🧭 方位別ポイント</button>
-      <button class="hero-nav-btn" onclick="document.querySelector('#colors').scrollIntoView({behavior:'smooth'})">🌸 花の色ポイント</button>
+      <button class="hero-nav-btn" onclick="fusuiScrollTo('intro')">☯ 風水とは</button>
+      <button class="hero-nav-btn" onclick="fusuiScrollTo('lucky')">🌿 運気別ポイント</button>
+      <button class="hero-nav-btn" onclick="fusuiScrollTo('direction')">🧭 方位別ポイント</button>
+      <button class="hero-nav-btn" onclick="fusuiScrollTo('colors')">🌸 花の色ポイント</button>
     </nav>
   </div>
 </section>
@@ -268,17 +268,19 @@ colors.forEach((c,i)=>{const card=document.createElement('div');card.className='
 function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},'*');}
 window.addEventListener('load',sendHeight);window.addEventListener('resize',sendHeight);setInterval(sendHeight,1000);
 
-// ナビボタンのスムーススクロール
-document.querySelectorAll('.hero-nav-btn').forEach(function(btn){
-  btn.addEventListener('click',function(e){
-    var href=this.getAttribute('href');
-    if(href&&href.startsWith('#')){
-      e.preventDefault();
-      var target=document.querySelector(href);
-      if(target){target.scrollIntoView({behavior:'smooth',block:'start'});}
-    }
-  });
-});
+// ナビボタンのスクロール関数
+function fusuiScrollTo(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var offsetTop = el.getBoundingClientRect().top + window.pageYOffset;
+  if (window !== window.top) {
+    // iframe内 → 親ページにスクロール指示を送る
+    window.parent.postMessage({fusuiScrollTo: offsetTop}, '*');
+  } else {
+    // 直接表示の場合
+    el.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
 </script>
 </body>
 </html>
