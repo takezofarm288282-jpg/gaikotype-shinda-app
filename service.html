@@ -96,5 +96,11 @@ function tfTogglePrice(){
   else{t.classList.remove("open");a.classList.remove("open");b.querySelector("span").textContent="現地調査料金表を見る（税込）";}
 }
 </script>
+<script>
+function sendHeight(){window.parent.postMessage({frameHeight:document.body.scrollHeight},"*");}
+window.addEventListener("load",sendHeight);
+window.addEventListener("resize",sendHeight);
+setInterval(sendHeight,500);
+</script>
 </body>
 </html>
