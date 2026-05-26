@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>あなたの外構タイプ性格診断</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green:   #3D6B4F;
+            --orange:  #C96A2B;
+            --blue:    #2A4F8C;
+            --gold:    #8A6520;
+            --ink:     #1C1C1C;
+            --mist:    #F4F2EE;
+            --paper:   #FDFBF8;
+            --accent:  #3D6B4F;
+            --radius:  18px;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--mist);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        /* 背景テクスチャ */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(61,107,79,.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(138,101,32,.06) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 480px;
+            background: var(--paper);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow:
+                0 2px 4px rgba(0,0,0,.04),
+                0 8px 24px rgba(0,0,0,.08),
+                0 32px 64px rgba(0,0,0,.10);
+            position: relative;
+            margin: 0 auto;
+        }
+
+        /* ======== 画面共通 ======== */
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeUp .45s cubic-bezier(.22,1,.36,1); }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(18px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        /* ======== TOP ======== */
+        #topScreen {
+            position: relative;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #F5EFE6;
+        }
+        .top-bg { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+        .top-bg-circle1 {
+            position:absolute; width:320px; height:320px; border-radius:50%;
+            background:radial-gradient(circle,rgba(196,169,130,.28) 0%,transparent 70%);
+            top:-80px; right:-80px;
+        }
+        .top-bg-circle2 {
+            position:absolute; width:220px; height:220px; border-radius:50%;
+            background:radial-gradient(circle,rgba(160,130,95,.18) 0%,transparent 70%);
+            bottom:60px; left:-60px;
+        }
+        .top-bg-line {
+            position:absolute; bottom:0; left:0; right:0; height:160px;
+            background:linear-gradient(to top,rgba(180,148,105,.12),transparent);
+        }
+        .top-brand { padding:48px 36px 0; position:relative; z-index:1; }
+        .top-eyebrow {
+            font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+            color:#9A7D5A; margin-bottom:32px;
+            display:flex; align-items:center; gap:10px;
+        }
+        .top-eyebrow::after { content:''; flex:1; height:1px; background:rgba(154,125,90,.3); }
+        .top-center {
+            flex:1; display:flex; flex-direction:column;
+            justify-content:center; align-items:center;
+            padding:32px 36px; text-align:center; position:relative; z-index:1;
+        }
+        .top-frame {
+            border:1px solid rgba(154,125,90,.35); border-radius:24px;
+            padding:40px 28px 36px; width:100%; position:relative;
+            background:rgba(255,252,248,.6);
+        }
+        .top-frame::before {
+            content:''; position:absolute; top:-1px; left:32px; right:32px; height:1px;
+            background:linear-gradient(90deg,transparent,rgba(196,169,130,.7),transparent);
+        }
+        .top-deco { font-size:11px; letter-spacing:.15em; color:#B8977A; margin-bottom:20px; }
+        .top-title {
+            font-family:'Shippori Mincho',serif; font-size:30px; font-weight:700;
+            color:#3A2E22; line-height:1.5; margin-bottom:20px; letter-spacing:.04em;
+        }
+        .top-divider {
+            width:40px; height:1px;
+            background:linear-gradient(90deg,transparent,#B8977A,transparent);
+            margin:0 auto 20px;
+        }
+        .top-sub { font-size:13px; color:#8A7060; line-height:1.9; margin-bottom:32px; }
+        .btn-start {
+            background:#3A2E22; color:#F5EFE6; border:none;
+            padding:16px 48px; font-size:14px; font-weight:500;
+            font-family:'Noto Sans JP',sans-serif; border-radius:50px; cursor:pointer;
+            letter-spacing:.1em; transition:background .25s,transform .2s,box-shadow .25s;
+            box-shadow:0 4px 20px rgba(58,46,34,.25);
+        }
+        .btn-start:hover { background:#5A4432; transform:translateY(-2px); box-shadow:0 8px 28px rgba(58,46,34,.30); }
+        .btn-start:active { transform:translateY(0); }
+        .time-note { margin-top:18px; font-size:11px; color:#B0967A; letter-spacing:.08em; }
+        .top-footer { padding:0 36px 36px; display:flex; justify-content:center; gap:16px; position:relative; z-index:1; }
+        .top-tag {
+            font-size:11px; color:#A08060; padding:5px 14px;
+            border:1px solid rgba(160,128,96,.3); border-radius:20px;
+            background:rgba(255,252,248,.5); letter-spacing:.04em;
+        }
+
+        /* ======== QUIZ ======== */
+        #quizScreen { min-height: 520px; }
+
+        .progress-wrap {
+            height: 4px;
+            background: #E8E4DD;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), #6AAF82);
+            width: 0%;
+            transition: width .5s cubic-bezier(.22,1,.36,1);
+        }
+
+        .quiz-inner {
+            padding: 40px 32px;
+        }
+
+        .q-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .q-num {
+            font-size: 12px;
+            letter-spacing: .1em;
+            color: #aaa;
+        }
+
+        .q-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #E0DDD8;
+            transition: background .3s;
+        }
+        .dot.done { background: var(--green); }
+        .dot.current { background: var(--ink); }
+
+        .q-text {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1.55;
+            margin-bottom: 32px;
+        }
+
+        .answers { display: flex; flex-direction: column; gap: 12px; }
+
+        .answer-btn {
+            background: var(--paper);
+            border: 1.5px solid #E0DDD8;
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            text-align: left;
+            transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .answer-btn:hover {
+            border-color: var(--ink);
+            background: #F7F5F1;
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,.07);
+        }
+        .answer-btn:active { transform: scale(.98); }
+
+        .ans-icon { font-size: 26px; flex-shrink: 0; margin-top: 1px; }
+        .ans-text { font-size: 14px; color: #444; line-height: 1.65; }
+
+        /* ======== RESULT ======== */
+        #resultScreen { overflow-y: auto; max-height: 92vh; }
+
+        .result-hero {
+            padding: 48px 32px 36px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,.12));
+            pointer-events: none;
+        }
+
+        .result-hero.type-a { background: linear-gradient(135deg,#3D6B4F,#5A9E6F); }
+        .result-hero.type-b { background: linear-gradient(135deg,#C96A2B,#E8964E); }
+        .result-hero.type-c { background: linear-gradient(135deg,#2A4F8C,#4A74B8); }
+        .result-hero.type-d { background: linear-gradient(135deg,#8A6520,#BF9040); }
+
+        .r-icon {
+            font-size: 72px;
+            margin-bottom: 14px;
+            display: block;
+            animation: popIn .6s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes popIn {
+            from { opacity:0; transform:scale(.3); }
+            to   { opacity:1; transform:scale(1); }
+        }
+
+        .r-type-label {
+            font-size: 11px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.75);
+            margin-bottom: 10px;
+        }
+
+        .r-title {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .r-catch {
+            font-size: 14px;
+            color: rgba(255,255,255,.88);
+            line-height: 1.7;
+        }
+
+        .result-body { padding: 32px; }
+
+        .r-section { margin-bottom: 32px; }
+
+        .r-section-title {
+            font-size: 13px;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 14px;
+        }
+
+        .r-section p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.9;
+        }
+
+        .feature-list { list-style: none; }
+        .feature-list li {
+            padding: 13px 0 13px 28px;
+            position: relative;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.65;
+            border-bottom: 1px solid #F0EDE8;
+        }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list li::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 20px;
+            width: 10px; height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .check-list { list-style: none; }
+        .check-list li {
+            background: var(--mist);
+            border-radius: 14px;
+            padding: 16px 16px 16px 52px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #444;
+            line-height: 1.7;
+            position: relative;
+        }
+        .check-list li::before {
+            content: attr(data-step);
+            position: absolute;
+            left: 16px; top: 16px;
+            width: 24px; height: 24px;
+            background: var(--ink);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--ink);
+            color: var(--ink);
+            padding: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Noto Sans JP', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: .05em;
+            transition: background .2s, color .2s;
+        }
+        .btn-outline:hover { background: var(--ink); color: #fff; }
+
+        .btn-solid {
+            background: var(--ink);
+            border: none;
+            color: #fff;
+            padding: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Noto Sans JP', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: .05em;
+            transition: background .2s, transform .2s;
+        }
+        .btn-solid:hover { background: #333; transform: translateY(-2px); }
+
+        /* ======== TYPES LIST ======== */
+        #typesScreen { padding: 36px 28px; }
+
+        .types-hd {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .types-hd h2 {
+            font-family: 'Shippori Mincho', serif;
+            font-size: 24px;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+        .types-hd p { font-size: 13px; color: #999; }
+
+        .type-card {
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            transition: transform .2s, box-shadow .2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .type-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+        .type-card.type-a { background: #EAF3EC; border-color: #B8D9C0; }
+        .type-card.type-b { background: #FDF0E7; border-color: #F0C49A; }
+        .type-card.type-c { background: #EAF0FA; border-color: #AABFE0; }
+        .type-card.type-d { background: #F9F3E7; border-color: #D9C490; }
+
+        .tc-icon { font-size: 38px; flex-shrink: 0; }
+        .tc-info { flex: 1; }
+        .tc-name { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+        .tc-catch { font-size: 12px; color: #777; line-height: 1.5; }
+        .tc-arrow { font-size: 18px; color: #ccc; }
+
+        /* ======== MODAL ======== */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            z-index: 999;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 0;
+            animation: fadeIn .3s;
+        }
+        .overlay.active { display: flex; }
+
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+        .modal-sheet {
+            background: var(--paper);
+            border-radius: 28px 28px 0 0;
+            width: 100%;
+            max-width: 480px;
+            max-height: 88vh;
+            overflow-y: auto;
+            animation: slideUp .4s cubic-bezier(.22,1,.36,1);
+        }
+        @keyframes slideUp {
+            from{ transform:translateY(100%); }
+            to{ transform:translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px; height: 4px;
+            background: #DDD;
+            border-radius: 2px;
+            margin: 14px auto 0;
+        }
+
+        .modal-close-row {
+            text-align: right;
+            padding: 12px 20px 0;
+        }
+        .btn-close {
+            background: #F0EDE8;
+            border: none;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            transition: background .2s, transform .2s;
+        }
+        .btn-close:hover { background: #E0DDD8; transform: rotate(90deg); }
+
+        /* scrollbar */
+        #resultScreen::-webkit-scrollbar,
+        .modal-sheet::-webkit-scrollbar { width:6px; }
+        #resultScreen::-webkit-scrollbar-track,
+        .modal-sheet::-webkit-scrollbar-track { background:#f1f1f1; }
+        #resultScreen::-webkit-scrollbar-thumb,
+        .modal-sheet::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
+
+        @media (max-width:480px) {
+            body { padding:0; align-items:center; justify-content:center; }
+            .app { max-width:100%; border-radius:28px; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+
+    <!-- TOP -->
+    <div class="screen active" id="topScreen">
+        <div class="top-bg">
+            <div class="top-bg-circle1"></div>
+            <div class="top-bg-circle2"></div>
+            <div class="top-bg-line"></div>
+        </div>
+        <div class="top-brand">
+            <div class="top-eyebrow">Exterior Type Character Diagnosis</div>
+        </div>
+        <div class="top-center">
+            <div class="top-frame">
+                <div class="top-deco">― あなたらしい外構を見つける ―</div>
+                <div class="top-title">外構タイプ<br>性格診断</div>
+                <div class="top-divider"></div>
+                <p class="top-sub">5つの質問に答えるだけ。<br>あなたの外構タイプ別性格が<br>わかります。</p>
+                <button class="btn-start" onclick="event.preventDefault(); event.stopPropagation(); startQuiz();">診断スタート</button>
+                <p class="time-note">⏱ 約2分で完了</p>
+            </div>
+        </div>
+        <div class="top-footer">
+            <span class="top-tag">全4タイプ</span>
+            <span class="top-tag">全5問</span>
+            <span class="top-tag">無料診断</span>
+        </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="screen" id="quizScreen">
+        <div class="progress-wrap">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="quiz-inner">
+            <div class="q-meta">
+                <span class="q-num" id="qNum">Q1 / 5</span>
+                <div class="q-dots" id="qDots"></div>
+            </div>
+            <div class="q-text" id="qText"></div>
+            <div class="answers" id="answers"></div>
+        </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="screen" id="resultScreen">
+        <div class="result-hero" id="rHero">
+            <span class="r-icon" id="rIcon"></span>
+            <div class="r-type-label">Your Style</div>
+            <div class="r-title" id="rTitle"></div>
+            <div class="r-catch" id="rCatch"></div>
+        </div>
+        <div class="result-body">
+            <div class="r-section">
+                <div class="r-section-title">✦ あなたはこんな人</div>
+                <p id="rPersonality"></p>
+            </div>
+            <div class="r-section">
+                <div class="r-section-title">✦ こんな外構が向いています</div>
+                <ul class="feature-list" id="rFeatures"></ul>
+            </div>
+            <div class="r-section">
+                <div class="r-section-title">✦ 展示場でチェックしてほしいポイント</div>
+                <ul class="check-list" id="rChecks"></ul>
+            </div>
+            <div class="result-actions">
+                <button class="btn-outline" onclick="event.preventDefault();event.stopPropagation();showAllTypes()">他のタイプも見る</button>
+                <button class="btn-solid" onclick="event.preventDefault();event.stopPropagation();restartQuiz()">もう一度診断する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TYPES LIST -->
+    <div class="screen" id="typesScreen">
+        <div class="types-hd">
+            <h2>4つのスタイルタイプ</h2>
+            <p>タップして詳細を確認できます</p>
+        </div>
+        <div onclick="event.preventDefault();event.stopPropagation();showTypeModal('A')" class="type-card type-a">
+            <span class="tc-icon">🌿</span>
+            <div class="tc-info">
+                <div class="tc-name">やすらぎガーデン</div>
+                <div class="tc-catch">家に帰るたびに、ふっと息が抜ける。</div>
+            </div>
+            <span class="tc-arrow">›</span>
+        </div>
+        <div onclick="event.preventDefault();event.stopPropagation();showTypeModal('B')" class="type-card type-b">
+            <span class="tc-icon">🎉</span>
+            <div class="tc-info">
+                <div class="tc-name">にぎわいテラス</div>
+                <div class="tc-catch">週末、ここが一番の遊び場になる。</div>
+            </div>
+            <span class="tc-arrow">›</span>
+        </div>
+        <div onclick="event.preventDefault();event.stopPropagation();showTypeModal('C')" class="type-card type-c">
+            <span class="tc-icon">📊</span>
+            <div class="tc-info">
+                <div class="tc-name">スマート導線</div>
+                <div class="tc-catch">無駄をなくせば、毎日がもっとラクになる。</div>
+            </div>
+            <span class="tc-arrow">›</span>
+        </div>
+        <div onclick="event.preventDefault();event.stopPropagation();showTypeModal('D')" class="type-card type-d">
+            <span class="tc-icon">👑</span>
+            <div class="tc-info">
+                <div class="tc-name">一流美学</div>
+                <div class="tc-catch">細部に宿るこだわりが、あなたの家を作品にする。</div>
+            </div>
+            <span class="tc-arrow">›</span>
+        </div>
+        <div style="margin-top:20px;">
+            <button class="btn-solid" style="width:100%;" onclick="event.preventDefault();event.stopPropagation();restartQuiz()">もう一度診断する</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL (ボトムシート) -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+    <div class="modal-sheet" id="modalSheet">
+        <div class="modal-handle"></div>
+        <div class="modal-close-row">
+            <button class="btn-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="result-hero" id="mHero">
+            <span class="r-icon" id="mIcon"></span>
+            <div class="r-type-label">Style Type</div>
+            <div class="r-title" id="mTitle"></div>
+            <div class="r-catch" id="mCatch"></div>
+        </div>
+        <div class="result-body">
+            <div class="r-section">
+                <div class="r-section-title">✦ あなたはこんな人</div>
+                <p id="mPersonality"></p>
+            </div>
+            <div class="r-section">
+                <div class="r-section-title">✦ こんな外構が向いています</div>
+                <ul class="feature-list" id="mFeatures"></ul>
+            </div>
+            <div class="r-section">
+                <div class="r-section-title">✦ 展示場でチェックしてほしいポイント</div>
+                <ul class="check-list" id="mChecks"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// WordPress干渉対策（修正版）
+// ボタンへのイベント伝達は許可しつつ、WordPress側への伝達だけ止める
+(function() {
+    function protect() {
+        const app = document.querySelector('.app');
+        if (!app) return;
+
+        // バブリング（下→上）だけ止める。キャプチャ（上→下）は止めない
+        function blockBubble(e) {
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
+
+        ['click','mousedown','mouseup','touchstart','touchend'].forEach(function(type) {
+            app.addEventListener(type, blockBubble, {capture: false, passive: false});
+        });
+
+        // アプリ内の<a>タグのナビゲーションを無効化
+        app.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link) e.preventDefault();
+        }, false);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', protect);
+    } else {
+        protect();
+    }
+})();
+
+const questions = [
+    {
+        text: "週末の理想の過ごし方は？",
+        answers: [
+            { icon: "🌿", text: "庭でコーヒーを飲みながら本を読んだり、植物の世話をしてのんびりしたい", type: "A" },
+            { icon: "🎉", text: "友人家族を呼んでBBQや外ごはんを楽しんだり、DIYで何かを作りたい", type: "B" },
+            { icon: "📊", text: "家の改善点をリストアップしてスッキリさせたり、便利グッズを試したい", type: "C" },
+            { icon: "👑", text: "インテリアや建築の本を眺めたり、こだわりのカフェや美術館を巡りたい", type: "D" }
+        ]
+    },
+    {
+        text: "外から帰ってきたとき、こんな家だったら最高！と思うのは？",
+        answers: [
+            { icon: "🌿", text: "玄関前に緑があり、季節ごとに花が咲いていて、「ただいま」とほっとできる家", type: "A" },
+            { icon: "🎉", text: "広い駐車スペースと、いつでも人を招けるテラスがある、にぎやかな家", type: "B" },
+            { icon: "📊", text: "雨でも濡れずに玄関まで入れて、宅配ボックスに荷物が入っている、ストレスゼロの家", type: "C" },
+            { icon: "👑", text: "門を開けるたびに「かっこいい」と感じる、街で一番目を引くこだわりの家", type: "D" }
+        ]
+    },
+    {
+        text: "外構・お庭に一番大切なことは何だと思いますか？",
+        answers: [
+            { icon: "🌿", text: "見た目の美しさと、家にいる時間を豊かにする心地よさ", type: "A" },
+            { icon: "🎉", text: "家族や友人が楽しめる広さと、使い勝手のよさ", type: "B" },
+            { icon: "📊", text: "メンテナンスのしやすさと、長期的なコストパフォーマンス", type: "C" },
+            { icon: "👑", text: "素材の質と、デザインとしての完成度・存在感", type: "D" }
+        ]
+    },
+    {
+        text: "外出先で思わず足を止める空間は？",
+        answers: [
+            { icon: "🌿", text: "植物の手入れが行き届いた、光と影の美しいカフェの庭", type: "A" },
+            { icon: "🎉", text: "開放的で、子どもや犬がのびのびと遊ぶ、活気ある公園や広場", type: "B" },
+            { icon: "📊", text: "動線がよく考えられた、無駄のないシンプルでモダンな商業施設", type: "C" },
+            { icon: "👑", text: "建築雑誌に載りそうな、素材と細部にこだわった邸宅やホテルの入口", type: "D" }
+        ]
+    },
+    {
+        text: "もし明日から外構工事が始まるとしたら、一番楽しみなことは？",
+        answers: [
+            { icon: "🌿", text: "完成後に庭でお気に入りの植物に水をやる、静かな朝の時間", type: "A" },
+            { icon: "🎉", text: "完成お披露目パーティーで友人に「すごい！」と言ってもらう瞬間", type: "B" },
+            { icon: "📊", text: "今まで手間だったことがなくなって、毎日がラクになる実感", type: "C" },
+            { icon: "👑", text: "朝、玄関を出るたびに「この外構、最高だな」と自分で惚れ直す感覚", type: "D" }
+        ]
+    }
+];
+
+const typeData = {
+    A: {
+        icon: "🌿", name: "やすらぎガーデン", cssClass: "type-a",
+        catch: "家に帰るたびに、ふっと息が抜ける。",
+        personality: "感受性豊かで、家を自分だけの「聖域」と感じたい。植物や自然素材、静かな時間を大切にする。視覚的な美しさと、毎日のストレスから解放してくれる「静寂の空間」を求めています。",
+        features: ["季節の植栽や緑あふれるナチュラルガーデン","天然石の小径、ウッドデッキのベンチ","視線を遮りながら光と風を通すフェンス","やわらかなライトアップで夜も美しい空間"],
+        checks: ["ベンチや植栽エリアに実際に座って、風や光の感じを体験する","石や木材の肌触り、素材の質感をじっくり触れてみる","「この場所にいると気持ちいいか」を感覚で確かめる"]
+    },
+    B: {
+        icon: "🎉", name: "にぎわいテラス", cssClass: "type-b",
+        catch: "週末、ここが一番の遊び場になる。",
+        personality: "外向的で、大切な人と時間を共有するのが何より好き。BBQや家族との時間、友人を招くのが生きがい。家族・友人と笑顔を共有できる「体験の場」を求めています。",
+        features: ["広いウッドデッキやタイルテラスでBBQやパーティー","子どもが安心して遊べるフラットな庭","趣味のDIY作業ができるガレージや作業スペース","夜も使えるアウトドアリビングの照明計画"],
+        checks: ["テラスの広さをイメージ。「何人並んで座れるか」を確認する","ガレージや収納スペースの使い勝手を試す","「ここでパーティーしたい！」とワクワクできるかで判断する"]
+    },
+    C: {
+        icon: "📊", name: "スマート導線", cssClass: "type-c",
+        catch: "無駄をなくせば、毎日がもっとラクになる。",
+        personality: "論理的で無駄が嫌い。生活の中の小さなストレスをひとつずつ解消したい。家事や時間の効率化を常に考えている。資産価値の維持と、動線最適化による「時間の余白」を求めています。",
+        features: ["手入れ不要のメンテナンスフリー素材（人工木・砂利・コンクリート）","スマート宅配ボックスや防犯カメラとの連携","雨でも濡れない動線（カーポートから玄関まで屋根つなぎ）","将来の変化にも対応できる拡張性ある設計"],
+        checks: ["素材の耐久年数・メンテナンスコストを数字で確認する","宅配ボックスや照明の機能スペックをチェックする","「10年後のコストはいくらか」という視点で質問してみる"]
+    },
+    D: {
+        icon: "👑", name: "一流美学", cssClass: "type-d",
+        catch: "細部に宿るこだわりが、あなたの家を作品にする。",
+        personality: "完璧主義で本物志向。素材の産地、施工の精度、デザインの意図まで気になる。自分の審美眼に妥協しない。自分のアイデンティティを表現する「唯一無二の誇り」を求めています。",
+        features: ["希少な天然石や特注素材を使ったオーダーデザイン","ライティングで表情が変わる計算されたアプローチ","街並みに存在感を放つ門柱・門扉のデザイン","職人の技と素材の物語を持つ、作品としての外構"],
+        checks: ["施工の「納まり」（石の目地、フェンスの接合部）をじっくり見る","素材の由来や産地、施工した職人の話を聞いてみる","「これは他にはない」と感じられるかを自分の直感で確かめる"]
+    }
+};
+
+// --- State ---
+let current = 0;
+let answers = [];
+let shuffled = [];
+
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function switchTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+    current = 0;
+    answers = [];
+    shuffled = shuffle(questions);
+    switchTo('quizScreen');
+    renderQuestion();
+}
+
+function renderQuestion() {
+    const q = shuffled[current];
+    const total = shuffled.length;
+
+    document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+    document.getElementById('qNum').textContent = `Q${current + 1} / ${total}`;
+
+    // dots
+    const dotsEl = document.getElementById('qDots');
+    dotsEl.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+        const d = document.createElement('span');
+        d.className = 'dot' + (i < current ? ' done' : i === current ? ' current' : '');
+        dotsEl.appendChild(d);
+    }
+
+    document.getElementById('qText').textContent = q.text;
+
+    const answersEl = document.getElementById('answers');
+    answersEl.innerHTML = '';
+    shuffle(q.answers).forEach(a => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.innerHTML = `<span class="ans-text">${a.text}</span>`;
+        btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); pick(a.type); };
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); pick(a.type); }, {passive: false});
+        answersEl.appendChild(btn);
+    });
+}
+
+function pick(type) {
+    answers.push(type);
+    if (current < shuffled.length - 1) {
+        current++;
+        setTimeout(renderQuestion, 280);
+    } else {
+        setTimeout(showResult, 280);
+    }
+}
+
+function calcResult() {
+    const c = { A:0, B:0, C:0, D:0 };
+    answers.forEach(a => c[a]++);
+    return Object.entries(c).sort((x,y) => y[1] - x[1])[0][0];
+}
+
+function fillResult(data, prefix) {
+    document.getElementById(prefix+'Hero').className = 'result-hero ' + data.cssClass;
+    document.getElementById(prefix+'Icon').textContent = data.icon;
+    document.getElementById(prefix+'Title').textContent = `「${data.name}」タイプ`;
+    document.getElementById(prefix+'Catch').textContent = data.catch;
+    document.getElementById(prefix+'Personality').textContent = data.personality;
+
+    const fl = document.getElementById(prefix+'Features');
+    fl.innerHTML = '';
+    data.features.forEach(f => { const li=document.createElement('li'); li.textContent=f; fl.appendChild(li); });
+
+    const cl = document.getElementById(prefix+'Checks');
+    cl.innerHTML = '';
+    data.checks.forEach((c,i) => {
+        const li=document.createElement('li');
+        li.setAttribute('data-step', i+1);
+        li.textContent=c;
+        cl.appendChild(li);
+    });
+}
+
+function showResult() {
+    const type = calcResult();
+    fillResult(typeData[type], 'r');
+    switchTo('resultScreen');
+}
+
+function showAllTypes() { switchTo('typesScreen'); }
+
+function showTypeModal(type) {
+    fillResult(typeData[type], 'm');
+    document.getElementById('overlay').classList.add('active');
+}
+
+function closeModal(e) {
+    if (!e || e.target === document.getElementById('overlay')) {
+        document.getElementById('overlay').classList.remove('active');
+    }
+}
+
+function restartQuiz() {
+    closeModal();
+    startQuiz();
+}
+</script>
+</body>
+</html>
