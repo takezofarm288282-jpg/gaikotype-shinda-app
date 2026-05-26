@@ -1,0 +1,1 @@
+# gaikotype-shinda-app
