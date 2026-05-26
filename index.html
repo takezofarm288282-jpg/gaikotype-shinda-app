@@ -630,28 +630,36 @@
 </div>
 
 <script>
-// WordPress干渉対策（修正版）
-// ボタンへのイベント伝達は許可しつつ、WordPress側への伝達だけ止める
+// WordPress干渉対策（最強版）
+// documentの一番最初にキャプチャして、アプリ内のイベントを外に漏らさない
 (function() {
     function protect() {
         const app = document.querySelector('.app');
         if (!app) return;
 
-        // バブリング（下→上）だけ止める。キャプチャ（上→下）は止めない
-        function blockBubble(e) {
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-        }
+        // documentレベルのキャプチャ phase で最優先に処理
+        document.addEventListener('click', function(e) {
+            if (app.contains(e.target)) {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                const link = e.target.closest('a');
+                if (link) e.preventDefault();
+            }
+        }, {capture: true});
 
-        ['click','mousedown','mouseup','touchstart','touchend'].forEach(function(type) {
-            app.addEventListener(type, blockBubble, {capture: false, passive: false});
-        });
+        document.addEventListener('touchend', function(e) {
+            if (app.contains(e.target)) {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }
+        }, {capture: true, passive: false});
 
-        // アプリ内の<a>タグのナビゲーションを無効化
-        app.addEventListener('click', function(e) {
-            const link = e.target.closest('a');
-            if (link) e.preventDefault();
-        }, false);
+        document.addEventListener('touchstart', function(e) {
+            if (app.contains(e.target)) {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }
+        }, {capture: true, passive: false});
     }
 
     if (document.readyState === 'loading') {
