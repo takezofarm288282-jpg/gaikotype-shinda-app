@@ -630,44 +630,7 @@
 </div>
 
 <script>
-// WordPress干渉対策（最強版）
-// documentの一番最初にキャプチャして、アプリ内のイベントを外に漏らさない
-(function() {
-    function protect() {
-        const app = document.querySelector('.app');
-        if (!app) return;
 
-        // documentレベルのキャプチャ phase で最優先に処理
-        document.addEventListener('click', function(e) {
-            if (app.contains(e.target)) {
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                const link = e.target.closest('a');
-                if (link) e.preventDefault();
-            }
-        }, {capture: true});
-
-        document.addEventListener('touchend', function(e) {
-            if (app.contains(e.target)) {
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-            }
-        }, {capture: true, passive: false});
-
-        document.addEventListener('touchstart', function(e) {
-            if (app.contains(e.target)) {
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-            }
-        }, {capture: true, passive: false});
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', protect);
-    } else {
-        protect();
-    }
-})();
 
 const questions = [
     {
