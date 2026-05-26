@@ -28,8 +28,8 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 16px;
+            align-items: flex-start;
+            padding: 16px 16px 40px;
         }
 
         /* 背景テクスチャ */
@@ -219,7 +219,7 @@
         .ans-text { font-size: 14px; color: #444; line-height: 1.65; }
 
         /* ======== RESULT ======== */
-        #resultScreen { overflow-y: auto; max-height: 92vh; }
+        #resultScreen { overflow-y: visible; }
 
         .result-hero {
             padding: 48px 32px 36px;
@@ -468,11 +468,8 @@
         .btn-close:hover { background: #E0DDD8; transform: rotate(90deg); }
 
         /* scrollbar */
-        #resultScreen::-webkit-scrollbar,
         .modal-sheet::-webkit-scrollbar { width:6px; }
-        #resultScreen::-webkit-scrollbar-track,
         .modal-sheet::-webkit-scrollbar-track { background:#f1f1f1; }
-        #resultScreen::-webkit-scrollbar-thumb,
         .modal-sheet::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
 
         @media (max-width:480px) {
