@@ -1,0 +1,2478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, viewport-fit=cover"/>
+  <title>松くい虫対策ガイド｜出雲市</title>
+  <meta name="description" content="出雲市の大切な松を守るためのマツクイムシ対策ガイドです。"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #F7F0E6; font-family: 'Hiragino Kaku Gothic ProN','Meiryo',sans-serif; }
+    #root { max-width: 480px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script>
+    const { useState, useEffect, useRef, createContext, useContext } = React;
+    
+  // localStorage fallback（通常ブラウザ用）
+  if (!window.storage) {
+    var _store = {};
+    try {
+      var saved = localStorage.getItem('matsukui-v2');
+      if (saved) Object.assign(_store, JSON.parse(saved));
+    } catch(e) {}
+    var _save = function() { try { localStorage.setItem('matsukui-v2', JSON.stringify(_store)); } catch(e) {} };
+    window.storage = {
+      get:    function(k) { return Promise.resolve(_store[k] !== undefined ? { key:k, value:_store[k] } : null); },
+      set:    function(k,v) { _store[k]=v; _save(); return Promise.resolve({ key:k, value:v }); },
+      delete: function(k) { delete _store[k]; _save(); return Promise.resolve({ key:k, deleted:true }); },
+      list:   function()  { return Promise.resolve({ keys: Object.keys(_store) }); },
+    };
+  }
+
+    /* ── カラーパレット ── */
+const T = {
+  brand: "#502200",
+  brandMid: "#7A3B10",
+  brandLt: "#A06030",
+  tan: "#C49A6C",
+  tanLt: "#D4B896",
+  cream: "#F7F0E6",
+  parchment: "#EDE0CC",
+  sand: "#D9C9A8",
+  card: "#FFFDF8",
+  border: "#D0BFA0",
+  borderSoft: "#E8D8C0",
+  textDark: "#2A1508",
+  textMid: "#5C3920",
+  textSoft: "#8B6A40",
+  pine: "#4A6B30",
+  pineLt: "#EEF2E6",
+  danger: "#8B2000",
+  dangerBg: "#FDF5F0",
+  dangerBd: "#D4A090",
+  gold: "#9B7020",
+  goldBg: "#FBF6E8",
+  goldBd: "#C8A840"
+};
+const F = {
+  mincho: "'Hiragino Mincho ProN','Yu Mincho','游明朝',Georgia,serif",
+  gothic: "'Hiragino Kaku Gothic ProN','Meiryo','MS Gothic',sans-serif"
+};
+
+/* ── デフォルトコンテンツ ── */
+const DEFAULTS = {
+  menus: [{
+    id: "what",
+    label: "松くい虫とは何か",
+    note: "病気のしくみをやさしく解説"
+  }, {
+    id: "cycle",
+    label: "年間サイクルと対策時期",
+    note: "何月に何をすべきかが一目でわかる"
+  }, {
+    id: "damage",
+    label: "出雲市の被害状況",
+    note: "数字で見る深刻な現実"
+  }, {
+    id: "prevent",
+    label: "予防のしかた",
+    note: "松を守る方法"
+  }, {
+    id: "exterminate",
+    label: "駆除のしかた",
+    note: "枯れ木を放置してはいけない理由"
+  }, {
+    id: "medicine",
+    label: "薬剤ガイド",
+    note: "グリンガードNEOなど製品の詳細"
+  }, {
+    id: "faq",
+    label: "よくある質問",
+    note: "疑問をタップして解決"
+  }, {
+    id: "procedure",
+    label: "グリンガードNEO 施工手順",
+    note: "穴あけから注入完了までの詳細手順"
+  }, {
+    id: "spray",
+    label: "マツグリーン液剤2 散布手順",
+    note: "希釈方法・散布時期・注意事項の詳細"
+  }],
+  cycles: [{
+    m: "12〜2月",
+    label: "樹幹注入の最適期",
+    tag: "対策",
+    col: "#7A3B10",
+    body: ["カミキリが発生する3ヶ月前までに注入を完了する", "マツヤニが出にくい冬が施工の最適期", "グリンガードNEOの注入はこの時期に"]
+  }, {
+    m: "3月末まで",
+    label: "伐倒駆除の締切",
+    tag: "締切",
+    col: "#8B2000",
+    body: ["枯れた松の幼虫を5月の羽化前に処理する", "くん蒸・破砕・焼却を3月末までに完了", "この締切を守らないと翌年の被害が拡大する"]
+  }, {
+    m: "5月下旬〜",
+    label: "羽化・脱出開始",
+    tag: "危険",
+    col: "#8B2000",
+    body: ["カミキリ成虫が被害木から飛び出す最危険期", "出雲市では5月下旬頃から始まる", "薬剤散布1回目を実施（マツグリーン液剤2）"]
+  }, {
+    m: "6〜7月",
+    label: "感染拡大期",
+    tag: "危険",
+    col: "#8B2000",
+    body: ["カミキリが健全な松の小枝をかじり線虫を運ぶ", "薬剤散布2〜3回目を1ヶ月ごとに実施", "樹幹注入済みの木は線虫増殖を阻止できる"]
+  }, {
+    m: "8〜9月",
+    label: "松が枯れ始める",
+    tag: "監視",
+    col: "#8B5010",
+    body: ["感染から1〜2ヶ月後、針葉が赤褐色に変色する", "枯れた松は回復しない。早急に専門業者へ相談", "被害木を放置すると感染源になる"]
+  }, {
+    m: "9〜10月",
+    label: "産卵期",
+    tag: "注意",
+    col: "#7A3B10",
+    body: ["カミキリが枯れ木の樹皮下に産卵（最高215粒）", "これが翌年の被害源になる", "速やかな伐倒駆除の実施が必要"]
+  }, {
+    m: "11月〜翌3月",
+    label: "幼虫越冬期",
+    tag: "準備",
+    col: "#7A3B10",
+    body: ["カミキリ幼虫が材内で越冬している", "3月末までに伐倒・くん蒸・破砕で翌年発生を防止", "翌年の樹幹注入の計画もこの時期に立てる"]
+  }],
+  medicines: [{
+    name: "グリンガード・NEO",
+    kind: "樹幹注入剤",
+    col: "#4A6B30",
+    reg: "農林水産省登録 第22028号",
+    maker: "ニッソーグリーン（日本曹達製）",
+    comp: "酒石酸モランテル 20%",
+    effect: "最大7年（出雲市は6年目途）",
+    when: "12〜2月（カミキリ発生3ヶ月前まで）",
+    pts: ["マツノザイセンチュウの侵入・増殖を防止", "人畜毒性：普通物・魚毒性A類で安全", "水に溶けやすく樹体全体に広がる", "自然圧注入と加圧注入の2種類あり"],
+    use: "直径10〜15cm → 90ml、15〜20cm → 135ml、20〜25cm → 270ml 目安",
+    caution: "カミキリ成虫には効果なし（線虫の防止のみ）"
+  }, {
+    name: "マツグリーン液剤２",
+    kind: "薬剤散布用（殺虫剤）",
+    col: "#4A3A7A",
+    reg: "農林水産省登録 第20838号",
+    maker: "ニッソーグリーン",
+    comp: "アセタミプリド 2%（ネオニコチノイド系）",
+    effect: "散布後3〜4週間",
+    when: "5月上旬〜7月（1ヶ月ごとに3回）",
+    pts: ["カミキリ成虫を殺虫・後食を防止", "耐雨性が高く効果が持続"],
+    use: "水10Lに対し：60倍=167ml / 100倍=100ml / 250倍=40ml / 500倍=20ml",
+    caution: "蚕には長時間毒性あり。桑の近くでは使用不可"
+  }],
+  faqs: [{
+    q: "松が赤くなってきた。どうすれば？",
+    a: "残念ながら感染した松は回復しません。すぐに専門業者に相談し、伐倒・殺虫処理の手配を。伐倒だけでなくカミキリ幼虫を5月の羽化前に殺虫することが重要です。"
+  }, {
+    q: "樹幹注入は自分でできる？",
+    a: "専門性が必要なため、専門業者への依頼を推奨しています。"
+  }, {
+    q: "補助金はある？",
+    a: "築地松に対する補助制度があります。詳細は築地松景観保全対策推進協議会（0853-21-6176）へ。"
+  }, {
+    q: "樹幹注入は何年おきにすればいい？",
+    a: "グリンガードNEOは最大7年の効果がありますが、出雲市では安全をみて6年を目途に更新しています。薬剤濃度は年とともに下がるため定期的な更新が大切です。"
+  }, {
+    q: "カミキリはどのくらい飛ぶ？",
+    a: "一般的に数百メートルから2キロメートル移動します。1本の被害木を放置すると周囲2kmの松すべてに感染リスクが生じます。"
+  }, {
+    q: "夏が暑いと被害が増える？",
+    a: "はい。高温だとカミキリの羽化が早まり活動期間が長くなります。少雨だと死亡率が下がり個体数が増えます。高温・少雨の夏は特に要警戒です。"
+  }, {
+    q: "松くい虫の専門家に相談できる？",
+    a: "「松保護士」という専門資格者に相談できます。松保護士は、マツ材線虫病の現状調査・防除計画の立案・防除指導を行う専門家で、全国に486名（令和8年4月現在）が登録されています。国土交通省の登録資格にもなっており、樹幹注入の相談や現地診断など、松の保護について専門的なサポートを受けられます。詳細は一般財団法人日本緑化センター（TEL：03-6457-5215）へ。"
+  }, {
+    q: "松保護士とはどんな資格？",
+    a: "一般財団法人日本緑化センターが認定する専門資格です。松くい虫病について幅広い知識を持ち、地域の松の被害状況に応じた適切な防除対策を計画し、実際に指導を行います。地権者・行政・地域住民などと連携しながら、松の保護を自発的・組織的に進める役割を担います。登録者の検索は日本緑化センターのホームページ（https://www.jpgreen.or.jp/matsu_hogoshi/）で確認できます。"
+  }, {
+    q: "被害木の処理の締切はいつ？",
+    a: "カミキリが5月下旬から羽化するため、3月末までに伐倒・くん蒸・破砕などの処理を完了させることが必要です。この締切を守ることで翌年の被害拡大を防げます。"
+  }],
+  homeAlert: "島根県の被害が再拡大中",
+  homeAlertSub: "令和6年度は前年比124%増。出雲市でも増加傾向あり。早めの対策を。"
+};
+
+/* ── EditContext ── */
+const EditContext = createContext({
+  editMode: false,
+  content: DEFAULTS,
+  setContent: () => {}
+});
+
+/* ── ストレージキー ── */
+const STORAGE_KEY = "matsukui-content-v2";
+
+/* ── 共通UIパーツ ── */
+function Divider() {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      margin: "1.2rem 0"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      height: "1px",
+      background: `linear-gradient(to right,transparent,${T.sand})`
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 6,
+      height: 6,
+      borderRadius: "50%",
+      background: T.tanLt
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      height: "1px",
+      background: `linear-gradient(to left,transparent,${T.sand})`
+    }
+  }));
+}
+function BackBtn({
+  onBack
+}) {
+  return /*#__PURE__*/React.createElement("button", {
+    onClick: onBack,
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "5px",
+      background: "rgba(255,255,255,0.15)",
+      border: "1px solid rgba(255,255,255,0.3)",
+      color: "#fff",
+      borderRadius: "3px",
+      padding: "6px 16px",
+      fontSize: "0.82rem",
+      cursor: "pointer",
+      marginBottom: "1.2rem",
+      fontFamily: F.gothic
+    }
+  }, "\u2039 \u30DB\u30FC\u30E0\u3078\u623B\u308B");
+}
+function PageTop({
+  onBack,
+  title,
+  sub,
+  gradA,
+  gradB,
+  borderCol
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: `linear-gradient(155deg,${gradA || T.brand},${gradB || T.brandMid})`,
+      padding: "1.8rem 1.3rem 1.5rem",
+      borderBottom: `3px solid ${borderCol || T.tan}`
+    }
+  }, /*#__PURE__*/React.createElement(BackBtn, {
+    onBack: onBack
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 32,
+      height: 3,
+      background: T.tan,
+      borderRadius: 2,
+      marginBottom: "0.75rem"
+    }
+  }), /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontSize: "1.4rem",
+      margin: "0 0 0.4rem",
+      fontFamily: F.mincho,
+      fontWeight: "normal",
+      letterSpacing: "0.1em",
+      color: "#fff"
+    }
+  }, title), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.8rem",
+      margin: 0,
+      color: "rgba(255,255,255,0.7)",
+      fontFamily: F.gothic
+    }
+  }, sub));
+}
+function Card({
+  children,
+  style = {}
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.card,
+      borderRadius: "6px",
+      padding: "1.2rem",
+      boxShadow: `0 2px 10px rgba(80,34,0,0.08)`,
+      border: `1px solid ${T.borderSoft}`,
+      marginBottom: "0.8rem",
+      ...style
+    }
+  }, children);
+}
+function NoteBox({
+  type = "gold",
+  children
+}) {
+  const s = type === "danger" ? {
+    bg: T.dangerBg,
+    bd: T.dangerBd
+  } : {
+    bg: T.goldBg,
+    bd: T.goldBd
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: s.bg,
+      border: `1.5px solid ${s.bd}`,
+      borderRadius: "6px",
+      padding: "1rem",
+      marginBottom: "0.8rem"
+    }
+  }, children);
+}
+function Bullet({
+  text,
+  col,
+  arrow
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px",
+      marginBottom: "0.4rem",
+      alignItems: "flex-start"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: col || T.pine,
+      flexShrink: 0,
+      fontSize: "0.8rem",
+      marginTop: "3px",
+      fontWeight: "bold"
+    }
+  }, arrow ? "—" : "✓"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textMid,
+      lineHeight: 1.75,
+      fontFamily: F.gothic
+    }
+  }, text));
+}
+function NumBadge({
+  n,
+  col
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: col || T.brandMid,
+      color: "#fff",
+      borderRadius: "3px",
+      width: 26,
+      height: 26,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "0.78rem",
+      fontWeight: "bold",
+      flexShrink: 0,
+      fontFamily: F.gothic
+    }
+  }, n);
+}
+function TagBadge({
+  col,
+  children
+}) {
+  return /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: col + "22",
+      color: col,
+      border: `1px solid ${col}55`,
+      borderRadius: "3px",
+      padding: "3px 10px",
+      fontSize: "0.7rem",
+      fontWeight: "bold",
+      fontFamily: F.gothic,
+      letterSpacing: "0.06em",
+      flexShrink: 0
+    }
+  }, children);
+}
+function SectionLabel({
+  col,
+  children
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: col || T.brand,
+      fontSize: "0.97rem",
+      letterSpacing: "0.04em",
+      marginBottom: "0.75rem",
+      borderLeft: `3px solid ${col || T.brand}`,
+      paddingLeft: "0.6rem"
+    }
+  }, children);
+}
+
+/* ════════════════════════════════════════════
+   編集パネル
+════════════════════════════════════════════ */
+function EditPanel({
+  content,
+  onSave,
+  onCancel
+}) {
+  const [draft, setDraft] = useState(() => JSON.parse(JSON.stringify(content)));
+  const [tab, setTab] = useState("menus");
+  const tabs = [{
+    id: "menus",
+    label: "メニュー"
+  }, {
+    id: "cycles",
+    label: "年間サイクル"
+  }, {
+    id: "medicines",
+    label: "薬剤"
+  }, {
+    id: "faqs",
+    label: "Q&A"
+  }, {
+    id: "home",
+    label: "ホーム"
+  }];
+  const taStyle = {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "8px 10px",
+    borderRadius: "4px",
+    border: `1.5px solid ${T.border}`,
+    fontFamily: F.gothic,
+    fontSize: "0.85rem",
+    color: T.textDark,
+    background: "#fff",
+    resize: "vertical",
+    lineHeight: 1.6
+  };
+  const labelStyle = {
+    fontSize: "0.72rem",
+    color: T.textSoft,
+    fontFamily: F.gothic,
+    letterSpacing: "0.05em",
+    marginBottom: "4px",
+    display: "block"
+  };
+  const rowStyle = {
+    marginBottom: "1rem"
+  };
+
+  /* ── メニュータブ ── */
+  const MenusTab = () => /*#__PURE__*/React.createElement("div", null, draft.menus.map((m, i) => /*#__PURE__*/React.createElement(Card, {
+    key: i,
+    style: {
+      marginBottom: "0.65rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: T.brand,
+      fontSize: "0.82rem",
+      marginBottom: "0.6rem"
+    }
+  }, "\u30E1\u30CB\u30E5\u30FC ", i + 1, "\uFF1A", DEFAULTS.menus[i]?.id), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u30BF\u30A4\u30C8\u30EB"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 1,
+    style: taStyle,
+    value: m.label,
+    onChange: e => {
+      const n = [...draft.menus];
+      n[i] = {
+        ...n[i],
+        label: e.target.value
+      };
+      setDraft({
+        ...draft,
+        menus: n
+      });
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u30B5\u30D6\u30C6\u30AD\u30B9\u30C8"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 1,
+    style: taStyle,
+    value: m.note,
+    onChange: e => {
+      const n = [...draft.menus];
+      n[i] = {
+        ...n[i],
+        note: e.target.value
+      };
+      setDraft({
+        ...draft,
+        menus: n
+      });
+    }
+  })))));
+
+  /* ── サイクルタブ ── */
+  const CyclesTab = () => /*#__PURE__*/React.createElement("div", null, draft.cycles.map((c, i) => /*#__PURE__*/React.createElement(Card, {
+    key: i,
+    style: {
+      marginBottom: "0.65rem",
+      borderLeft: `4px solid ${c.col}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: c.col,
+      fontSize: "0.82rem",
+      marginBottom: "0.6rem"
+    }
+  }, c.m, "\uFF1A", c.label), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u671F\u9593\u30E9\u30D9\u30EB"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 1,
+    style: taStyle,
+    value: c.m,
+    onChange: e => {
+      const n = [...draft.cycles];
+      n[i] = {
+        ...n[i],
+        m: e.target.value
+      };
+      setDraft({
+        ...draft,
+        cycles: n
+      });
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u898B\u51FA\u3057"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 1,
+    style: taStyle,
+    value: c.label,
+    onChange: e => {
+      const n = [...draft.cycles];
+      n[i] = {
+        ...n[i],
+        label: e.target.value
+      };
+      setDraft({
+        ...draft,
+        cycles: n
+      });
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u30BF\u30B0"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 1,
+    style: taStyle,
+    value: c.tag,
+    onChange: e => {
+      const n = [...draft.cycles];
+      n[i] = {
+        ...n[i],
+        tag: e.target.value
+      };
+      setDraft({
+        ...draft,
+        cycles: n
+      });
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u5185\u5BB9\uFF081\u884C\u3054\u3068\u306B\u9805\u76EE\uFF09"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 4,
+    style: taStyle,
+    value: c.body.join("\n"),
+    onChange: e => {
+      const n = [...draft.cycles];
+      n[i] = {
+        ...n[i],
+        body: e.target.value.split("\n")
+      };
+      setDraft({
+        ...draft,
+        cycles: n
+      });
+    }
+  })))));
+
+  /* ── 薬剤タブ ── */
+  const MedicinesTab = () => /*#__PURE__*/React.createElement("div", null, draft.medicines.map((m, i) => /*#__PURE__*/React.createElement(Card, {
+    key: i,
+    style: {
+      marginBottom: "0.65rem",
+      borderLeft: `4px solid ${m.col}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: m.col,
+      fontSize: "0.82rem",
+      marginBottom: "0.6rem"
+    }
+  }, m.name), [["製品名", "name", 1], ["種類", "kind", 1], ["登録番号", "reg", 1], ["メーカー", "maker", 1], ["有効成分", "comp", 1], ["効果持続", "effect", 1], ["施工時期", "when", 1], ["使用量", "use", 2], ["注意事項", "caution", 2]].map(([lbl, key, rows]) => /*#__PURE__*/React.createElement("div", {
+    style: rowStyle,
+    key: key
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, lbl), /*#__PURE__*/React.createElement("textarea", {
+    rows: rows,
+    style: taStyle,
+    value: m[key],
+    onChange: e => {
+      const n = [...draft.medicines];
+      n[i] = {
+        ...n[i],
+        [key]: e.target.value
+      };
+      setDraft({
+        ...draft,
+        medicines: n
+      });
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u7279\u9577\uFF081\u884C\u3054\u3068\u306B\u9805\u76EE\uFF09"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 4,
+    style: taStyle,
+    value: m.pts.join("\n"),
+    onChange: e => {
+      const n = [...draft.medicines];
+      n[i] = {
+        ...n[i],
+        pts: e.target.value.split("\n")
+      };
+      setDraft({
+        ...draft,
+        medicines: n
+      });
+    }
+  })))));
+
+  /* ── FAQタブ ── */
+  const FaqsTab = () => /*#__PURE__*/React.createElement("div", null, draft.faqs.map((f, i) => /*#__PURE__*/React.createElement(Card, {
+    key: i,
+    style: {
+      marginBottom: "0.65rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.75rem",
+      color: T.textSoft,
+      fontFamily: F.gothic,
+      marginBottom: "0.5rem"
+    }
+  }, "Q&A ", i + 1), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u8CEA\u554F"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 2,
+    style: taStyle,
+    value: f.q,
+    onChange: e => {
+      const n = [...draft.faqs];
+      n[i] = {
+        ...n[i],
+        q: e.target.value
+      };
+      setDraft({
+        ...draft,
+        faqs: n
+      });
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u56DE\u7B54"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 4,
+    style: taStyle,
+    value: f.a,
+    onChange: e => {
+      const n = [...draft.faqs];
+      n[i] = {
+        ...n[i],
+        a: e.target.value
+      };
+      setDraft({
+        ...draft,
+        faqs: n
+      });
+    }
+  })))));
+
+  /* ── ホームタブ ── */
+  const HomeTab = () => /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u7DCA\u6025\u30A2\u30E9\u30FC\u30C8"), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u30BF\u30A4\u30C8\u30EB"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 1,
+    style: taStyle,
+    value: draft.homeAlert,
+    onChange: e => setDraft({
+      ...draft,
+      homeAlert: e.target.value
+    })
+  })), /*#__PURE__*/React.createElement("div", {
+    style: rowStyle
+  }, /*#__PURE__*/React.createElement("label", {
+    style: labelStyle
+  }, "\u30B5\u30D6\u30C6\u30AD\u30B9\u30C8"), /*#__PURE__*/React.createElement("textarea", {
+    rows: 2,
+    style: taStyle,
+    value: draft.homeAlertSub,
+    onChange: e => setDraft({
+      ...draft,
+      homeAlertSub: e.target.value
+    })
+  }))));
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      zIndex: 1000,
+      display: "flex",
+      flexDirection: "column",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.brand,
+      padding: "0.9rem 1rem",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: T.tan,
+      fontSize: "0.68rem",
+      fontFamily: F.gothic,
+      letterSpacing: "0.12em"
+    }
+  }, "\u7DE8\u96C6\u30E2\u30FC\u30C9"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#fff",
+      fontSize: "1rem",
+      fontFamily: F.mincho,
+      letterSpacing: "0.06em"
+    }
+  }, "\u30B3\u30F3\u30C6\u30F3\u30C4\u7DE8\u96C6")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onCancel,
+    style: {
+      background: "rgba(255,255,255,0.15)",
+      border: "1px solid rgba(255,255,255,0.3)",
+      color: "#fff",
+      borderRadius: "3px",
+      padding: "7px 14px",
+      fontSize: "0.82rem",
+      cursor: "pointer",
+      fontFamily: F.gothic
+    }
+  }, "\u30AD\u30E3\u30F3\u30BB\u30EB"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => onSave(draft),
+    style: {
+      background: T.tan,
+      border: "none",
+      color: T.textDark,
+      borderRadius: "3px",
+      padding: "7px 16px",
+      fontSize: "0.82rem",
+      cursor: "pointer",
+      fontFamily: F.gothic,
+      fontWeight: "bold"
+    }
+  }, "\u4FDD\u5B58\u3057\u3066\u9589\u3058\u308B"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.parchment,
+      borderBottom: `1px solid ${T.border}`,
+      display: "flex",
+      overflowX: "auto",
+      flexShrink: 0
+    }
+  }, tabs.map(t => /*#__PURE__*/React.createElement("button", {
+    key: t.id,
+    onClick: () => setTab(t.id),
+    style: {
+      padding: "0.7rem 1rem",
+      border: "none",
+      cursor: "pointer",
+      background: "none",
+      fontFamily: F.gothic,
+      fontSize: "0.82rem",
+      color: tab === t.id ? T.brand : T.textSoft,
+      fontWeight: tab === t.id ? "bold" : "normal",
+      borderBottom: tab === t.id ? `2px solid ${T.brand}` : "2px solid transparent",
+      whiteSpace: "nowrap",
+      flexShrink: 0
+    }
+  }, t.label))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      overflowY: "auto",
+      padding: "1rem"
+    }
+  }, tab === "menus" && /*#__PURE__*/React.createElement(MenusTab, null), tab === "cycles" && /*#__PURE__*/React.createElement(CyclesTab, null), tab === "medicines" && /*#__PURE__*/React.createElement(MedicinesTab, null), tab === "faqs" && /*#__PURE__*/React.createElement(FaqsTab, null), tab === "home" && /*#__PURE__*/React.createElement(HomeTab, null)));
+}
+
+/* ════════════════════════════════════════════
+   各ページ
+════════════════════════════════════════════ */
+function PageWhat({
+  onBack
+}) {
+  const {
+    content: C
+  } = useContext(EditContext);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    title: "\u677E\u304F\u3044\u866B\u3068\u306F\u4F55\u304B",
+    sub: "\u75C5\u6C17\u306E\u3057\u304F\u307F\u3092\u3084\u3055\u3057\u304F\u89E3\u8AAC\u3057\u307E\u3059"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement(NoteBox, {
+    type: "gold"
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.gold
+  }, "\u307E\u305A\u5927\u4E8B\u306A\u30DD\u30A4\u30F3\u30C8"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: "0.88rem",
+      color: T.textDark,
+      lineHeight: 2,
+      fontFamily: F.gothic
+    }
+  }, "\u300C\u677E\u304F\u3044\u866B\u300D\u3068\u3044\u3046\u540D\u524D\u306E\u866B\u306F\u5B58\u5728\u3057\u307E\u305B\u3093\u3002", /*#__PURE__*/React.createElement("br", null), "\u6B63\u5F0F\u540D\u79F0\u306F\u300C", /*#__PURE__*/React.createElement("strong", null, "\u30DE\u30C4\u6750\u7DDA\u866B\u75C5"), "\u300D\u3068\u3044\u3046\u4F1D\u67D3\u75C5\u3067\u3059\u3002", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("strong", null, "\u7DDA\u866B\uFF08\u30BB\u30F3\u30C1\u30E5\u30A6\uFF09"), "\u304C\u677E\u3092\u67AF\u3089\u3057\u3001", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("strong", null, "\u30AB\u30DF\u30AD\u30EA\u30E0\u30B7"), "\u304C\u305D\u308C\u3092\u677E\u304B\u3089\u677E\u3078\u904B\u3073\u307E\u3059\u3002")), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.danger
+  }, "\u75C5\u539F\u4F53\uFF1A\u30DE\u30C4\u30CE\u30B6\u30A4\u30BB\u30F3\u30C1\u30E5\u30A6"), ["体長1mm以下。肉眼では見えない極小の生き物", "松の中に入ると数日で約25万匹に爆発的増殖", "水の通り道をふさぎ、松が水を吸えなくなる", "感染した松はほぼ100%枯死する", "北米原産。輸入木材に混入して日本に侵入"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.danger
+  }))), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brandMid
+  }, "\u904B\u3073\u5C4B\uFF1A\u30DE\u30C4\u30CE\u30DE\u30C0\u30E9\u30AB\u30DF\u30AD\u30EA"), ["体長20〜25mmのカミキリムシ", "1頭に数千〜数万匹のセンチュウを持つ", "出雲市では5月下旬〜7月頃に被害木から羽化", "健全な松の小枝をかじった傷口からセンチュウを移す", "移動距離は数百m〜2km。雌は最高215粒産卵する"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.brandMid
+  }))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.parchment,
+      border: `1.5px solid ${T.tanLt}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u88AB\u5BB3\u306E\u65E9\u671F\u767A\u898B\u30C1\u30A7\u30C3\u30AF"), ["枝を折ったり幹に傷をつける → 1時間以内にマツヤニが出れば健全。出なければ感染の疑い", "針葉の色をよく見る → しおれ・くすみ・変色が出ていたら要注意", "8〜9月に松全体が赤褐色になっていたら感染確定。早急に専門業者へ相談"].map((t, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: "10px",
+      alignItems: "flex-start",
+      marginBottom: "0.6rem"
+    }
+  }, /*#__PURE__*/React.createElement(NumBadge, {
+    n: i + 1,
+    col: T.brand
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textMid,
+      lineHeight: 1.75,
+      fontFamily: F.gothic
+    }
+  }, t))))));
+}
+function PageCycle({
+  onBack
+}) {
+  const {
+    content: C
+  } = useContext(EditContext);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: "#2A1800",
+    gradB: T.brandMid,
+    title: "\u5E74\u9593\u30B5\u30A4\u30AF\u30EB\u3068\u5BFE\u7B56\u6642\u671F",
+    sub: "\u4F55\u6708\u306B\u4F55\u3092\u3059\u308C\u3070\u3044\u3044\u304B\u304C\u4E00\u76EE\u3067\u308F\u304B\u308A\u307E\u3059"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, C.cycles.map((c, i) => /*#__PURE__*/React.createElement(Card, {
+    key: i,
+    style: {
+      borderLeft: `4px solid ${c.col}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "0.5rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.76rem",
+      color: c.col,
+      fontFamily: F.gothic,
+      fontWeight: "bold",
+      marginBottom: "2px"
+    }
+  }, c.m), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.97rem",
+      color: T.textDark,
+      fontFamily: F.mincho,
+      letterSpacing: "0.04em"
+    }
+  }, c.label)), /*#__PURE__*/React.createElement(TagBadge, {
+    col: c.col
+  }, c.tag)), c.body.filter(Boolean).map((l, j) => /*#__PURE__*/React.createElement(Bullet, {
+    key: j,
+    text: l,
+    col: c.col,
+    arrow: true
+  })))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.parchment,
+      border: `1.5px solid ${T.tanLt}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u7D76\u5BFE\u306B\u899A\u3048\u3066\u304A\u304F3\u3064\u306E\u30EB\u30FC\u30EB"), ["12〜2月に樹幹注入を完了させる", "3月末までに被害木の駆除処理を完了させる", "5月〜7月に薬剤散布を1ヶ月ごとに3回行う"].map((r, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: "10px",
+      alignItems: "center",
+      marginBottom: "0.55rem"
+    }
+  }, /*#__PURE__*/React.createElement(NumBadge, {
+    n: i + 1,
+    col: T.brand
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.88rem",
+      color: T.textDark,
+      fontFamily: F.gothic,
+      fontWeight: "bold"
+    }
+  }, r))))));
+}
+function PageDamage({
+  onBack
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: "#4A0A00",
+    gradB: T.danger,
+    borderCol: "#D4A090",
+    title: "\u51FA\u96F2\u5E02\u306E\u88AB\u5BB3\u72B6\u6CC1",
+    sub: "\u6570\u5B57\u3067\u898B\u308B\u6DF1\u523B\u306A\u5B9F\u614B"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement(NoteBox, {
+    type: "danger"
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.danger
+  }, "\u51FA\u96F2\u5E02\u306E\u73FE\u72B6"), [["松くい虫の影響を受けた割合", "市内の約8割", T.danger], ["築地松の本数（1999年）", "22,501本", T.textDark], ["築地松の本数（2020年）", "11,182本（半数以下に）", T.danger]].map(([l, v, c]) => /*#__PURE__*/React.createElement("div", {
+    key: l,
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      padding: "0.55rem 0",
+      borderBottom: `1px solid ${T.dangerBd}`,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "0.82rem",
+      color: T.textMid,
+      fontFamily: F.gothic
+    }
+  }, l), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "0.88rem",
+      fontWeight: "bold",
+      color: c,
+      fontFamily: F.gothic
+    }
+  }, v)))), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u5730\u533A\u5225 \u7BC9\u5730\u677E\u306E\u73FE\u72B6\uFF082020\u5E74\u8ABF\u67FB\uFF09"), [["斐川", "804戸", "6,952本"], ["平田", "212戸", "1,496本"], ["出雲", "196戸", "1,184本"], ["大社", "51戸", "549本"], ["湖陵", "1戸", "1本"]].map(([a, b, c]) => /*#__PURE__*/React.createElement("div", {
+    key: a,
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      padding: "0.5rem 0",
+      borderBottom: `1px solid ${T.borderSoft}`,
+      fontSize: "0.85rem",
+      fontFamily: F.gothic
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.textDark,
+      fontWeight: "bold",
+      minWidth: "55px"
+    }
+  }, a), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.textSoft
+    }
+  }, b), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.pine,
+      fontWeight: "bold"
+    }
+  }, c))), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.74rem",
+      color: T.textSoft,
+      margin: "0.4rem 0 0",
+      fontFamily: F.gothic
+    }
+  }, "\u203B1999\u5E74\u8ABF\u67FB\u3067\u306F3,380\u6238\u30FB22,501\u672C\u3042\u3063\u305F")), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u5CF6\u6839\u770C\u306E\u88AB\u5BB3\u91CF\u63A8\u79FB"), [["昭和59年（県内ピーク）", "110,000 m³", T.danger], ["平成23年（過去最高）", "127,000 m³", T.danger], ["令和元年（最低）", "2,900 m³", T.pine], ["令和5年度", "5,400 m³（12年ぶり増加）", "#8B5010"], ["令和6年度（最新）", "6,600 m³（前年比 +24%）", T.danger]].map(([y, v, c]) => /*#__PURE__*/React.createElement("div", {
+    key: y,
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      padding: "0.5rem 0",
+      borderBottom: `1px solid ${T.borderSoft}`,
+      fontSize: "0.84rem",
+      fontFamily: F.gothic
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.textMid
+    }
+  }, y), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: "bold",
+      color: c
+    }
+  }, v))))));
+}
+function PagePrevent({
+  onBack
+}) {
+  const {
+    content: C
+  } = useContext(EditContext);
+  const methods = [{
+    title: "1. 薬剤樹幹注入（最重要・最も効果的）",
+    col: T.pine,
+    when: "12〜2月",
+    desc: "健全な松の幹に穴を開けて薬剤を注入。センチュウの侵入・増殖を防ぐ最も効果的な方法。",
+    pts: ["グリンガードNEOで最大7年間の効果", "出雲市は6年を目途に更新", "専門業者への依頼を推奨"]
+  }, {
+    title: "2. 薬剤地上散布",
+    col: "#3A6B4A",
+    when: "5〜7月（3回）",
+    desc: "地上から噴霧器でマツグリーン液剤2などを散布。カミキリの後食を防ぎ感染を阻止する。",
+    pts: ["5月上旬から1ヶ月ごとに3回～4回散布を推奨"]
+  }];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: "#152800",
+    gradB: T.pine,
+    borderCol: "#A0C070",
+    title: "\u4E88\u9632\u306E\u3057\u304B\u305F",
+    sub: "\u611F\u67D3\u3057\u305F\u3089\u56DE\u5FA9\u3057\u306A\u3044\u3002\u4E8B\u524D\u306E\u4E88\u9632\u304C\u6700\u91CD\u8981"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement(NoteBox, {
+    type: "gold"
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: "0.9rem",
+      color: T.textDark,
+      lineHeight: 1.95,
+      fontFamily: F.gothic
+    }
+  }, /*#__PURE__*/React.createElement("strong", null, "\u677E\u304F\u3044\u866B\u306F\u6CBB\u7642\u3067\u304D\u307E\u305B\u3093\u3002"), /*#__PURE__*/React.createElement("br", null), "\u611F\u67D3\u3057\u305F\u3089\u307B\u307C100%\u67AF\u308C\u307E\u3059\u3002\u3060\u304B\u3089\u300C\u4E88\u9632\u300D\u304C\u547D\u7DB1\u3067\u3059\u3002", /*#__PURE__*/React.createElement("br", null), "\u4E88\u9632\u306E\u4E2D\u3067\u3082", /*#__PURE__*/React.createElement("strong", null, "\u6A39\u5E79\u6CE8\u5165\u304C\u6700\u3082\u52B9\u679C\u7684"), "\u3067\u3059\u3002")), methods.map(m => /*#__PURE__*/React.createElement(Card, {
+    key: m.title,
+    style: {
+      borderLeft: `4px solid ${m.col}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: m.col,
+      fontSize: "0.97rem",
+      letterSpacing: "0.03em",
+      marginBottom: "6px"
+    }
+  }, m.title), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "inline-block",
+      background: m.col + "18",
+      borderRadius: "3px",
+      padding: "3px 10px",
+      fontSize: "0.74rem",
+      color: m.col,
+      fontWeight: "bold",
+      fontFamily: F.gothic,
+      marginBottom: "0.55rem",
+      border: `1px solid ${m.col}40`
+    }
+  }, "\u5B9F\u65BD\u6642\u671F\uFF1A", m.when), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textMid,
+      lineHeight: 1.75,
+      marginBottom: "0.6rem",
+      fontFamily: F.gothic
+    }
+  }, m.desc), m.pts.map((p, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: p,
+    col: m.col
+  }))))));
+}
+function PageExterminate({
+  onBack
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: "#2A1000",
+    gradB: T.brandLt,
+    title: "\u99C6\u9664\u306E\u3057\u304B\u305F",
+    sub: "\u67AF\u308C\u305F\u677E\u3092\u653E\u7F6E\u3057\u3066\u306F\u3044\u3051\u306A\u3044\u7406\u7531\u3068\u5BFE\u51E6\u6CD5"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement(NoteBox, {
+    type: "danger"
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.danger
+  }, "\u7D76\u5BFE\u306B\u899A\u3048\u3066\u307B\u3057\u3044\u30EB\u30FC\u30EB"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: "0.9rem",
+      color: T.textDark,
+      lineHeight: 1.9,
+      fontFamily: F.gothic
+    }
+  }, "\u67AF\u308C\u305F\u677E\u3092", /*#__PURE__*/React.createElement("strong", null, "\u4F10\u5012\u3059\u308B\u3060\u3051\u3067\u306F\u30C0\u30E1"), "\u3067\u3059\u3002", /*#__PURE__*/React.createElement("br", null), "\u6750\u306E\u4E2D\u306B\u30AB\u30DF\u30AD\u30EA\u5E7C\u866B\u304C\u3044\u30665\u6708\u4E0B\u65EC\u306B\u7FBD\u5316\u3057\u307E\u3059\u3002", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("strong", null, "3\u6708\u672B\u307E\u3067"), "\u306B\u304F\u3093\u84B8\u30FB\u7834\u7815\u30FB\u713C\u5374\u3067\u6BBA\u866B\u3057\u3066\u304F\u3060\u3055\u3044\u3002")), [{
+    title: "くん蒸処理（最も広く使われる）",
+    col: "#8B5A10",
+    desc: "ビニールシートで覆い薬剤で約1週間くん蒸。冬期でも材内の幼虫・線虫をほぼ100%殺虫できる。",
+    pts: ["実施時期の制約がなく全国で最多使用", "生分解性くん蒸資材「ミクスト」が登場", "枝条の放置やビニール破損に要注意"]
+  }, {
+    title: "破砕処理（チップ化）",
+    col: T.brandMid,
+    desc: "チッパーで被害木を細かく粉砕する。移動式破砕機で5cm以下に破砕可能。",
+    pts: ["現場での処理が可能", "急斜面の山林では作業困難な場合も"]
+  }, {
+    title: "焼却処理",
+    col: T.danger,
+    desc: "伐倒した被害木を焼却する。確実な殺虫効果があるが場所の制約が大きい。",
+    pts: ["完全な殺虫が可能", "実施場所・周辺環境への配慮が必要"]
+  }].map(m => /*#__PURE__*/React.createElement(Card, {
+    key: m.title,
+    style: {
+      borderLeft: `4px solid ${m.col}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: m.col,
+      fontSize: "0.97rem",
+      marginBottom: "6px"
+    }
+  }, m.title), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textMid,
+      lineHeight: 1.75,
+      marginBottom: "0.5rem",
+      fontFamily: F.gothic
+    }
+  }, m.desc), m.pts.map((p, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: p,
+    col: m.col,
+    arrow: true
+  })))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.parchment,
+      border: `1.5px solid ${T.tanLt}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u9632\u9664\u52B9\u679C\u306E\u9AD8\u3044\u9806"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.88rem",
+      color: T.textDark,
+      lineHeight: 2.2,
+      fontFamily: F.gothic
+    }
+  }, /*#__PURE__*/React.createElement("strong", null, "\u6A39\u5E79\u6CE8\u5165"), " > \u85AC\u5264\u6563\u5E03 > \u713C\u5374\u30FB\u7834\u7815\u30FB\u304F\u3093\u84B8"))));
+}
+function PageMedicine({
+  onBack
+}) {
+  const {
+    content: C
+  } = useContext(EditContext);
+  const [sel, setSel] = useState(0);
+  const m = C.medicines[sel];
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: "#0E2A18",
+    gradB: T.pine,
+    borderCol: "#A0C070",
+    title: "\u85AC\u5264\u30AC\u30A4\u30C9",
+    sub: "\u88FD\u54C1\u3092\u9078\u3093\u3067\u8A73\u7D30\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.76rem",
+      color: T.textSoft,
+      margin: "0 0 0.5rem",
+      fontFamily: F.gothic
+    }
+  }, "\u85AC\u5264\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
+      marginBottom: "1rem"
+    }
+  }, C.medicines.map((med, i) => /*#__PURE__*/React.createElement("button", {
+    key: i,
+    onClick: () => setSel(i),
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      padding: "0.9rem 1rem",
+      borderRadius: "6px",
+      cursor: "pointer",
+      border: sel === i ? `2px solid ${med.col}` : `1.5px solid ${T.border}`,
+      background: sel === i ? med.col + "0e" : T.card,
+      textAlign: "left",
+      transition: "all 0.15s"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: "bold",
+      color: sel === i ? med.col : T.textDark,
+      fontSize: "0.93rem",
+      fontFamily: F.mincho
+    }
+  }, med.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.73rem",
+      color: T.textSoft,
+      fontFamily: F.gothic
+    }
+  }, med.kind)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: sel === i ? med.col : T.border,
+      fontSize: "1.3rem"
+    }
+  }, sel === i ? "◆" : "›")))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      border: `2px solid ${m.col}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderBottom: `1px solid ${m.col}28`,
+      paddingBottom: "0.8rem",
+      marginBottom: "0.85rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: m.col,
+      fontSize: "1.05rem",
+      marginBottom: "4px"
+    }
+  }, m.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.73rem",
+      color: T.textSoft,
+      fontFamily: F.gothic
+    }
+  }, m.kind, " \uFF0F ", m.maker), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.7rem",
+      color: T.textSoft,
+      fontFamily: F.gothic
+    }
+  }, "\u767B\u9332\uFF1A", m.reg)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "8px",
+      marginBottom: "1rem"
+    }
+  }, [["有効成分", m.comp], ["効果持続", m.effect], ["施工時期", m.when]].map(([label, val]) => /*#__PURE__*/React.createElement("div", {
+    key: label,
+    style: {
+      background: T.parchment,
+      borderRadius: "4px",
+      padding: "0.6rem 0.7rem",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.68rem",
+      color: T.textSoft,
+      marginBottom: "3px",
+      fontFamily: F.gothic
+    }
+  }, label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.8rem",
+      fontWeight: "bold",
+      color: T.textDark,
+      fontFamily: F.gothic
+    }
+  }, val)))), /*#__PURE__*/React.createElement(SectionLabel, {
+    col: m.col
+  }, "\u7279\u9577"), m.pts.filter(Boolean).map((p, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: p,
+    col: m.col
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.pineLt,
+      borderRadius: "4px",
+      padding: "0.65rem",
+      marginTop: "0.75rem",
+      border: `1px solid #A0C070`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.7rem",
+      color: T.pine,
+      fontWeight: "bold",
+      marginBottom: "3px",
+      fontFamily: F.gothic
+    }
+  }, "\u4F7F\u7528\u91CF\u306E\u76EE\u5B89"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.82rem",
+      color: T.textDark,
+      fontFamily: F.gothic
+    }
+  }, m.use)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.dangerBg,
+      borderRadius: "4px",
+      padding: "0.65rem",
+      marginTop: "8px",
+      border: `1px solid ${T.dangerBd}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.7rem",
+      color: T.danger,
+      fontWeight: "bold",
+      marginBottom: "3px",
+      fontFamily: F.gothic
+    }
+  }, "\u6CE8\u610F\u4E8B\u9805"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.82rem",
+      color: T.textDark,
+      fontFamily: F.gothic
+    }
+  }, m.caution)), sel === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "0.75rem",
+      padding: "0.65rem",
+      background: T.parchment,
+      borderRadius: "4px",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.7rem",
+      color: T.textSoft,
+      fontFamily: F.gothic,
+      marginBottom: "6px"
+    }
+  }, "\u516C\u5F0F\u8CC7\u6599"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "6px"
+    }
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "https://www.ns-green.com/pd/guringa-doneo/",
+    target: "_blank",
+    style: {
+      fontSize: "0.82rem",
+      color: T.pine,
+      textDecoration: "underline",
+      fontFamily: F.gothic
+    }
+  }, "\u88FD\u54C1\u60C5\u5831\u30DA\u30FC\u30B8\uFF08\u30CB\u30C3\u30BD\u30FC\u30B0\u30EA\u30FC\u30F3\uFF09"), /*#__PURE__*/React.createElement("a", {
+    href: "https://www.ns-green.com/wp/wp-content/uploads/2025/02/leaf_guringa-doNEO.pdf",
+    target: "_blank",
+    style: {
+      fontSize: "0.82rem",
+      color: T.pine,
+      textDecoration: "underline",
+      fontFamily: F.gothic
+    }
+  }, "\u516C\u5F0F\u30EA\u30FC\u30D5\u30EC\u30C3\u30C8\uFF08PDF\uFF09"))), sel === 1 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "0.75rem",
+      padding: "0.65rem",
+      background: T.parchment,
+      borderRadius: "4px",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.7rem",
+      color: T.textSoft,
+      fontFamily: F.gothic,
+      marginBottom: "6px"
+    }
+  }, "\u516C\u5F0F\u8CC7\u6599"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "6px"
+    }
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "https://www.ns-green.com/pd/matuguri-neki2__sinrin/",
+    target: "_blank",
+    style: {
+      fontSize: "0.82rem",
+      color: "#4A3A7A",
+      textDecoration: "underline",
+      fontFamily: F.gothic
+    }
+  }, "\u88FD\u54C1\u60C5\u5831\u30DA\u30FC\u30B8\uFF08\u30CB\u30C3\u30BD\u30FC\u30B0\u30EA\u30FC\u30F3\uFF09")))), sel === 0 && /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.goldBg,
+      border: `1.5px solid ${T.goldBd}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.gold
+  }, "\u6CE8\u5165\u5B54\u306E\u5F8C\u51E6\u7406\uFF08\u91CD\u8981\uFF09"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: "0.86rem",
+      color: T.textDark,
+      lineHeight: 1.95,
+      fontFamily: F.gothic
+    }
+  }, "\u6CE8\u5165\u5F8C\u306E\u7A74\u306F\u6614\u306F\u30B3\u30EB\u30AF\u3067\u585E\u3044\u3067\u3044\u307E\u3057\u305F\u304C\u3001\u4ECA\u306F", /*#__PURE__*/React.createElement("strong", null, "\u6728\u6813"), "\u3092\u4F7F\u3044\u307E\u3059\u3002 \u6728\u6813\u306B\u5909\u3048\u308B\u3053\u3068\u3067\u7C97\u76AE\u518D\u751F\u30FB\u5E74\u8F2A\u5F62\u6210\u3078\u306E\u8CA0\u62C5\u304C\u5C11\u306A\u304F\u306A\u308A\u81EA\u7136\u306B\u8FD1\u3044\u4FEE\u5FA9\u304C\u671F\u5F85\u3067\u304D\u307E\u3059\u3002 \u6BBA\u83CC\u7652\u5408\u5264\u3092\u7A74\u306E\u5165\u53E3\u306B\u5857\u5E03\u3057\u3066\u304B\u3089\u6728\u6813\u3092\u5DEE\u3057\u8FBC\u307F\u300116\u6642\u9593\u5F8C\u306B\u30DE\u30C4\u30E4\u30CB\u304C\u51FA\u308C\u3070\u81EA\u5DF1\u4FEE\u5FA9\u306E\u30B5\u30A4\u30F3\u3067\u3059\u3002"))));
+}
+function PageFaq({
+  onBack
+}) {
+  const {
+    content: C
+  } = useContext(EditContext);
+  const [open, setOpen] = useState(null);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: T.brand,
+    gradB: T.brandLt,
+    title: "\u3088\u304F\u3042\u308B\u8CEA\u554F\uFF08Q&A\uFF09",
+    sub: "\u7591\u554F\u3092\u30BF\u30C3\u30D7\u3057\u3066\u7B54\u3048\u3092\u78BA\u8A8D\u3057\u3066\u304F\u3060\u3055\u3044"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, C.faqs.map((item, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      background: T.card,
+      borderRadius: "6px",
+      marginBottom: "0.55rem",
+      overflow: "hidden",
+      border: open === i ? `2px solid ${T.brandMid}` : `1px solid ${T.borderSoft}`,
+      boxShadow: `0 2px 8px rgba(80,34,0,0.07)`,
+      transition: "border-color 0.15s"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setOpen(open === i ? null : i),
+    style: {
+      width: "100%",
+      padding: "1rem",
+      textAlign: "left",
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      gap: "0.75rem"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px",
+      alignItems: "flex-start"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: T.brand,
+      color: "#fff",
+      borderRadius: "3px",
+      padding: "3px 8px",
+      fontSize: "0.74rem",
+      fontWeight: "bold",
+      flexShrink: 0,
+      marginTop: "2px",
+      fontFamily: F.gothic
+    }
+  }, "Q"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: "0.93rem",
+      color: T.textDark,
+      fontWeight: "bold",
+      lineHeight: 1.55,
+      fontFamily: F.mincho
+    }
+  }, item.q)), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: T.tan,
+      fontSize: "1.1rem",
+      flexShrink: 0,
+      marginTop: "2px"
+    }
+  }, open === i ? "▲" : "▼")), open === i && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 1rem 1rem",
+      borderTop: `1px solid ${T.sand}`,
+      display: "flex",
+      gap: "8px",
+      alignItems: "flex-start"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: T.pine,
+      color: "#fff",
+      borderRadius: "3px",
+      padding: "3px 8px",
+      fontSize: "0.74rem",
+      fontWeight: "bold",
+      flexShrink: 0,
+      marginTop: "2px",
+      fontFamily: F.gothic
+    }
+  }, "A"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      margin: 0,
+      fontSize: "0.87rem",
+      color: T.textMid,
+      lineHeight: 1.9,
+      fontFamily: F.gothic
+    }
+  }, item.a.split(/(https?:\/\/[^\s）)]+)/).map((part, i) => /^https?:\/\//.test(part) ? /*#__PURE__*/React.createElement("a", {
+    key: i,
+    href: part,
+    target: "_blank",
+    style: {
+      color: T.pine,
+      textDecoration: "underline"
+    }
+  }, part) : part)))))));
+}
+
+/* ════════════════════════════════════════════
+   ページ: グリンガードNEO 施工手順
+════════════════════════════════════════════ */
+function PageProcedure({
+  onBack
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: "#0E2A18",
+    gradB: T.pine,
+    borderCol: "#A0C070",
+    title: "\u30B0\u30EA\u30F3\u30AC\u30FC\u30C9NEO \u65BD\u5DE5\u624B\u9806",
+    sub: "\u7A74\u3042\u3051\u304B\u3089\u6CE8\u5165\u5B8C\u4E86\u307E\u3067\u306E\u8A73\u7D30\u624B\u9806"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.pine
+  }, "\u4F7F\u7528\u91CF\u306E\u76EE\u5B89\uFF08\u80F8\u9AD8\u76F4\u5F84\u5225\uFF09"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    style: {
+      width: "100%",
+      borderCollapse: "collapse",
+      fontSize: "0.83rem",
+      fontFamily: F.gothic
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      background: T.pine,
+      color: "#fff"
+    }
+  }, /*#__PURE__*/React.createElement("th", {
+    style: {
+      padding: "7px 10px",
+      textAlign: "left"
+    }
+  }, "\u80F8\u9AD8\u76F4\u5F84"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      padding: "7px 10px",
+      textAlign: "right"
+    }
+  }, "\u4F7F\u7528\u91CF"))), /*#__PURE__*/React.createElement("tbody", null, [["10〜15cm", "90ml（1本）"], ["15〜20cm", "135ml（1.5本）"], ["20〜25cm", "180〜270ml（2〜3本）"], ["25〜30cm", "270〜360ml（3〜4本）"], ["30〜35cm", "360〜450ml（4〜5本）"], ["35〜40cm", "450〜540ml（5〜6本）"], ["40cm以上", "5cm増すごとに 45〜135ml を順次増量"]].map(([d, v], i) => /*#__PURE__*/React.createElement("tr", {
+    key: d,
+    style: {
+      background: i % 2 === 0 ? T.card : T.parchment
+    }
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "7px 10px",
+      color: T.textDark,
+      fontWeight: "bold"
+    }
+  }, d), /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "7px 10px",
+      color: T.pine,
+      textAlign: "right"
+    }
+  }, v)))))), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.75rem",
+      color: T.textSoft,
+      margin: "0.5rem 0 0",
+      fontFamily: F.gothic
+    }
+  }, "\u203B\u5EAD\u5712\u677E\u306A\u3069\u6A39\u5F62\u3092\u77EF\u6B63\u3055\u308C\u305F\u677E\u306F\u901A\u5E38\u306E\u534A\u91CF\uFF5E1/3\u3092\u76EE\u5B89\u306B")), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u7A74\u3042\u3051\u306E\u65B9\u6CD5"), ["ドリル径：6.5mm（専用ドリル刃を使用）", "穴あけ位置：地上50cm〜1mの樹幹部", "角度：斜め下方向（約30度）", "深さ：小・中径木は甘皮の内側から5cm、大径木は9cm", "注意：大きな節の直下は避けてください", "注意：薬液が形成層に触れないよう深さを守ってください"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.brand
+  }))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      borderLeft: `4px solid ${T.pine}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.pine
+  }, "\u81EA\u7136\u5727\u6CE8\u5165\uFF08\u6A19\u6E96\u306E\u65B9\u6CD5\uFF09"), ["穴をあけたら直ちに容器の蓋を取り除く", "ノズルキャップを装着する", "薬液が漏れないよう容器ごと樹幹に押し込む", "容器の底部陥凹部に小孔をあけ、自然圧で注入開始", "複数容器を使う場合は注入孔を周囲に分散させる", "注入時間：早いもので1時間、遅いもので48時間、通常3〜6時間", "晴天の日中に施工することを推奨"].map((t, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: "10px",
+      alignItems: "flex-start",
+      marginBottom: "0.5rem"
+    }
+  }, /*#__PURE__*/React.createElement(NumBadge, {
+    n: i + 1,
+    col: T.pine
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textMid,
+      lineHeight: 1.75,
+      fontFamily: F.gothic
+    }
+  }, t)))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      borderLeft: `4px solid ${T.brandMid}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brandMid
+  }, "\u52A0\u5727\u6CE8\u5165\uFF08\u96E3\u6CE8\u5165\u6728\u5411\u3051\uFF09"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.84rem",
+      color: T.textMid,
+      lineHeight: 1.7,
+      marginBottom: "0.75rem",
+      fontFamily: F.gothic
+    }
+  }, "\u6A39\u8102\u6D41\u51FA\u306E\u76DB\u3093\u306A\u6728\u306A\u3069\u3001\u81EA\u7136\u5727\u3067\u306F\u6CE8\u5165\u3057\u306B\u304F\u3044\u6728\u306B\u4F7F\u7528\u3057\u307E\u3059\u3002 \u5C02\u7528\u306E\u52A0\u5727\u6CE8\u5165\u7528\u5668\u5177\uFF08\u30AC\u30B9\u30DC\u30F3\u30D9\u30FB\u52A0\u5727\u6CE8\u5165\u7528\u5BB9\u5668\uFF09\u304C\u5FC5\u8981\u3067\u3059\u3002"), ["樹幹に注入孔をあけたら直ちに加圧注入用容器にノズルキャップを装着", "容器ごと樹幹に押し込む", "加圧注入用容器の底部のフタをはずし薬液を注ぐ（1容器につき270mlまで）", "底部キャップに加圧注入用ガスボンベを装着し密栓する", "底キャップの凸出部をまわしガスを噴出させ容器内を加圧", "注入完了後、底部キャップをゆるめガスが排出したことを確認してから容器を取り除く", "注入時間：通常1〜2時間", "注意：外気温30℃を超える場所では使用しないこと"].map((t, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: "10px",
+      alignItems: "flex-start",
+      marginBottom: "0.5rem"
+    }
+  }, /*#__PURE__*/React.createElement(NumBadge, {
+    n: i + 1,
+    col: T.brandMid
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textMid,
+      lineHeight: 1.75,
+      fontFamily: F.gothic
+    }
+  }, t)))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.goldBg,
+      border: `1.5px solid ${T.goldBd}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.gold
+  }, "\u6CE8\u5165\u5F8C\u306E\u51E6\u7406"), ["注入の終了した孔は必ずふさぐ（木栓または被膜塗布剤）", "使用済み容器は速やかに回収し、適切に処理する", "施工30分後に薬剤の注入状況を必ず確認する", "入りにくい場合は打ち換えること"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.gold
+  }))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.dangerBg,
+      border: `1.5px solid ${T.dangerBd}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.danger
+  }, "\u6CE8\u5165\u3057\u3066\u306F\u3044\u3051\u306A\u3044\u677E"), ["すでに針葉の変色・樹脂流出の異常が出ている松（治療効果はない）", "病害虫やその他の原因で弱っている松", "植栽後の期間が短い松", "樹形を激しく矯正された松"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.danger
+  }))), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u4F5C\u696D\u6642\u306E\u5B89\u5168\u6CE8\u610F"), ["手袋・長ズボン・長袖の作業衣を着用すること", "作業後は手足・顔を石けんでよく洗い、うがいをすること", "誤って飲み込んだ場合は吐き出させ、直ちに医師の手当を受けること", "火気・直射日光を避け、食品と区別して低温な場所に密栓保管（0℃以下は不可）", "街路・公園での使用時は、使用中および当日は立ち入り禁止措置をとること"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.brand
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "0.75rem",
+      padding: "0.65rem",
+      background: T.parchment,
+      borderRadius: "4px",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.75rem",
+      color: T.brand,
+      fontWeight: "bold",
+      fontFamily: F.gothic,
+      marginBottom: "3px"
+    }
+  }, "\u5371\u967A\u7269\u5206\u985E"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.82rem",
+      color: T.textDark,
+      fontFamily: F.gothic
+    }
+  }, "\u7B2C\u56DB\u985E\u7B2C2\u77F3\u6CB9\u985E\uFF08\u6C34\u6EB6\u6027\uFF09\u5371\u967A\u7B49\u7D1AIII\u3000\u706B\u6C17\u53B3\u7981"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.parchment,
+      borderRadius: "5px",
+      padding: "0.9rem",
+      border: `1px solid ${T.border}`,
+      fontSize: "0.75rem",
+      color: T.textSoft,
+      fontFamily: F.gothic,
+      lineHeight: 1.8
+    }
+  }, "\u51FA\u5178\uFF1A\u682A\u5F0F\u4F1A\u793E\u30CB\u30C3\u30BD\u30FC\u30B0\u30EA\u30FC\u30F3 \u516C\u5F0F\u88FD\u54C1\u60C5\u5831\uFF08\u8FB2\u6797\u6C34\u7523\u7701\u767B\u9332 \u7B2C22028\u53F7\uFF09", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("a", {
+    href: "https://www.ns-green.com/pd/guringa-doneo/",
+    target: "_blank",
+    style: {
+      color: "#4A6B30",
+      textDecoration: "underline"
+    }
+  }, "\u88FD\u54C1\u60C5\u5831\u30DA\u30FC\u30B8"), "\xA0\uFF0F\xA0", /*#__PURE__*/React.createElement("a", {
+    href: "https://www.ns-green.com/wp/wp-content/uploads/2025/02/leaf_guringa-doNEO.pdf",
+    target: "_blank",
+    style: {
+      color: "#4A6B30",
+      textDecoration: "underline"
+    }
+  }, "\u516C\u5F0F\u30EA\u30FC\u30D5\u30EC\u30C3\u30C8\uFF08PDF\uFF09"))));
+}
+
+/* ════════════════════════════════════════════
+   ページ: マツグリーン液剤2 散布手順
+════════════════════════════════════════════ */
+function PageSpray({
+  onBack
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement(PageTop, {
+    onBack: onBack,
+    gradA: "#28103A",
+    gradB: "#4A3A7A",
+    borderCol: "#9080C0",
+    title: "\u30DE\u30C4\u30B0\u30EA\u30FC\u30F3\u6DB2\u52642 \u6563\u5E03\u624B\u9806",
+    sub: "\u5E0C\u91C8\u65B9\u6CD5\u30FB\u6563\u5E03\u6642\u671F\u30FB\u6CE8\u610F\u4E8B\u9805\u306E\u8A73\u7D30"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.1rem",
+      background: T.cream
+    }
+  }, /*#__PURE__*/React.createElement(Card, {
+    style: {
+      borderLeft: `4px solid ${"#4A3A7A"}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: "#4A3A7A"
+  }, "\u5730\u4E0A\u6563\u5E03\u306E\u624B\u9806"), ["60倍または100倍希釈液を十分に撹拌しながら調製する", "梢端部（枝の先端）に散布もれのないよう、ノズルを上に向けて散布する", "1回目：マツノマダラカミキリ成虫の発生前または発生初期（出雲市は5月上旬〜）", "約20日後：2回目散布（成虫発生最盛期直前）", "さらに約20日後：3回目散布", "松枯れ防止には散布適期を逃さず、散布むらのないよう十分量散布することが重要"].map((t, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      gap: "10px",
+      alignItems: "flex-start",
+      marginBottom: "0.5rem"
+    }
+  }, /*#__PURE__*/React.createElement(NumBadge, {
+    n: i + 1,
+    col: "#4A3A7A"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textMid,
+      lineHeight: 1.75,
+      fontFamily: F.gothic
+    }
+  }, t)))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.goldBg,
+      border: `1.5px solid ${T.goldBd}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.gold
+  }, "\u51FA\u96F2\u5E02\u3067\u306E\u6563\u5E03\u6642\u671F\u306E\u76EE\u5B89"), [["1回目", "5月上旬〜下旬", "カミキリ成虫の発生前または発生初期"], ["2回目", "約20日後（6月頃）", "成虫発生最盛期直前"], ["3回目", "さらに約20日後（6〜7月頃）", "成虫活動期"]].map(([n, t, d]) => /*#__PURE__*/React.createElement("div", {
+    key: n,
+    style: {
+      display: "flex",
+      gap: "10px",
+      alignItems: "flex-start",
+      marginBottom: "0.6rem",
+      padding: "0.6rem",
+      background: "rgba(255,255,255,0.6)",
+      borderRadius: "4px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.gold,
+      color: "#fff",
+      borderRadius: "3px",
+      padding: "2px 8px",
+      fontSize: "0.72rem",
+      fontWeight: "bold",
+      flexShrink: 0,
+      fontFamily: F.gothic
+    }
+  }, n), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.86rem",
+      color: T.textDark,
+      fontWeight: "bold",
+      fontFamily: F.gothic
+    }
+  }, t), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.78rem",
+      color: T.textSoft,
+      fontFamily: F.gothic
+    }
+  }, d))))), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.pine
+  }, "\u88FD\u54C1\u306E\u7279\u9577"), ["浸達性に優れ樹皮・樹内で安定、耐雨性が高く効果が長期間持続", "散布後の臭いや汚れがほとんどなく、車の塗装・墓石を汚染しない", "蒸気圧が低く散布した松から大気への移行がほとんどない", "土壌中・河川水中で微生物により速やかに分解される", "ミツバチ・天敵ダニ・鳥類への安全性が高い", "ヒノキなど周辺樹木や農作物に薬害の心配がほとんどない"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.pine
+  }))), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: "#4A3A7A"
+  }, "\u9069\u7528\u75C5\u5BB3\u866B\u3068\u5E0C\u91C8\u500D\u6570\uFF08\u5168\u7A2E\u985E\uFF09"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    style: {
+      width: "100%",
+      borderCollapse: "collapse",
+      fontSize: "0.81rem",
+      fontFamily: F.gothic
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      background: "#4A3A7A",
+      color: "#fff"
+    }
+  }, /*#__PURE__*/React.createElement("th", {
+    style: {
+      padding: "7px 8px",
+      textAlign: "left"
+    }
+  }, "\u5BB3\u866B\u540D"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      padding: "7px 8px",
+      textAlign: "center"
+    }
+  }, "\u5E0C\u91C8\u500D\u6570"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      padding: "7px 8px",
+      textAlign: "left"
+    }
+  }, "\u4F7F\u7528\u6642\u671F"))), /*#__PURE__*/React.createElement("tbody", null, [["マツノマダラカミキリ\n（地上散布）", "60〜100倍", "成虫発生直前〜発生初期"], ["マツノマダラカミキリ\n（無人航空機）", "10倍", "成虫発生初期および最盛期直前"], ["マツカレハ", "100〜250倍", "幼虫発生前〜幼虫発生期"], ["アブラムシ類", "500倍", "発生初期"], ["カイガラムシ類", "250倍", "発生期"], ["ケムシ類", "250倍", "幼虫発生期"], ["樹幹散布（カミキリ等）", "200倍", "成虫発生期"]].map(([pest, dil, timing], i) => /*#__PURE__*/React.createElement("tr", {
+    key: i,
+    style: {
+      background: i % 2 === 0 ? T.card : T.parchment
+    }
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "7px 8px",
+      color: T.textDark,
+      whiteSpace: "pre-line",
+      lineHeight: 1.45
+    }
+  }, pest), /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "7px 8px",
+      color: "#4A3A7A",
+      fontWeight: "bold",
+      textAlign: "center"
+    }
+  }, dil), /*#__PURE__*/React.createElement("td", {
+    style: {
+      padding: "7px 8px",
+      color: T.textMid,
+      fontSize: "0.76rem"
+    }
+  }, timing)))))), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: "0.74rem",
+      color: T.textSoft,
+      margin: "0.5rem 0 0",
+      fontFamily: F.gothic
+    }
+  }, "\u203B\u30A2\u30BB\u30BF\u30DF\u30D7\u30EA\u30C9\u3092\u542B\u3080\u8FB2\u85AC\u306E\u7DCF\u4F7F\u7528\u56DE\u6570\u306B\u6CE8\u610F\u3059\u308B\u3053\u3068")), /*#__PURE__*/React.createElement(Card, null, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.brand
+  }, "\u4F5C\u696D\u6642\u306E\u5B89\u5168\u6CE8\u610F"), ["散布の際は農薬用マスク・手袋・長袖作業衣を着用すること", "作業後はうがいをするとともに洗眼し、手足・顔を石けんでよく洗うこと", "本剤は眼に対して刺激性あり。眼に入った場合は直ちに水洗し、眼科医の手当を受けること", "危険物第四類第三石油類に属するので、火気には十分注意すること", "街路・公園等での使用時は、散布当日中は立ち入り禁止措置（綱囲い・立て札）をとること"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.brand
+  }))), /*#__PURE__*/React.createElement(Card, {
+    style: {
+      background: T.dangerBg,
+      border: `1.5px solid ${T.dangerBd}`
+    }
+  }, /*#__PURE__*/React.createElement(SectionLabel, {
+    col: T.danger
+  }, "\u74B0\u5883\u3078\u306E\u6CE8\u610F\u4E8B\u9805"), ["蚕には長期間の毒性あり。桑に付着するおそれがある地域では使用しないこと", "水産動植物（甲殻類）に影響を及ぼすおそれあり。河川・養殖池等への飛散・流入に注意", "使用残りの薬液が生じないよう調製を行い使い切ること", "散布機具・容器の洗浄水は河川等に流さないこと", "空容器は水産動植物に影響を与えないよう適切に処理すること"].map((t, i) => /*#__PURE__*/React.createElement(Bullet, {
+    key: i,
+    text: t,
+    col: T.danger
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.parchment,
+      borderRadius: "5px",
+      padding: "0.9rem",
+      border: `1px solid ${T.border}`,
+      fontSize: "0.75rem",
+      color: T.textSoft,
+      fontFamily: F.gothic,
+      lineHeight: 1.8
+    }
+  }, "\u53C2\u8003\uFF1A\u30CB\u30C3\u30BD\u30FC\u30B0\u30EA\u30FC\u30F3\u30FB\u30B5\u30F3\u30B1\u30A4\u5316\u5B66 \u516C\u5F0F\u88FD\u54C1\u60C5\u5831\uFF08\u8FB2\u6797\u6C34\u7523\u7701\u767B\u9332 \u7B2C20838\u53F7\uFF09", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("a", {
+    href: "https://www.ns-green.com/pd/matuguri-neki2__sinrin/",
+    target: "_blank",
+    style: {
+      color: T.pine,
+      textDecoration: "underline",
+      fontFamily: F.gothic
+    }
+  }, "\u88FD\u54C1\u60C5\u5831\u30DA\u30FC\u30B8\uFF08\u30CB\u30C3\u30BD\u30FC\u30B0\u30EA\u30FC\u30F3\uFF09"))));
+}
+
+/* ════════════════════════════════════════════
+   ホーム画面
+════════════════════════════════════════════ */
+function Home({
+  onNavigate
+}) {
+  const {
+    content: C
+  } = useContext(EditContext);
+  const [hov, setHov] = useState(null);
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.cream,
+      minHeight: "100vh"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: `linear-gradient(158deg,${T.brand} 0%,#6B3010 55%,${T.brandLt} 100%)`,
+      padding: "2.5rem 1.4rem 2rem",
+      textAlign: "center",
+      borderBottom: `4px solid ${T.tan}`,
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, [140, 100, 62].map((r, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      position: "absolute",
+      left: "50%",
+      top: "50%",
+      transform: "translate(-50%,-50%)",
+      width: r * 2,
+      height: r * 2,
+      border: "1px solid rgba(255,255,255,0.05)",
+      borderRadius: "50%",
+      pointerEvents: "none"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.tanLt,
+      fontSize: "0.7rem",
+      margin: "0 0 0.6rem",
+      letterSpacing: "0.22em",
+      fontFamily: F.gothic
+    }
+  }, "IZUMO MATSUKUI GUIDE"), /*#__PURE__*/React.createElement("h1", {
+    style: {
+      color: "#fff",
+      fontSize: "1.7rem",
+      fontWeight: "normal",
+      margin: "0 0 0.5rem",
+      lineHeight: 1.45,
+      fontFamily: F.mincho,
+      letterSpacing: "0.12em"
+    }
+  }, "\u677E\u304F\u3044\u866B\u5BFE\u7B56", /*#__PURE__*/React.createElement("br", null), "\u304B\u3093\u305F\u3093\u30AC\u30A4\u30C9"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: T.sand,
+      fontSize: "0.8rem",
+      margin: "0 0 0.3rem",
+      fontFamily: F.gothic
+    }
+  }, "\u51FA\u96F2\u5E02\u306E\u5927\u5207\u306A\u677E\u3092\u5B88\u308B\u305F\u3081\u306E\u77E5\u8B58\u3068\u5B9F\u8DF5"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 40,
+      height: 1,
+      background: T.tan,
+      margin: "1rem auto 1.4rem",
+      opacity: 0.7
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "rgba(139,32,0,0.8)",
+      borderRadius: "4px",
+      padding: "0.9rem 1.1rem",
+      display: "flex",
+      alignItems: "center",
+      gap: "0.8rem",
+      textAlign: "left",
+      border: "1px solid rgba(212,160,144,0.35)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 4,
+      minHeight: 36,
+      background: T.dangerBd,
+      borderRadius: 2,
+      flexShrink: 0
+    }
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: "0.9rem",
+      fontFamily: F.mincho
+    }
+  }, C.homeAlert), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#EAC0B0",
+      fontSize: "0.77rem",
+      marginTop: "3px",
+      fontFamily: F.gothic
+    }
+  }, C.homeAlertSub))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "1.4rem 1.2rem"
+    }
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      textAlign: "center",
+      fontSize: "0.75rem",
+      color: T.textSoft,
+      fontFamily: F.gothic,
+      letterSpacing: "0.12em",
+      margin: "0 0 1.1rem"
+    }
+  }, "\u77E5\u308A\u305F\u3044\u9805\u76EE\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044"), C.menus.map(item => /*#__PURE__*/React.createElement("button", {
+    key: item.id,
+    onClick: () => onNavigate(item.id),
+    onMouseEnter: () => setHov(item.id),
+    onMouseLeave: () => setHov(null),
+    onTouchStart: () => setHov(item.id),
+    onTouchEnd: () => setHov(null),
+    style: {
+      width: "100%",
+      marginBottom: "0.55rem",
+      background: hov === item.id ? T.parchment : T.card,
+      border: hov === item.id ? `1.5px solid ${T.brandMid}` : `1.5px solid ${T.borderSoft}`,
+      borderRadius: "5px",
+      cursor: "pointer",
+      textAlign: "left",
+      boxShadow: hov === item.id ? `0 4px 16px rgba(80,34,0,0.16)` : `0 2px 8px rgba(80,34,0,0.07)`,
+      overflow: "hidden",
+      display: "block",
+      transform: hov === item.id ? "translateY(-1px)" : "translateY(0)",
+      transition: "all 0.15s ease",
+      padding: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "stretch"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: `linear-gradient(180deg,${T.brand},${T.brandMid})`,
+      width: "6px",
+      flexShrink: 0
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0.95rem 1rem",
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: hov === item.id ? T.brand : T.textDark,
+      fontSize: "0.98rem",
+      marginBottom: "0.2rem",
+      fontFamily: F.mincho,
+      letterSpacing: "0.05em",
+      transition: "color 0.15s"
+    }
+  }, item.label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.75rem",
+      color: T.textSoft,
+      lineHeight: 1.4,
+      fontFamily: F.gothic
+    }
+  }, item.note)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      paddingRight: "1rem",
+      color: T.tan,
+      fontSize: "1.3rem"
+    }
+  }, "\u203A"))))));
+}
+
+/* ════════════════════════════════════════════
+   アプリ本体（編集機能付き）
+════════════════════════════════════════════ */
+function App() {
+  const [page, setPage] = useState("home");
+  const [content, setContent] = useState(() => JSON.parse(JSON.stringify(DEFAULTS)));
+  const [editMode, setEditMode] = useState(false);
+  const [showPwModal, setShowPwModal] = useState(false);
+  const [pwInput, setPwInput] = useState("");
+  const [pwError, setPwError] = useState(false);
+
+  // 隠しトリガー用
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef(null);
+
+  // ストレージから読み込み
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await window.storage.get(STORAGE_KEY);
+        if (res && res.value) {
+          const saved = JSON.parse(res.value);
+          // DEFAULTSとマージ（新キーが追加されていても対応）
+          setContent(prev => ({
+            ...prev,
+            ...saved
+          }));
+        }
+      } catch (_) {}
+    })();
+  }, []);
+  const go = id => {
+    setPage(id);
+    try {
+      window.scrollTo(0, 0);
+    } catch (_) {}
+  };
+  const back = () => go("home");
+
+  // 隠しトリガー：フッターの電話番号エリアを5回連続タップ
+  const handleHiddenTrigger = () => {
+    clickCountRef.current += 1;
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0;
+    }, 3000);
+    if (clickCountRef.current >= 5) {
+      clickCountRef.current = 0;
+      setPwInput("");
+      setPwError(false);
+      setShowPwModal(true);
+    }
+  };
+  const handlePwSubmit = () => {
+    if (pwInput === "8282") {
+      setShowPwModal(false);
+      setPwError(false);
+      setPwInput("");
+      setEditMode(true);
+    } else {
+      setPwError(true);
+    }
+  };
+  const handleSave = async draft => {
+    setContent(draft);
+    setEditMode(false);
+    try {
+      await window.storage.set(STORAGE_KEY, JSON.stringify(draft));
+    } catch (_) {}
+  };
+  const handleCancel = () => setEditMode(false);
+  const pageMap = {
+    home: /*#__PURE__*/React.createElement(Home, {
+      onNavigate: go
+    }),
+    what: /*#__PURE__*/React.createElement(PageWhat, {
+      onBack: back
+    }),
+    cycle: /*#__PURE__*/React.createElement(PageCycle, {
+      onBack: back
+    }),
+    damage: /*#__PURE__*/React.createElement(PageDamage, {
+      onBack: back
+    }),
+    prevent: /*#__PURE__*/React.createElement(PagePrevent, {
+      onBack: back
+    }),
+    exterminate: /*#__PURE__*/React.createElement(PageExterminate, {
+      onBack: back
+    }),
+    medicine: /*#__PURE__*/React.createElement(PageMedicine, {
+      onBack: back
+    }),
+    faq: /*#__PURE__*/React.createElement(PageFaq, {
+      onBack: back
+    }),
+    procedure: /*#__PURE__*/React.createElement(PageProcedure, {
+      onBack: back
+    }),
+    spray: /*#__PURE__*/React.createElement(PageSpray, {
+      onBack: back
+    })
+  };
+  return /*#__PURE__*/React.createElement(EditContext.Provider, {
+    value: {
+      editMode,
+      content,
+      setContent
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: "480px",
+      margin: "0 auto",
+      background: T.cream,
+      minHeight: "100vh",
+      boxShadow: "0 0 40px rgba(0,0,0,0.1)",
+      position: "relative"
+    }
+  }, !editMode && (pageMap[page] ?? pageMap["home"]), editMode && /*#__PURE__*/React.createElement(EditPanel, {
+    content: content,
+    onSave: handleSave,
+    onCancel: handleCancel
+  }), !editMode && /*#__PURE__*/React.createElement("div", {
+    onClick: handleHiddenTrigger,
+    style: {
+      position: "fixed",
+      bottom: 0,
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: "120px",
+      height: "18px",
+      cursor: "default",
+      background: "transparent",
+      zIndex: 500
+    }
+  }), showPwModal && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.5)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 900
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: T.card,
+      borderRadius: "8px",
+      padding: "1.8rem 1.4rem",
+      width: "300px",
+      maxWidth: "90%",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+      border: `1px solid ${T.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: F.mincho,
+      color: T.brand,
+      fontSize: "1rem",
+      letterSpacing: "0.06em",
+      marginBottom: "0.3rem"
+    }
+  }, "\u7DE8\u96C6\u30E2\u30FC\u30C9"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.78rem",
+      color: T.textSoft,
+      fontFamily: F.gothic,
+      marginBottom: "1.2rem"
+    }
+  }, "\u30D1\u30B9\u30EF\u30FC\u30C9\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044"), /*#__PURE__*/React.createElement("input", {
+    type: "password",
+    value: pwInput,
+    onChange: e => {
+      setPwInput(e.target.value);
+      setPwError(false);
+    },
+    onKeyDown: e => {
+      if (e.key === "Enter") handlePwSubmit();
+    },
+    placeholder: "\u30D1\u30B9\u30EF\u30FC\u30C9",
+    autoFocus: true,
+    style: {
+      width: "100%",
+      boxSizing: "border-box",
+      padding: "10px 12px",
+      borderRadius: "4px",
+      border: pwError ? `1.5px solid ${T.danger}` : `1.5px solid ${T.border}`,
+      fontFamily: F.gothic,
+      fontSize: "1rem",
+      color: T.textDark,
+      outline: "none",
+      marginBottom: "0.5rem"
+    }
+  }), pwError && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: "0.78rem",
+      color: T.danger,
+      fontFamily: F.gothic,
+      marginBottom: "0.75rem"
+    }
+  }, "\u30D1\u30B9\u30EF\u30FC\u30C9\u304C\u9055\u3044\u307E\u3059"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: "8px",
+      marginTop: "0.8rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowPwModal(false),
+    style: {
+      flex: 1,
+      padding: "9px",
+      borderRadius: "4px",
+      border: `1px solid ${T.border}`,
+      background: T.parchment,
+      color: T.textMid,
+      cursor: "pointer",
+      fontFamily: F.gothic,
+      fontSize: "0.85rem"
+    }
+  }, "\u30AD\u30E3\u30F3\u30BB\u30EB"), /*#__PURE__*/React.createElement("button", {
+    onClick: handlePwSubmit,
+    style: {
+      flex: 1,
+      padding: "9px",
+      borderRadius: "4px",
+      border: "none",
+      background: T.brand,
+      color: "#fff",
+      cursor: "pointer",
+      fontFamily: F.gothic,
+      fontSize: "0.85rem",
+      fontWeight: "bold"
+    }
+  }, "\u78BA\u8A8D"))))));
+}
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(React.createElement(App, null));
+  </script>
+</body>
+</html>
