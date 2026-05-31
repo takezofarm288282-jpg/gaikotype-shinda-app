@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人気の庭木図鑑 | Takezo植栽ガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--gd:#1a3a2a;--gm:#2d6a4f;--gl:#52b788;--gp:#b7e4c7;--cream:#f8f4ee;--ww:#fdfaf5;--earth:#8b6914;--td:#1c1c1c;--tm:#4a4a4a;--sh:0 4px 24px rgba(26,58,42,.12);--r:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans JP",sans-serif;background:var(--cream);color:var(--td);min-height:100vh}
+header{background:linear-gradient(135deg,var(--gd),var(--gm));padding:16px 22px;position:sticky;top:0;z-index:100;box-shadow:0 2px 18px rgba(0,0,0,.22)}
+.hi{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-family:"Noto Serif JP",serif;font-size:1.3rem;font-weight:700;color:#fff;white-space:nowrap}
+.logo span{color:var(--gp);font-size:.66rem;display:block;font-weight:400;letter-spacing:.1em}
+.sw{flex:1;min-width:170px;position:relative}
+.sw svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gl)}
+#si{width:100%;padding:9px 12px 9px 38px;border:none;border-radius:50px;background:rgba(255,255,255,.16);color:#fff;font-size:.86rem;font-family:"Noto Sans JP",sans-serif;outline:none;transition:background .2s}
+#si::placeholder{color:rgba(255,255,255,.58)}
+#si:focus{background:rgba(255,255,255,.26)}
+#cntbadge{background:rgba(255,255,255,.14);color:var(--gp);border-radius:50px;padding:5px 12px;font-size:.76rem;white-space:nowrap;font-weight:500}
+.fw{background:var(--ww);border-bottom:1px solid rgba(26,58,42,.1);padding:8px 22px;overflow-x:auto;scrollbar-width:none}
+.fw::-webkit-scrollbar{display:none}
+.fi{max-width:1400px;margin:0 auto;display:flex;gap:6px;align-items:center}
+.fl{font-size:.68rem;color:var(--tm);white-space:nowrap;margin-right:1px}
+.fb{padding:4px 12px;border:1.5px solid rgba(45,106,79,.28);border-radius:50px;background:transparent;color:var(--gm);font-size:.74rem;font-family:"Noto Sans JP",sans-serif;cursor:pointer;white-space:nowrap;transition:all .18s}
+.fb:hover{background:var(--gp)}.fb.active{background:var(--gm);color:#fff;border-color:var(--gm)}
+.sb{padding:4px 10px;border:1.5px solid rgba(139,105,20,.28);border-radius:50px;background:transparent;color:var(--earth);font-size:.74rem;font-family:"Noto Sans JP",sans-serif;cursor:pointer;white-space:nowrap;transition:all .18s}
+.sb:hover{background:#fef3c7}.sb.active{background:var(--earth);color:#fff}
+.dv{width:1px;height:20px;background:rgba(26,58,42,.14);margin:0 2px;flex-shrink:0}
+.main{max-width:1400px;margin:0 auto;padding:20px 22px}
+.sbar{display:flex;align-items:center;gap:6px;margin-bottom:14px;font-size:.74rem;color:var(--tm);flex-wrap:wrap}
+.stb{padding:4px 10px;border:1px solid rgba(26,58,42,.18);border-radius:50px;background:transparent;color:var(--tm);font-size:.68rem;font-family:"Noto Sans JP",sans-serif;cursor:pointer;transition:all .15s}
+.stb:hover{background:var(--gp)}.stb.active{background:var(--gd);color:#fff;border-color:var(--gd)}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:15px}
+.card{background:var(--ww);border-radius:var(--r);box-shadow:var(--sh);cursor:pointer;transition:transform .2s,box-shadow .2s;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(26,58,42,.06)}
+.card:hover{transform:translateY(-3px);box-shadow:0 7px 28px rgba(26,58,42,.18)}
+.cimg{position:relative;width:100%;height:160px;overflow:hidden;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);flex-shrink:0}
+.ci{width:100%;height:100%;object-fit:cover;transition:transform .4s;display:none;position:absolute;inset:0}
+.card:hover .ci{transform:scale(1.06)}
+.cph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--gm);opacity:.4;position:absolute;inset:0}
+.cph svg{width:32px;height:32px}.cph span{font-size:.68rem}
+.cld{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.sp{width:24px;height:24px;border:2.5px solid rgba(45,106,79,.18);border-top-color:var(--gm);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ch{padding:12px 14px 8px;background:linear-gradient(135deg,rgba(45,106,79,.05),rgba(82,183,136,.03));border-bottom:1px solid rgba(26,58,42,.07)}
+.cn{font-family:"Noto Serif JP",serif;font-size:1rem;font-weight:700;color:var(--gd);margin-bottom:3px;line-height:1.3}
+.cm{display:flex;gap:4px;flex-wrap:wrap}
+.badge{padding:1px 7px;border-radius:50px;font-size:.62rem;font-weight:500;white-space:nowrap}
+.bt-常緑広葉樹{background:#d1fae5;color:#065f46}.bt-落葉広葉樹{background:#fef3c7;color:#92400e}
+.bt-常緑針葉樹{background:#cffafe;color:#164e63}.bt-竹笹類{background:#e0f2fe;color:#075985}
+.bt-芝類,.bt-常緑多年草{background:#f0fdf4;color:#166534}.bt-常緑ツル性{background:#ede9fe;color:#5b21b6}
+.bt-宿根{background:#fce7f3;color:#9d174d}.bt-fam{background:rgba(26,58,42,.08);color:var(--gd)}
+.cb2{padding:10px 14px 12px;flex:1}
+.ir{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.ii{display:flex;flex-direction:column;gap:1px}
+.il{font-size:.58rem;color:var(--tm)}.iv{font-size:.78rem;color:var(--td);font-weight:500}
+.dsc{font-size:.74rem;color:var(--tm);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cf{padding:6px 14px;background:rgba(26,58,42,.03);border-top:1px solid rgba(26,58,42,.06);display:flex;gap:8px;flex-wrap:wrap}
+.mb{font-size:.62rem;color:var(--tm)}
+.empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--tm)}
+#loading{position:fixed;inset:0;background:var(--gd);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px;transition:opacity .4s}
+#loading.hide{opacity:0;pointer-events:none}
+#loading p{color:var(--gp);font-size:.9rem;font-family:"Noto Serif JP",serif}
+.mo{display:none;position:fixed;inset:0;background:rgba(10,30,20,.65);backdrop-filter:blur(5px);z-index:200;align-items:center;justify-content:center;padding:14px}
+.mo.open{display:flex}
+.modal{background:var(--ww);border-radius:22px;max-width:760px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 70px rgba(0,0,0,.35);animation:su .24s ease;scrollbar-width:thin;scrollbar-color:var(--gp) transparent}
+@keyframes su{from{transform:translateY(28px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhero{position:relative}
+.mmi{width:100%;height:260px;object-fit:cover;border-radius:22px 22px 0 0;display:block}
+.mph{width:100%;height:260px;border-radius:22px 22px 0 0;background:linear-gradient(135deg,#1a3a2a,#2d6a4f);display:flex;align-items:center;justify-content:center}
+.mph .sp{width:40px;height:40px;border-color:rgba(255,255,255,.2);border-top-color:#fff}
+.mgrd{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,25,18,.88) 0%,rgba(10,25,18,.12) 58%,transparent 100%);border-radius:22px 22px 0 0}
+.mhc{position:absolute;bottom:0;left:0;right:0;padding:16px 24px}
+.mt{font-family:"Noto Serif JP",serif;font-size:1.75rem;font-weight:700;color:#fff;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.mbd{display:flex;gap:6px;flex-wrap:wrap}
+.mbs{padding:3px 10px;border-radius:50px;font-size:.68rem;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.24)}
+.cbtn{position:absolute;top:13px;right:13px;width:33px;height:33px;background:rgba(255,255,255,.2);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(4px)}
+.cbtn:hover{background:rgba(255,255,255,.35)}
+.fps{padding:16px 24px 0}
+.fpt{font-size:.7rem;font-weight:600;color:var(--gm);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.fpg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fpw{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);cursor:pointer}
+.fpimg{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.fpw:hover .fpimg{transform:scale(1.05)}
+.fplbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.68),transparent);padding:14px 6px 5px;font-size:.6rem;color:#fff;text-align:center;font-weight:500}
+.fph{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.mbody{padding:16px 24px 24px}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:16px}
+.sc{background:linear-gradient(135deg,rgba(45,106,79,.06),rgba(82,183,136,.04));border:1px solid rgba(45,106,79,.12);border-radius:10px;padding:8px 10px}
+.sl{font-size:.58rem;color:var(--gm);letter-spacing:.08em;margin-bottom:2px;text-transform:uppercase}
+.sv{font-size:.86rem;font-weight:600;color:var(--gd)}
+.sec{margin-bottom:14px}
+.stl{font-family:"Noto Serif JP",serif;font-size:.86rem;font-weight:600;color:var(--gd);margin-bottom:5px;padding-bottom:4px;border-bottom:2px solid var(--gp);display:flex;align-items:center;gap:5px}
+.df{font-size:.85rem;line-height:1.8;color:var(--tm)}
+.pl{display:flex;flex-wrap:wrap;gap:4px}
+.pt{background:#fff1f2;color:#9f1239;border:1px solid #fecdd3;padding:2px 7px;border-radius:50px;font-size:.68rem}
+.pn{color:var(--gm);font-size:.82rem}
+.nb{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 10px;font-size:.8rem;color:#78350f;line-height:1.6}
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:400;align-items:center;justify-content:center;padding:18px}
+.lb.open{display:flex}
+.lb img{max-width:90vw;max-height:84vh;object-fit:contain;border-radius:8px}
+.lbc{position:fixed;top:16px;right:16px;width:40px;height:40px;background:rgba(255,255,255,.14);border:none;border-radius:50%;cursor:pointer;color:#fff;font-size:1.4rem;display:flex;align-items:center;justify-content:center}
+.lbc:hover{background:rgba(255,255,255,.26)}
+.wiki-credit{font-size:.58rem;color:rgba(255,255,255,.55);position:absolute;bottom:4px;right:8px;z-index:2}
+@media(max-width:600px){
+  header{padding:12px 14px}.fw{padding:7px 14px}.main{padding:12px 14px}
+  #grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .cimg{height:120px}.cn{font-size:.88rem}
+  .mt{font-size:1.3rem}.mmi,.mph{height:200px}
+  .mhc{padding:12px 16px}.fps,.mbody{padding-left:14px;padding-right:14px}
+  .fpg{gap:6px}
+}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#b7e4c7" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/><path d="M17 8c0-2.76-2.24-5-5-5S7 5.24 7 8"/></svg>
+  <p>図鑑データを読み込み中…</p>
+</div>
+
+<header>
+  <div class="hi">
+    <div class="logo">人気の庭木図鑑<span>Takezo 植栽提案ガイド 2026</span></div>
+    <div class="sw">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="si" placeholder="樹木名・科名・特徴で検索…" oninput="flt()">
+    </div>
+    <div id="cntbadge">読込中</div>
+  </div>
+</header>
+
+<div class="fw">
+  <div class="fi">
+    <span class="fl">種別：</span>
+    <button class="fb active" onclick="setT('')" data-t="">すべて</button>
+    <button class="fb" onclick="setT('常緑広葉樹')" data-t="常緑広葉樹">常緑広葉樹</button>
+    <button class="fb" onclick="setT('落葉広葉樹')" data-t="落葉広葉樹">落葉広葉樹</button>
+    <button class="fb" onclick="setT('常緑針葉樹')" data-t="常緑針葉樹">常緑針葉樹</button>
+    <button class="fb" onclick="setT('宿根')" data-t="宿根">宿根</button>
+    <button class="fb" onclick="setT('竹笹類')" data-t="竹笹類">竹笹</button>
+    <button class="fb" onclick="setT('常緑多年草')" data-t="常緑多年草">常緑多年草</button>
+    <button class="fb" onclick="setT('常緑ツル性')" data-t="常緑ツル性">ツル性</button>
+    <div class="dv"></div>
+    <span class="fl">日照：</span>
+    <button class="sb active" onclick="setSun('')">すべて</button>
+    <button class="sb" onclick="setSun('◎')">◎全日</button>
+    <button class="sb" onclick="setSun('〇')">〇半日</button>
+    <button class="sb" onclick="setSun('△')">△日陰</button>
+    <div class="dv"></div>
+    <span class="fl">灌水：</span>
+    <button class="sb active" onclick="setW('')">すべて</button>
+    <button class="sb" onclick="setW('多')">多</button>
+    <button class="sb" onclick="setW('中')">中</button>
+    <button class="sb" onclick="setW('少')">少</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sbar">
+    <span>並び替え：</span>
+    <button class="stb active" onclick="setSort('n')" id="sn">名前順</button>
+    <button class="stb" onclick="setSort('t')" id="st">種別順</button>
+    <button class="stb" onclick="setSort('fl')" id="sf">開花月順</button>
+    <button class="stb" onclick="setSort('h')" id="sh">高さ順</button>
+  </div>
+  <div id="grid"><div class="empty"><p>データを読み込んでいます…</p></div></div>
+</div>
+
+<div class="mo" id="mo" onclick="bgC(event)">
+  <div class="modal" id="modal">
+    <div class="mhero">
+      <button class="cbtn" onclick="closeM()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="mmain"></div>
+      <div class="mgrd"></div>
+      <div class="mhc">
+        <div class="mt" id="mttl"></div>
+        <div class="mbd" id="mbdg"></div>
+      </div>
+    </div>
+    <div class="fps">
+      <div class="fpt">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        特徴の写真（Wikipedia提供）
+      </div>
+      <div class="fpg" id="fpg"></div>
+    </div>
+    <div class="mbody" id="mbody"></div>
+  </div>
+</div>
+
+<div class="lb" id="lb" onclick="closeLB()">
+  <button class="lbc" onclick="closeLB()">×</button>
+  <img id="lbimg" src="" alt="">
+</div>
+
+<script>
+var PD = [];
+var cache = {};
+var cur = null;
+var tf='', sunf='', wf='', sk='n';
+var fdata = [];
+
+// ── LOAD plants.js ────────────────────────────────────────────
+function loadData() {
+  var s = document.createElement('script');
+  s.src = 'plants.js';
+  s.onload = function() {
+    fdata = PD.slice();
+    document.getElementById('cntbadge').textContent = PD.length + '種';
+    var ld = document.getElementById('loading');
+    ld.classList.add('hide');
+    setTimeout(function(){ ld.style.display='none'; }, 500);
+    renderGrid();
+  };
+  s.onerror = function() {
+    document.getElementById('grid').innerHTML = '<div class="empty"><p>⚠️ plants.js が見つかりません。両ファイルを同じフォルダに置いてください。</p></div>';
+    document.getElementById('loading').classList.add('hide');
+  };
+  document.head.appendChild(s);
+}
+
+// ── WIKIPEDIA IMAGE FETCH (APIキー不要・CORS対応) ─────────────
+var WP = 'https://ja.wikipedia.org/w/api.php';
+
+async function fetchImgs(name) {
+  if (cache[name]) return cache[name];
+
+  // Step 1: Get main image + article image list
+  var enc = encodeURIComponent(name);
+  var url1 = WP + '?action=query&titles=' + enc + '&prop=pageimages|images&pithumbsize=700&imlimit=15&format=json&origin=*&redirects=1';
+
+  var main = '';
+  var fileNames = [];
+
+  try {
+    var r1 = await fetch(url1);
+    var d1 = await r1.json();
+    var pages = d1.query && d1.query.pages ? d1.query.pages : {};
+    for (var pid in pages) {
+      var pg = pages[pid];
+      if (pg.thumbnail) main = pg.thumbnail.source;
+      if (pg.images) {
+        pg.images.forEach(function(img) {
+          var t = img.title || '';
+          if (/\.(jpg|jpeg|png|webp)$/i.test(t) &&
+              !/icon|logo|flag|map|stub|wikidata|wikimedia|commons-logo|disambig|question|edit|sound|speaker|listen/i.test(t)) {
+            fileNames.push(t);
+          }
+        });
+      }
+    }
+  } catch(e) {}
+
+  // Step 2: Get thumbnail URLs for up to 6 article images
+  var extraUrls = [];
+  if (fileNames.length > 0) {
+    var batch = fileNames.slice(0, 6).join('|');
+    var url2 = WP + '?action=query&titles=' + encodeURIComponent(batch) + '&prop=imageinfo&iiprop=url&iiurlwidth=500&format=json&origin=*';
+    try {
+      var r2 = await fetch(url2);
+      var d2 = await r2.json();
+      var pg2 = d2.query && d2.query.pages ? d2.query.pages : {};
+      for (var pid2 in pg2) {
+        var ii = pg2[pid2].imageinfo;
+        if (ii && ii[0] && ii[0].thumburl && ii[0].thumburl !== main) {
+          extraUrls.push(ii[0].thumburl);
+        }
+      }
+    } catch(e) {}
+  }
+
+  // If main not yet found, use first extra image
+  if (!main && extraUrls.length > 0) {
+    main = extraUrls.shift();
+  }
+
+  var result = { m: main, x: extraUrls.slice(0, 3) };
+  cache[name] = result;
+  return result;
+}
+
+// ── LAZY LOAD ─────────────────────────────────────────────────
+var obs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      var el = e.target, nm = el.dataset.plant;
+      if (nm && !el.dataset.ld) {
+        el.dataset.ld = '1';
+        loadCardImg(el, nm);
+        obs.unobserve(el);
+      }
+    }
+  });
+}, {rootMargin: '280px'});
+
+async function loadCardImg(wrap, name) {
+  var imgs = await fetchImgs(name);
+  var url = imgs.m;
+  var img = wrap.querySelector('.ci');
+  var sp = wrap.querySelector('.cld');
+  var ph = wrap.querySelector('.cph');
+  if (url) {
+    img.src = url;
+    img.onload = function(){ if(sp) sp.style.display='none'; img.style.display='block'; };
+    img.onerror = function(){
+      // Try English Wikipedia as fallback
+      tryEnWiki(wrap, name);
+    };
+  } else {
+    tryEnWiki(wrap, name);
+  }
+}
+
+async function tryEnWiki(wrap, name) {
+  // Fallback: search English Wikipedia with romanized query
+  var sp = wrap.querySelector('.cld');
+  var ph = wrap.querySelector('.cph');
+  try {
+    var r = await fetch('https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=' + encodeURIComponent(name) + '&prop=pageimages&pithumbsize=600&format=json&origin=*&gsrlimit=3');
+    var d = await r.json();
+    var pgs = d.query && d.query.pages ? d.query.pages : {};
+    var url = '';
+    for (var k in pgs) { if (pgs[k].thumbnail) { url = pgs[k].thumbnail.source; break; } }
+    if (url) {
+      var img = wrap.querySelector('.ci');
+      img.src = url;
+      img.onload = function(){ if(sp) sp.style.display='none'; img.style.display='block'; };
+      img.onerror = function(){ if(sp) sp.style.display='none'; if(ph) ph.style.display='flex'; };
+      return;
+    }
+  } catch(e) {}
+  if(sp) sp.style.display='none';
+  if(ph) ph.style.display='flex';
+}
+
+// ── FILTERS ───────────────────────────────────────────────────
+function setT(v) {
+  tf=v;
+  document.querySelectorAll('.fb').forEach(function(b){ b.classList.toggle('active', b.dataset.t===v); });
+  flt();
+}
+function setSun(v) {
+  sunf=v;
+  var btns=document.querySelectorAll('.sb'), vs=['','◎','〇','△'], i=0;
+  btns.forEach(function(b){ if(i<4){b.classList.toggle('active',vs[i]===v);} i++; });
+  flt();
+}
+function setW(v) {
+  wf=v;
+  var btns=Array.from(document.querySelectorAll('.sb')).slice(4), vs=['','多','中','少'];
+  btns.forEach(function(b,i){ b.classList.toggle('active',vs[i]===v); });
+  flt();
+}
+function setSort(k) {
+  sk=k;
+  document.querySelectorAll('.stb').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('s'+k[0]).classList.add('active');
+  renderGrid();
+}
+function flt() {
+  var q=document.getElementById('si').value.trim().toLowerCase();
+  fdata = PD.filter(function(p) {
+    if(tf && p.t!==tf) return false;
+    if(sunf && !p.su.includes(sunf)) return false;
+    if(wf && p.w!==wf) return false;
+    if(q && !p.n.toLowerCase().includes(q) && !p.f.toLowerCase().includes(q) && !p.d.toLowerCase().includes(q) && !p.t.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  renderGrid();
+}
+function doSort() {
+  return fdata.slice().sort(function(a,b) {
+    if(sk==='n') return a.n.localeCompare(b.n,'ja');
+    if(sk==='t') return (a.t||'zzz').localeCompare(b.t||'zzz','ja');
+    if(sk==='fl') return (parseInt(a.fl)||99)-(parseInt(b.fl)||99);
+    if(sk==='h') return (parseFloat(b.h)||0)-(parseFloat(a.h)||0);
+    return 0;
+  });
+}
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function si(s){ return !s?'':s.includes('◎')?'☀️':s.includes('〇')?'⛅':'🌥️'; }
+function tc(t){ return 'badge '+(t?'bt-'+t:''); }
+
+// ── RENDER GRID ────────────────────────────────────────────────
+function renderGrid() {
+  var list=doSort();
+  document.getElementById('cntbadge').textContent=list.length+'種';
+  var g=document.getElementById('grid');
+  if(!list.length){
+    g.innerHTML='<div class="empty"><p>該当する植物が見つかりませんでした</p></div>';
+    return;
+  }
+  g.innerHTML = list.map(function(p) {
+    var en=esc(p.n), nm=p.n.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    return '<div class="card" onclick="openM(this)" data-name="'+nm+'">'
+      +'<div class="cimg" data-plant="'+en+'">'
+        +'<div class="cld"><div class="sp"></div></div>'
+        +'<img class="ci" src="" alt="'+en+'">'
+        +'<div class="cph" style="display:none">'
+          +'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 0 1 10 10c0 4-2.5 8-7 10l-3-4-3 4c-4.5-2-7-6-7-10A10 10 0 0 1 12 2z"/><circle cx="12" cy="10" r="3"/></svg>'
+          +'<span>'+en+'</span>'
+        +'</div>'
+      +'</div>'
+      +'<div class="ch">'
+        +'<div class="cn">'+en+'</div>'
+        +'<div class="cm">'
+          +(p.t?'<span class="'+tc(p.t)+'">'+esc(p.t)+'</span>':'')
+          +(p.f?'<span class="badge bt-fam">'+esc(p.f)+'</span>':'')
+        +'</div>'
+      +'</div>'
+      +'<div class="cb2">'
+        +'<div class="ir">'
+          +(p.fl?'<div class="ii"><span class="il">開花</span><span class="iv">🌸 '+esc(p.fl)+'月</span></div>':'')
+          +(p.h?'<div class="ii"><span class="il">樹高</span><span class="iv">🌲 '+esc(p.h)+'m</span></div>':'')
+          +(p.su?'<div class="ii"><span class="il">日照</span><span class="iv">'+si(p.su)+' '+esc(p.su)+'</span></div>':'')
+          +(p.w?'<div class="ii"><span class="il">灌水</span><span class="iv">💧 '+esc(p.w)+'</span></div>':'')
+        +'</div>'
+        +(p.d?'<div class="dsc">'+esc(p.d)+'</div>':'')
+      +'</div>'
+      +'<div class="cf">'
+        +(p.c?'<span class="mb">❄️ 耐寒：'+esc(p.c)+'</span>':'')
+        +(p.pr?'<span class="mb">✂️ '+esc(p.pr)+'</span>':'')
+        +(p.al&&p.al!=='-'?'<span class="mb">🍂 '+esc(p.al)+'</span>':'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+  document.querySelectorAll('.cimg[data-plant]').forEach(function(el){ obs.observe(el); });
+}
+
+// ── MODAL ──────────────────────────────────────────────────────
+async function openM(cardEl) {
+  var name = cardEl.dataset.name;
+  var p = PD.find(function(x){ return x.n===name; });
+  if(!p) return;
+  cur = name;
+
+  document.getElementById('mttl').textContent = p.n;
+  document.getElementById('mbdg').innerHTML = [p.t,p.f].filter(Boolean).map(function(b){ return '<span class="mbs">'+esc(b)+'</span>'; }).join('');
+
+  // Main image - show spinner
+  var mmain = document.getElementById('mmain');
+  var cached = cache[name];
+  if(cached && cached.m) {
+    mmain.innerHTML = '<img class="mmi" src="'+cached.m+'" alt="'+esc(name)+'" onerror="this.style.display=\'none\'">'
+      +'<span class="wiki-credit">© Wikipedia</span>';
+  } else {
+    mmain.innerHTML = '<div class="mph"><div class="sp"></div></div>';
+  }
+
+  // Feature photo placeholders
+  var lbls = ['花・開花','葉・樹形','実・特徴'];
+  document.getElementById('fpg').innerHTML = lbls.map(function(lb,i){
+    return '<div class="fpw" id="fp'+i+'"><div class="fph"><div class="sp" style="width:20px;height:20px"></div></div><div class="fplbl">'+lb+'</div></div>';
+  }).join('');
+
+  // Stats
+  var pests = p.p ? p.p.split('\n').map(function(s){return s.trim();}).filter(Boolean) : [];
+  var hasP = pests.length>0 && !pests.some(function(x){return x.includes('ほとんど')||x.includes('特に見当');});
+  document.getElementById('mbody').innerHTML =
+    '<div class="sg">'
+      +(p.fl?'<div class="sc"><div class="sl">🌸 開花時期</div><div class="sv">'+esc(p.fl)+'月</div></div>':'')
+      +(p.h?'<div class="sc"><div class="sl">🌲 樹高(m)</div><div class="sv">'+esc(p.h)+'</div></div>':'')
+      +(p.su?'<div class="sc"><div class="sl">☀️ 日照</div><div class="sv">'+esc(p.su)+'</div></div>':'')
+      +(p.w?'<div class="sc"><div class="sl">💧 灌水</div><div class="sv">'+esc(p.w)+'</div></div>':'')
+      +(p.c?'<div class="sc"><div class="sl">❄️ 耐寒性</div><div class="sv">'+esc(p.c)+'</div></div>':'')
+      +(p.dw?'<div class="sc"><div class="sl">🌊 乾湿耐性</div><div class="sv">'+esc(p.dw)+'</div></div>':'')
+      +(p.td?'<div class="sc"><div class="sl">🌊 耐潮性</div><div class="sv">'+esc(p.td)+'</div></div>':'')
+      +(p.al&&p.al!=='-'?'<div class="sc"><div class="sl">🍂 紅葉</div><div class="sv">'+esc(p.al)+'</div></div>':'')
+      +(p.pr?'<div class="sc"><div class="sl">✂️ 剪定</div><div class="sv">'+esc(p.pr)+'</div></div>':'')
+      +(p.so?'<div class="sc"><div class="sl">🌱 土壌</div><div class="sv">'+esc(p.so)+'</div></div>':'')
+    +'</div>'
+    +(p.d?'<div class="sec"><div class="stl">📄 特徴・解説</div><p class="df">'+esc(p.d)+'</p></div>':'')
+    +'<div class="sec"><div class="stl">🛡️ 病害虫</div>'
+      +(hasP?'<div class="pl">'+pests.map(function(x){return '<span class="pt">'+esc(x)+'</span>';}).join('')+'</div>'
+            :'<p class="pn">✅ '+(pests.length?esc(pests[0]):'情報なし')+'</p>')
+    +'</div>'
+    +(p.nt?'<div class="sec"><div class="stl">⚠️ 備考</div><div class="nb">'+esc(p.nt)+'</div></div>':'');
+
+  document.getElementById('mo').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('modal').scrollTop=0;
+
+  // Fetch images
+  var imgs = await fetchImgs(name);
+  if(cur!==name) return;
+
+  // Update main
+  if(imgs.m) {
+    mmain.innerHTML='<img class="mmi" src="'+imgs.m+'" alt="'+esc(name)+'" onerror="this.style.display=\'none\'">'
+      +'<span class="wiki-credit">© Wikipedia / Wikimedia Commons</span>';
+  } else {
+    mmain.innerHTML='<div class="mph"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:54px;height:54px;color:rgba(255,255,255,.2)"><path d="M12 2a10 10 0 0 1 10 10c0 4-2.5 8-7 10l-3-4-3 4c-4.5-2-7-6-7-10A10 10 0 0 1 12 2z"/><circle cx="12" cy="10" r="3"/></svg></div>';
+  }
+
+  // Update feature photos
+  lbls.forEach(function(lb, i) {
+    var wrap=document.getElementById('fp'+i);
+    if(!wrap) return;
+    var url=imgs.x[i];
+    if(url) {
+      var safeU=url.replace(/'/g,'%27');
+      wrap.innerHTML='<img class="fpimg" src="'+url+'" alt="'+esc(name)+' '+esc(lb)+'" onclick="openLB(\''+safeU+'\')" onerror="this.parentElement.innerHTML=\'<div class=fph></div><div class=fplbl>'+lb+'</div>\'">'
+        +'<div class="fplbl">'+lb+'</div>';
+    } else {
+      wrap.innerHTML='<div class="fph"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2d6a4f" stroke-width="1.5" opacity=".32"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div class="fplbl">'+lb+'</div>';
+    }
+  });
+
+  // Update card img if not loaded
+  var cw=document.querySelector('.cimg[data-plant="'+esc(name)+'"]');
+  if(cw&&!cw.dataset.ld&&imgs.m){
+    cw.dataset.ld='1';
+    var ci=cw.querySelector('.ci'), cld=cw.querySelector('.cld'), cph=cw.querySelector('.cph');
+    ci.src=imgs.m;
+    ci.onload=function(){if(cld)cld.style.display='none';ci.style.display='block';};
+    ci.onerror=function(){if(cld)cld.style.display='none';if(cph)cph.style.display='flex';};
+    obs.unobserve(cw);
+  }
+}
+
+function closeM(){cur=null;document.getElementById('mo').classList.remove('open');document.body.style.overflow='';}
+function bgC(e){if(e.target===document.getElementById('mo'))closeM();}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeLB();closeM();}});
+function openLB(url){document.getElementById('lbimg').src=url;document.getElementById('lb').classList.add('open');}
+function closeLB(){document.getElementById('lb').classList.remove('open');}
+
+loadData();
+</script>
+</body>
+</html>
