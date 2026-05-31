@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>外構工事 物件管理</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:#f5f5f0;min-height:100vh;color:#1a1a1a}
+input,select,textarea,button{font-family:inherit}
+.btn{cursor:pointer;border:1px solid #ccc;background:#fff;color:#1a1a1a;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;transition:background 0.15s}
+.btn:hover{background:#f0f0f0}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-primary{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.btn-primary:hover{background:#0F6E56}
+.btn-accept{background:#378ADD;color:#fff;border-color:#378ADD;font-size:15px;padding:12px 20px;width:100%;border-radius:8px}
+.btn-accept:hover{background:#185FA5}
+.btn-danger{background:#E24B4A;color:#fff;border-color:#E24B4A}
+.btn-danger:hover{background:#A32D2D}
+.btn-sm{padding:5px 10px;font-size:12px}
+input[type=text],input[type=password],input[type=date],select,textarea{
+  width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;background:#fff;color:#1a1a1a
+}
+input:focus,select:focus,textarea:focus{outline:2px solid #1D9E75;border-color:#1D9E75}
+#toast{position:fixed;top:16px;right:16px;padding:12px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none}
+#toast.show{opacity:1}
+.toast-ok{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
+.toast-err{background:#FCEBEB;color:#791F1F;border:1px solid #F09595}
+</style>
+</head>
+<body>
+<div id="app"><div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:14px;color:#888">読み込み中...</div></div>
+<div id="toast"></div>
+<script>
+// ===== ユーザー管理 (localStorage) =====
+const DEFAULT_USERS=[
+  {id:'takezofarm',name:'管理者',pass:'8282',role:'admin'},
+  {id:'takezo1',name:'高橋',pass:'takahashi',role:'worker'},
+];
+let USERS=JSON.parse(localStorage.getItem('gaiku_users')||'null')||JSON.parse(JSON.stringify(DEFAULT_USERS));
+function saveUsers(){localStorage.setItem('gaiku_users',JSON.stringify(USERS));}
+
+// ===== IndexedDB セットアップ =====
+// 物件データ(filesなし)はlocalStorage、ファイルデータはIndexedDBに保存
+let db;
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open('gaikuDB',1);
+    req.onupgradeneeded=e=>{
+      const d=e.target.result;
+      if(!d.objectStoreNames.contains('files')) d.createObjectStore('files');
+      if(!d.objectStoreNames.contains('projects')) d.createObjectStore('projects');
+    };
+    req.onsuccess=e=>{db=e.target.result;resolve(db);};
+    req.onerror=e=>reject(e);
+  });
+}
+
+function dbGet(store,key){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readonly');
+    const req=tx.objectStore(store).get(key);
+    req.onsuccess=e=>resolve(e.target.result);
+    req.onerror=e=>reject(e);
+  });
+}
+function dbPut(store,key,val){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readwrite');
+    const req=tx.objectStore(store).put(val,key);
+    req.onsuccess=()=>resolve();
+    req.onerror=e=>reject(e);
+  });
+}
+function dbDelete(store,key){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readwrite');
+    const req=tx.objectStore(store).delete(key);
+    req.onsuccess=()=>resolve();
+    req.onerror=e=>reject(e);
+  });
+}
+function dbGetAll(store){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,'readonly');
+    const req=tx.objectStore(store).getAll();
+    req.onsuccess=e=>resolve(e.target.result||[]);
+    req.onerror=e=>reject(e);
+  });
+}
+
+// ===== 物件データ =====
+// projectsのfilesフィールドは [{name,type,fileId}] のみ保存（データなし）
+// 実データはIndexedDB files store に fileId をキーとして保存
+const SAMPLE=[
+  {id:1,name:'山田様邸 外構工事',work:'フェンス設置・カーポート基礎・アプローチ舗装',place:'島根県出雲市今市町3-5',start:'2026-06-10',end:'2026-06-20',amount:'850,000',comment:'駐車スペース2台分。隣地境界線に注意。',files:[],status:'募集中',assignee:null},
+  {id:2,name:'田中様邸 門柱工事',work:'門柱新設・インターホン取付・ポスト設置',place:'島根県出雲市大社町1-12',start:'2026-06-15',end:'2026-06-17',amount:'320,000',comment:'既存ブロック撤去あり。養生しっかり。',files:[],status:'募集中',assignee:null},
+  {id:3,name:'鈴木アパート 駐車場整備',work:'アスファルト舗装・ライン引き・側溝設置',place:'島根県出雲市斐川町学頭200',start:'2026-07-01',end:'2026-07-10',amount:'1,200,000',comment:'車10台分。工期厳守。',files:[],status:'請負済み',assignee:'高橋'},
+];
+let projects=[];
+let currentUser=null;
+const app=document.getElementById('app');
+function render(html){app.innerHTML=html;}
+
+async function saveProjects(){
+  // filesのdataを除いたメタ情報だけ保存
+  await dbPut('projects','all', projects.map(p=>({...p})));
+}
+
+async function loadProjects(){
+  const saved=await dbGet('projects','all');
+  if(saved&&saved.length>0){projects=saved;}
+  else{projects=JSON.parse(JSON.stringify(SAMPLE));await saveProjects();}
+}
+
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='show '+(ok?'toast-ok':'toast-err');
+  setTimeout(()=>{t.className='';},3500);
+}
+
+// ===== ログイン =====
+function showLogin(){
+  render(`
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem">
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:2rem;width:100%;max-width:380px;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+      <div style="text-align:center;margin-bottom:1.5rem">
+        <div style="width:52px;height:52px;background:#E1F5EE;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:26px">🏗️</div>
+        <h2 style="font-size:20px;font-weight:600">外構工事 物件管理</h2>
+        <p style="font-size:13px;color:#666;margin-top:4px">ログインしてください</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">ユーザーID</label>
+          <input id="uid" type="text" placeholder="例: takezo1">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">パスワード</label>
+          <input id="upw" type="password" placeholder="パスワード">
+        </div>
+        <div id="lerr" style="color:#E24B4A;font-size:13px;display:none">IDまたはパスワードが違います</div>
+        <button class="btn btn-primary" onclick="doLogin()" style="width:100%;padding:10px;font-size:15px">ログイン</button>
+      </div>
+    </div>
+  </div>`);
+  document.getElementById('upw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+}
+
+function doLogin(){
+  const uid=document.getElementById('uid').value.trim();
+  const pw=document.getElementById('upw').value;
+  const u=USERS.find(u=>u.id===uid&&u.pass===pw);
+  if(!u){document.getElementById('lerr').style.display='block';return;}
+  currentUser=u;showList();
+}
+
+// ===== バッジ =====
+function statusBadge(p){
+  if(p.status==='請負済み') return `<span style="background:#EEEDFE;color:#3C3489;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap">請負済み</span>`;
+  return `<span style="background:#E1F5EE;color:#085041;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap">募集中</span>`;
+}
+
+// ===== 物件一覧 =====
+function showList(){
+  const isAdmin=currentUser.role==='admin';
+  const cards=projects.map(p=>`
+  <div onclick="showDetail(${p.id})" style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;transition:box-shadow 0.15s,border-color 0.15s" onmouseenter="this.style.borderColor='#1D9E75';this.style.boxShadow='0 2px 8px rgba(29,158,117,0.12)'" onmouseleave="this.style.borderColor='#e0e0e0';this.style.boxShadow='none'">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px">
+      <h3 style="font-size:15px;font-weight:600;flex:1;line-height:1.4">${p.name}</h3>
+      ${statusBadge(p)}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px;color:#666">
+      <div>🔧 ${p.work.length>20?p.work.slice(0,20)+'…':p.work}</div>
+      <div onclick="event.stopPropagation();window.open('https://maps.google.com/?q='+encodeURIComponent('${p.place}'),'_blank')" style="cursor:pointer;color:#185FA5;text-decoration:underline">📍 ${p.place.length>16?p.place.slice(0,16)+'…':p.place}</div>
+      <div>📅 ${p.start} 〜 ${p.end}</div>
+      <div>💴 ¥${p.amount} <span style="font-size:11px;color:#aaa">税別</span></div>
+      <div>👤 ${p.tantou||'未定'}</div>
+    </div>
+    ${p.assignee?`<div style="margin-top:8px;font-size:12px;color:#534AB7;border-top:1px solid #f0f0f0;padding-top:8px">✅ 担当: ${p.assignee}</div>`:''}
+  </div>`).join('');
+
+  render(`
+  <div style="max-width:800px;margin:0 auto;padding:1rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;background:#fff;border-radius:12px;border:1px solid #e0e0e0;padding:0.75rem 1rem;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">🏗️</span>
+        <span style="font-weight:600;font-size:16px">外構工事 物件一覧</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:13px;color:#666">${currentUser.name}</span>
+        ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="showAddForm()">＋ 物件追加</button>`:''}
+        ${isAdmin?`<button class="btn btn-sm" onclick="showUsers()">👷 職人管理</button>`:''}
+        <button class="btn btn-sm" onclick="showLogin()">ログアウト</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${cards||'<p style="text-align:center;padding:2rem;color:#888">物件がありません</p>'}
+    </div>
+  </div>`);
+}
+
+// ===== 物件詳細 =====
+function showDetail(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  const isAdmin=currentUser.role==='admin';
+  const canAccept=currentUser.role==='worker'&&p.status==='募集中';
+
+  const fileList=(p.files||[]).map((f,i)=>{
+    const isImg=f.type&&f.type.startsWith('image/');
+    return `<div style="border:1px solid #e0e0e0;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:18px">${isImg?'🖼️':'📄'}</span>
+      <span style="font-size:13px;flex:1">${f.name}</span>
+      <button class="btn btn-sm" onclick="previewFile(${id},${i})">プレビュー</button>
+      ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="removeFile(${id},${i})">削除</button>`:''}
+    </div>`;
+  }).join('');
+
+  const acceptSection=canAccept?`
+  <div style="background:#fff;border:2px solid #378ADD;border-radius:12px;padding:1.25rem;margin-top:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:20px">📨</span>
+      <h3 style="font-size:15px;font-weight:600;color:#185FA5">この物件を請け負う</h3>
+    </div>
+    <p style="font-size:13px;color:#555;margin-bottom:12px;line-height:1.6">ボタンを押すと <strong>izumo@takezofarm.co.jp</strong> へ自動メールが送信され、ステータスが「請負済み」に変わります。</p>
+    <button id="accept-btn" class="btn btn-accept" onclick="acceptProject(${id})">✅ 依頼を請ける</button>
+  </div>`:'';
+
+  const assignedBanner=p.status==='請負済み'?`
+  <div style="background:#EEEDFE;border:1px solid #AFA9EC;border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;display:flex;align-items:center;gap:10px">
+    <span style="font-size:24px">✅</span>
+    <div>
+      <p style="font-weight:600;font-size:14px;color:#3C3489">請負済み</p>
+      <p style="font-size:13px;color:#534AB7">担当: ${p.assignee||'—'}</p>
+    </div>
+  </div>`:'';
+
+  render(`
+  <div style="max-width:800px;margin:0 auto;padding:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="showList()">← 一覧に戻る</button>
+      <span style="font-size:13px;color:#888">物件詳細</span>
+    </div>
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem;margin-bottom:1rem">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+        <h2 style="font-size:18px;font-weight:600">${p.name}</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${statusBadge(p)}
+          ${isAdmin?`<button class="btn btn-sm" onclick="showEdit(${p.id})">✏️ 編集</button>`:''}
+          ${isAdmin?`<button class="btn btn-danger btn-sm" onclick="deleteProject(${p.id})">🗑️ 削除</button>`:''}
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        ${row('主な工事内容','🔧',p.work)}
+        ${row('工事場所','📍',`<a href="https://maps.google.com/?q=${encodeURIComponent(p.place)}" target="_blank" style="color:#185FA5;text-decoration:underline">${p.place} 🗺️</a>`)}
+        ${row('担当者名','👤',p.tantou||'未定')}
+        ${row('予定工期','📅',p.start+' 〜 '+p.end)}
+        ${row('希望工事金額','💴','¥'+p.amount+' <span style="font-size:12px;color:#888">（税別）</span>')}
+        ${row('コメント','💬',p.comment||'—')}
+      </table>
+    </div>
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <h3 style="font-size:15px;font-weight:600">📎 図面・資料</h3>
+        ${isAdmin?`<label class="btn btn-primary btn-sm" style="cursor:pointer">⬆️ ファイル追加<input type="file" accept="image/*,.pdf" multiple style="display:none" onchange="addFiles(${p.id},this)"></label>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${fileList||'<p style="font-size:13px;color:#888">資料がまだ添付されていません</p>'}
+      </div>
+    </div>
+    ${acceptSection}
+    ${assignedBanner}
+    <div id="preview-area"></div>
+  </div>`);
+}
+
+function row(label,icon,val){
+  return `<tr style="border-top:1px solid #f0f0f0">
+    <td style="padding:10px 8px 10px 0;color:#666;white-space:nowrap;width:150px;vertical-align:top">${icon} ${label}</td>
+    <td style="padding:10px 0;color:#1a1a1a;line-height:1.5">${val}</td>
+  </tr>`;
+}
+
+// ===== ファイル追加（IndexedDB） =====
+async function addFiles(id,input){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  const files=Array.from(input.files);
+  for(const f of files){
+    const data=await new Promise(res=>{
+      const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);
+    });
+    const fileId='file_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    await dbPut('files',fileId,{name:f.name,type:f.type,data});
+    p.files=p.files||[];
+    p.files.push({name:f.name,type:f.type,fileId});
+  }
+  await saveProjects();
+  toast('ファイルを追加しました');
+  showDetail(id);
+}
+
+// ===== ファイル削除 =====
+async function removeFile(pid,idx){
+  if(!confirm('このファイルを削除しますか？'))return;
+  const p=projects.find(x=>x.id===pid);
+  const f=p.files[idx];
+  if(f.fileId) await dbDelete('files',f.fileId);
+  p.files.splice(idx,1);
+  await saveProjects();
+  toast('削除しました');
+  showDetail(pid);
+}
+
+// ===== ファイルプレビュー =====
+async function previewFile(pid,idx){
+  const p=projects.find(x=>x.id===pid);
+  const meta=p.files[idx];
+  const area=document.getElementById('preview-area');if(!area)return;
+  area.innerHTML='<div style="margin-top:1rem;padding:1rem;text-align:center;color:#888;font-size:13px">読み込み中...</div>';
+  const f=await dbGet('files',meta.fileId);
+  if(!f){area.innerHTML='<div style="margin-top:1rem;padding:1rem;color:#E24B4A;font-size:13px">ファイルが見つかりません</div>';return;}
+  const isImg=f.type&&f.type.startsWith('image/');
+  area.innerHTML=`<div style="margin-top:1rem;background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:13px;font-weight:600">${f.name}</span>
+      <button class="btn btn-sm" onclick="document.getElementById('preview-area').innerHTML=''">✕ 閉じる</button>
+    </div>
+    ${isImg?`<img src="${f.data}" style="max-width:100%;border-radius:8px">`:`<iframe src="${f.data}" style="width:100%;height:500px;border:none;border-radius:8px"></iframe>`}
+  </div>`;
+  area.scrollIntoView({behavior:'smooth'});
+}
+
+// ===== 依頼を請ける =====
+async function acceptProject(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  if(!confirm(`「${p.name}」の依頼を請けますか？\nizumo@takezofarm.co.jp へ通知メールが送信されます。`))return;
+  const btn=document.getElementById('accept-btn');
+  if(btn){btn.disabled=true;btn.textContent='送信中...⏳';}
+  const body=`【外構工事 請負通知】\n\n■ 物件名：${p.name}\n■ 担当職人：${currentUser.name}\n■ 主な工事内容：${p.work}\n■ 工事場所：${p.place}\n■ 予定工期：${p.start} 〜 ${p.end}\n■ 希望工事金額：¥${p.amount}\n■ コメント：${p.comment||'なし'}\n■ 受注日時：${new Date().toLocaleString('ja-JP')}`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        mcp_servers:[{type:'url',url:'https://gmailmcp.googleapis.com/mcp/v1',name:'gmail'}],
+        messages:[{role:'user',content:`Gmailで以下のメールを送信してください。完了したら「送信完了」とだけ答えてください。\n宛先: izumo@takezofarm.co.jp\n件名: 【請負確定】${p.name}（担当：${currentUser.name}）\n本文:\n${body}`}]})
+    });
+    const data=await res.json();
+    const txt=(data.content||[]).map(c=>c.text||'').join('');
+    if(txt.includes('送信完了')||txt.includes('sent')||txt.includes('送信')){
+      p.status='請負済み';p.assignee=currentUser.name;
+      await saveProjects();
+      toast('✅ メール送信・ステータス更新しました');
+      setTimeout(()=>showDetail(id),900);
+    }else{
+      toast('⚠️ メール送信に問題が発生しました',false);
+      if(btn){btn.disabled=false;btn.textContent='✅ 依頼を請ける';}
+    }
+  }catch(e){
+    toast('❌ 通信エラー: '+e.message,false);
+    if(btn){btn.disabled=false;btn.textContent='✅ 依頼を請ける';}
+  }
+}
+
+// ===== 物件フォーム =====
+function showAddForm(){renderForm(null);}
+function showEdit(id){renderForm(projects.find(x=>x.id===id));}
+
+function renderForm(p){
+  const isEdit=!!p;
+  render(`
+  <div style="max-width:600px;margin:0 auto;padding:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="${isEdit?`showDetail(${p.id})`:'showList()'}">← 戻る</button>
+      <span style="font-size:13px;color:#888">${isEdit?'物件を編集':'新規物件を追加'}</span>
+    </div>
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem">
+      <h2 style="font-size:16px;font-weight:600;margin-bottom:1rem">${isEdit?'物件情報を編集':'新しい物件を追加'}</h2>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        ${field('物件名 <span style="color:#E24B4A">*</span>','name','text',p?.name||'')}
+        ${field('主な工事内容 <span style="color:#E24B4A">*</span>','work','text',p?.work||'')}
+        ${field('工事場所 <span style="color:#E24B4A">*</span>','place','text',p?.place||'')}
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">担当者名 <span style="color:#E24B4A">*</span></label>
+          <select id="f-tantou">
+            <option value="">-- 選択してください --</option>
+            <option value="岡田/田中" \${p?.tantou==='岡田/田中'?'selected':''}>岡田/田中</option>
+            <option value="竹田晶彦" \${p?.tantou==='竹田晶彦'?'selected':''}>竹田晶彦</option>
+            <option value="曽田良治" \${p?.tantou==='曽田良治'?'selected':''}>曽田良治</option>
+            <option value="土江徹郎" \${p?.tantou==='土江徹郎'?'selected':''}>土江徹郎</option>
+            <option value="竹田和彦" \${p?.tantou==='竹田和彦'?'selected':''}>竹田和彦</option>
+          </select>
+        </div>
+        ${field('工事開始日 <span style="color:#E24B4A">*</span>','start','date',p?.start||'')}
+        ${field('工事終了日 <span style="color:#E24B4A">*</span>','end','date',p?.end||'')}
+        ${field('希望工事金額（例: 850,000） <span style="color:#E24B4A">*</span>','amount','text',p?.amount||'')}
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">ステータス</label>
+          <select id="f-status">
+            <option value="募集中" ${(!p||p.status==='募集中')?'selected':''}>募集中</option>
+            <option value="請負済み" ${p?.status==='請負済み'?'selected':''}>請負済み</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">コメント <span style="color:#aaa;font-size:11px">（任意）</span></label>
+          <textarea id="f-comment" rows="3" style="resize:vertical">${p?.comment||''}</textarea>
+        </div>
+        <button class="btn btn-primary" onclick="saveForm(${isEdit?p.id:'null'})" style="padding:10px;font-size:15px">${isEdit?'更新する':'追加する'}</button>
+      </div>
+    </div>
+  </div>`);
+}
+
+function field(label,id,type,val){
+  return `<div>
+    <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">${label}</label>
+    <input id="f-${id}" type="${type}" value="${val}">
+  </div>`;
+}
+
+async function saveForm(editId){
+  const get=id=>document.getElementById('f-'+id)?.value.trim()||'';
+  const tantou=document.getElementById('f-tantou')?.value||'';
+  const name=get('name'),work=get('work'),place=get('place'),start=get('start'),end=get('end'),amount=get('amount');
+  if(!name||!work||!place||!tantou||!start||!end||!amount){alert('すべての必須項目を入力してください');return;}
+  const status=document.getElementById('f-status').value;
+  const comment=document.getElementById('f-comment').value.trim();
+  if(editId!==null){
+    const p=projects.find(x=>x.id===editId);
+    Object.assign(p,{name,work,place,tantou,start,end,amount,status,comment});
+    await saveProjects();showDetail(editId);
+  }else{
+    projects.push({id:Date.now(),name,work,place,tantou,start,end,amount,status,comment,files:[],assignee:null});
+    await saveProjects();showList();
+  }
+}
+
+async function deleteProject(id){
+  if(!confirm('この物件を削除しますか？'))return;
+  const p=projects.find(x=>x.id===id);
+  for(const f of (p.files||[])){if(f.fileId)await dbDelete('files',f.fileId);}
+  projects=projects.filter(x=>x.id!==id);
+  await saveProjects();showList();
+}
+
+// ===== 職人管理 =====
+function showUsers(){
+  const workers=USERS.filter(u=>u.role==='worker');
+  const rows=workers.map(u=>`
+  <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid #f0f0f0;flex-wrap:wrap">
+    <span style="font-size:18px">👷</span>
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:600">${u.name}</div>
+      <div style="font-size:12px;color:#888">ID: ${u.id}　パスワード: ${u.pass}</div>
+    </div>
+    <button class="btn btn-sm" onclick="showUserForm('${u.id}')">編集</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">削除</button>
+  </div>`).join('');
+  render(`
+  <div style="max-width:600px;margin:0 auto;padding:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="showList()">← 戻る</button>
+      <span style="font-size:13px;color:#888">職人管理</span>
+    </div>
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <h2 style="font-size:16px;font-weight:600">👷 登録済み職人</h2>
+        <button class="btn btn-primary btn-sm" onclick="showUserForm(null)">＋ 職人を追加</button>
+      </div>
+      ${rows||'<p style="font-size:13px;color:#888;padding:12px 0">職人が登録されていません</p>'}
+    </div>
+  </div>`);
+}
+
+function showUserForm(editId){
+  const u=editId?USERS.find(x=>x.id===editId):null;
+  const isEdit=!!u;
+  render(`
+  <div style="max-width:500px;margin:0 auto;padding:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="showUsers()">← 戻る</button>
+      <span style="font-size:13px;color:#888">${isEdit?'職人を編集':'職人を追加'}</span>
+    </div>
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem">
+      <h2 style="font-size:16px;font-weight:600;margin-bottom:1rem">${isEdit?(u.name+' を編集'):'新しい職人を追加'}</h2>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">名前</label>
+          <input id="u-name" type="text" value="${u?.name||''}" placeholder="例: 山田 太郎">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">ログインID</label>
+          <input id="u-id" type="text" value="${u?.id||''}" placeholder="例: takezo2" ${isEdit?'readonly style="background:#f5f5f5;cursor:not-allowed"':''}>
+          ${isEdit?'<p style="font-size:11px;color:#aaa;margin-top:3px">IDは変更できません</p>':''}
+        </div>
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">パスワード</label>
+          <input id="u-pass" type="text" value="${u?.pass||''}" placeholder="例: yamada123">
+        </div>
+        <div id="u-err" style="color:#E24B4A;font-size:13px;display:none"></div>
+        <button class="btn btn-primary" onclick="saveUser('${editId||''}')" style="padding:10px;font-size:15px">${isEdit?'更新する':'追加する'}</button>
+      </div>
+    </div>
+  </div>`);
+}
+
+function saveUser(editId){
+  const name=document.getElementById('u-name').value.trim();
+  const uid=document.getElementById('u-id').value.trim();
+  const pass=document.getElementById('u-pass').value.trim();
+  const err=document.getElementById('u-err');
+  if(!name||!uid||!pass){err.textContent='すべての項目を入力してください';err.style.display='block';return;}
+  if(!editId){
+    if(USERS.find(u=>u.id===uid)){err.textContent='このIDはすでに使われています';err.style.display='block';return;}
+    USERS.push({id:uid,name,pass,role:'worker'});
+  }else{
+    const u=USERS.find(x=>x.id===editId);
+    if(u){u.name=name;u.pass=pass;}
+  }
+  saveUsers();toast('職人情報を保存しました');showUsers();
+}
+
+function deleteUser(uid){
+  if(!confirm('この職人を削除しますか？'))return;
+  USERS=USERS.filter(u=>u.id!==uid);
+  saveUsers();toast('削除しました');showUsers();
+}
+
+// ===== 起動 =====
+openDB().then(loadProjects).then(showLogin);
+</script>
+</body>
+</html>
