@@ -18,106 +18,120 @@ input,select,textarea,button{font-family:inherit}
 .btn-danger{background:#E24B4A;color:#fff;border-color:#E24B4A}
 .btn-danger:hover{background:#A32D2D}
 .btn-sm{padding:5px 10px;font-size:12px}
-input[type=text],input[type=password],input[type=date],select,textarea{
-  width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;background:#fff;color:#1a1a1a
-}
+input[type=text],input[type=password],input[type=date],select,textarea{width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;background:#fff;color:#1a1a1a}
 input:focus,select:focus,textarea:focus{outline:2px solid #1D9E75;border-color:#1D9E75}
 #toast{position:fixed;top:16px;right:16px;padding:12px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none}
 #toast.show{opacity:1}
 .toast-ok{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
 .toast-err{background:#FCEBEB;color:#791F1F;border:1px solid #F09595}
+.tab-btn{padding:8px 16px;border:1px solid #ddd;background:#f5f5f0;border-radius:8px 8px 0 0;cursor:pointer;font-size:14px;font-weight:500;border-bottom:none}
+.tab-btn.active{background:#fff;border-bottom:1px solid #fff;margin-bottom:-1px;color:#1D9E75}
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:#1D9E75;flex-shrink:0}
 </style>
 </head>
 <body>
 <div id="app"><div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:14px;color:#888">読み込み中...</div></div>
 <div id="toast"></div>
 <script>
-// ===== ユーザー管理 (localStorage) =====
+// ===== デフォルトユーザー =====
 const DEFAULT_USERS=[
   {id:'takezofarm',name:'管理者',pass:'8282',role:'admin'},
-  {id:'takezo1',name:'高橋',pass:'takahashi',role:'worker'},
+  {id:'sota',name:'曽田 良治',pass:'ryoji',role:'kantoku'},
+  {id:'tutie',name:'土江 徹郎',pass:'teturou',role:'kantoku'},
+  {id:'takahashi',name:'高橋 誠治',pass:'seiji',role:'kantoku'},
+  {id:'takeda1',name:'竹田 和彦',pass:'kazuhiko',role:'planner'},
+  {id:'takeda2',name:'竹田 晶彦',pass:'akihiko',role:'planner'},
+  {id:'okada',name:'岡田 望',pass:'nozomi',role:'planner'},
+  {id:'tanaka',name:'田中 桃香',pass:'momoka',role:'planner'},
 ];
 let USERS=JSON.parse(localStorage.getItem('gaiku_users')||'null')||JSON.parse(JSON.stringify(DEFAULT_USERS));
 function saveUsers(){localStorage.setItem('gaiku_users',JSON.stringify(USERS));}
 
-// ===== IndexedDB セットアップ =====
-// 物件データ(filesなし)はlocalStorage、ファイルデータはIndexedDBに保存
+// デフォルトチェック項目
+const DEFAULT_CHECKS={
+  kantoku:[
+    'コンクリートの発注・納期確認',
+    '在庫資材の不足チェック',
+    '図面・仕様の最終確認',
+    '近隣への事前確認（依頼時のみ）',
+    '工程表の作成・更新',
+    '職人の手配（人数・日程確定）',
+    '各業者との日程調整',
+    '工事発注書送信',
+    '応援要員の確保',
+    '作業内容の事前共有',
+    '現地の状況確認（プランナーとのMT)',
+    '搬入経路の確認',
+    '駐車・資材置き場の確保',
+    '危険個所の事前把握',
+    '養生及びコーンの準備',
+    '重機等リース',
+  ],
+  planner:[
+    '最終施工図の整備',
+    '材料発注',
+    '建築確認申請',
+    '道路占有/使用許可申請',
+    '排水許可申請',
+    '補助金申請',
+    '発注書作成',
+    '駐車場段取り',
+    '工程表の提出',
+  ]
+};
+let checkTemplates=JSON.parse(localStorage.getItem('gaiku_check_templates')||'null')||JSON.parse(JSON.stringify(DEFAULT_CHECKS));
+function saveCheckTemplates(){localStorage.setItem('gaiku_check_templates',JSON.stringify(checkTemplates));}
+
+// ===== IndexedDB =====
 let db;
 function openDB(){
   return new Promise((resolve,reject)=>{
-    const req=indexedDB.open('gaikuDB',1);
+    const req=indexedDB.open('gaikuDB',2);
     req.onupgradeneeded=e=>{
       const d=e.target.result;
       if(!d.objectStoreNames.contains('files')) d.createObjectStore('files');
       if(!d.objectStoreNames.contains('projects')) d.createObjectStore('projects');
+      if(!d.objectStoreNames.contains('checks')) d.createObjectStore('checks');
     };
     req.onsuccess=e=>{db=e.target.result;resolve(db);};
     req.onerror=e=>reject(e);
   });
 }
-
-function dbGet(store,key){
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(store,'readonly');
-    const req=tx.objectStore(store).get(key);
-    req.onsuccess=e=>resolve(e.target.result);
-    req.onerror=e=>reject(e);
-  });
-}
-function dbPut(store,key,val){
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(store,'readwrite');
-    const req=tx.objectStore(store).put(val,key);
-    req.onsuccess=()=>resolve();
-    req.onerror=e=>reject(e);
-  });
-}
-function dbDelete(store,key){
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(store,'readwrite');
-    const req=tx.objectStore(store).delete(key);
-    req.onsuccess=()=>resolve();
-    req.onerror=e=>reject(e);
-  });
-}
-function dbGetAll(store){
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(store,'readonly');
-    const req=tx.objectStore(store).getAll();
-    req.onsuccess=e=>resolve(e.target.result||[]);
-    req.onerror=e=>reject(e);
-  });
-}
+function dbGet(store,key){return new Promise((res,rej)=>{const tx=db.transaction(store,'readonly');const r=tx.objectStore(store).get(key);r.onsuccess=e=>res(e.target.result);r.onerror=e=>rej(e);});}
+function dbPut(store,key,val){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');const r=tx.objectStore(store).put(val,key);r.onsuccess=()=>res();r.onerror=e=>rej(e);});}
+function dbDelete(store,key){return new Promise((res,rej)=>{const tx=db.transaction(store,'readwrite');const r=tx.objectStore(store).delete(key);r.onsuccess=()=>res();r.onerror=e=>rej(e);});}
 
 // ===== 物件データ =====
-// projectsのfilesフィールドは [{name,type,fileId}] のみ保存（データなし）
-// 実データはIndexedDB files store に fileId をキーとして保存
 const SAMPLE=[
-  {id:1,name:'山田様邸 外構工事',work:'フェンス設置・カーポート基礎・アプローチ舗装',place:'島根県出雲市今市町3-5',start:'2026-06-10',end:'2026-06-20',amount:'850,000',comment:'駐車スペース2台分。隣地境界線に注意。',files:[],status:'募集中',assignee:null},
-  {id:2,name:'田中様邸 門柱工事',work:'門柱新設・インターホン取付・ポスト設置',place:'島根県出雲市大社町1-12',start:'2026-06-15',end:'2026-06-17',amount:'320,000',comment:'既存ブロック撤去あり。養生しっかり。',files:[],status:'募集中',assignee:null},
-  {id:3,name:'鈴木アパート 駐車場整備',work:'アスファルト舗装・ライン引き・側溝設置',place:'島根県出雲市斐川町学頭200',start:'2026-07-01',end:'2026-07-10',amount:'1,200,000',comment:'車10台分。工期厳守。',files:[],status:'請負済み',assignee:'高橋'},
+  {id:1,name:'山田様邸 外構工事',work:'フェンス設置・カーポート基礎・アプローチ舗装',place:'島根県出雲市今市町3-5',tantou:'岡田/田中',start:'2026-06-10',end:'2026-06-20',amount:'850,000',comment:'駐車スペース2台分。隣地境界線に注意。',files:[],status:'募集中',assignee:null},
+  {id:2,name:'田中様邸 門柱工事',work:'門柱新設・インターホン取付・ポスト設置',place:'島根県出雲市大社町1-12',tantou:'竹田晶彦',start:'2026-06-15',end:'2026-06-17',amount:'320,000',comment:'既存ブロック撤去あり。',files:[],status:'募集中',assignee:null},
+  {id:3,name:'鈴木アパート 駐車場整備',work:'アスファルト舗装・ライン引き・側溝設置',place:'島根県出雲市斐川町学頭200',tantou:'曽田良治',start:'2026-07-01',end:'2026-07-10',amount:'1,200,000',comment:'車10台分。工期厳守。',files:[],status:'募集中',assignee:null},
 ];
 let projects=[];
 let currentUser=null;
 const app=document.getElementById('app');
 function render(html){app.innerHTML=html;}
-
-async function saveProjects(){
-  // filesのdataを除いたメタ情報だけ保存
-  await dbPut('projects','all', projects.map(p=>({...p})));
-}
-
-async function loadProjects(){
-  const saved=await dbGet('projects','all');
-  if(saved&&saved.length>0){projects=saved;}
-  else{projects=JSON.parse(JSON.stringify(SAMPLE));await saveProjects();}
-}
+async function saveProjects(){await dbPut('projects','all',projects.map(p=>({...p})));}
+async function loadProjects(){const s=await dbGet('projects','all');if(s&&s.length>0){projects=s;}else{projects=JSON.parse(JSON.stringify(SAMPLE));await saveProjects();}}
 
 function toast(msg,ok=true){
   const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='show '+(ok?'toast-ok':'toast-err');
+  t.textContent=msg;t.className='show '+(ok?'toast-ok':'toast-err');
   setTimeout(()=>{t.className='';},3500);
+}
+
+function roleLabel(role){
+  if(role==='admin') return '管理者';
+  if(role==='kantoku') return '現場監督';
+  if(role==='planner') return 'プランナー';
+  return '職人';
+}
+function roleBadgeStyle(role){
+  if(role==='kantoku') return 'background:#FFF3E0;color:#E65100;border:1px solid #FFCC80';
+  if(role==='planner') return 'background:#E8EAF6;color:#283593;border:1px solid #9FA8DA';
+  return 'background:#E1F5EE;color:#085041;border:1px solid #5DCAA5';
 }
 
 // ===== ログイン =====
@@ -133,7 +147,7 @@ function showLogin(){
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
           <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">ユーザーID</label>
-          <input id="uid" type="text" placeholder="例: takezo1">
+          <input id="uid" type="text" placeholder="ID">
         </div>
         <div>
           <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">パスワード</label>
@@ -155,7 +169,6 @@ function doLogin(){
   currentUser=u;showList();
 }
 
-// ===== バッジ =====
 function statusBadge(p){
   if(p.status==='請負済み') return `<span style="background:#EEEDFE;color:#3C3489;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap">請負済み</span>`;
   return `<span style="background:#E1F5EE;color:#085041;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap">募集中</span>`;
@@ -188,9 +201,11 @@ function showList(){
         <span style="font-weight:600;font-size:16px">外構工事 物件一覧</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:12px;padding:3px 8px;border-radius:12px;${roleBadgeStyle(currentUser.role)}">${roleLabel(currentUser.role)}</span>
         <span style="font-size:13px;color:#666">${currentUser.name}</span>
         ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="showAddForm()">＋ 物件追加</button>`:''}
-        ${isAdmin?`<button class="btn btn-sm" onclick="showUsers()">👷 職人管理</button>`:''}
+        ${isAdmin?`<button class="btn btn-sm" onclick="showUsers()">👥 ユーザー管理</button>`:''}
+        ${isAdmin?`<button class="btn btn-sm" onclick="showCheckTemplateManager()">📋 チェック項目管理</button>`:''}
         <button class="btn btn-sm" onclick="showLogin()">ログアウト</button>
       </div>
     </div>
@@ -204,7 +219,8 @@ function showList(){
 function showDetail(id){
   const p=projects.find(x=>x.id===id);if(!p)return;
   const isAdmin=currentUser.role==='admin';
-  const canAccept=currentUser.role==='worker'&&p.status==='募集中';
+  const isKantoku=currentUser.role==='kantoku';
+  const isPlanner=currentUser.role==='planner';
 
   const fileList=(p.files||[]).map((f,i)=>{
     const isImg=f.type&&f.type.startsWith('image/');
@@ -216,22 +232,14 @@ function showDetail(id){
     </div>`;
   }).join('');
 
-  const acceptSection=canAccept?`
-  <div style="background:#fff;border:2px solid #378ADD;border-radius:12px;padding:1.25rem;margin-top:1rem">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-      <span style="font-size:20px">📨</span>
-      <h3 style="font-size:15px;font-weight:600;color:#185FA5">この物件を請け負う</h3>
+  const checkTabs=(isKantoku||isPlanner||isAdmin)?`
+  <div style="margin-top:1rem">
+    <div style="display:flex;gap:4px;margin-bottom:-1px">
+      <button class="tab-btn active" id="tab-kantoku" onclick="switchTab('kantoku',${id})">📋 監督用チェックシート</button>
+      <button class="tab-btn" id="tab-planner" onclick="switchTab('planner',${id})">📋 プランナー用チェックシート</button>
     </div>
-    <p style="font-size:13px;color:#555;margin-bottom:12px;line-height:1.6">ボタンを押すと <strong>izumo@takezofarm.co.jp</strong> へ自動メールが送信され、ステータスが「請負済み」に変わります。</p>
-    <button id="accept-btn" class="btn btn-accept" onclick="acceptProject(${id})">✅ 依頼を請ける</button>
-  </div>`:'';
-
-  const assignedBanner=p.status==='請負済み'?`
-  <div style="background:#EEEDFE;border:1px solid #AFA9EC;border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;display:flex;align-items:center;gap:10px">
-    <span style="font-size:24px">✅</span>
-    <div>
-      <p style="font-weight:600;font-size:14px;color:#3C3489">請負済み</p>
-      <p style="font-size:13px;color:#534AB7">担当: ${p.assignee||'—'}</p>
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:0 8px 8px 8px;padding:1rem" id="check-content">
+      ${renderCheckSheet(id,'kantoku')}
     </div>
   </div>`:'';
 
@@ -268,53 +276,186 @@ function showDetail(id){
         ${fileList||'<p style="font-size:13px;color:#888">資料がまだ添付されていません</p>'}
       </div>
     </div>
-    ${acceptSection}
-    ${assignedBanner}
+    ${checkTabs}
+    ${(currentUser.role==='kantoku'&&p.status==='募集中')?`
+    <div style="background:#fff;border:2px solid #378ADD;border-radius:12px;padding:1.25rem;margin-top:1rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:20px">📨</span>
+        <h3 style="font-size:15px;font-weight:600;color:#185FA5">この物件を請け負う</h3>
+      </div>
+      <p style="font-size:13px;color:#555;margin-bottom:12px;line-height:1.6">ボタンを押すとステータスが「請負済み」に変わり、管理者が確認できるようになります。</p>
+      <button id="accept-btn" class="btn btn-accept" onclick="acceptProject(${id})">✅ 依頼を請ける</button>
+    </div>`:''}
+    ${p.status==='請負済み'?`
+    <div style="background:#EEEDFE;border:1px solid #AFA9EC;border-radius:12px;padding:1rem 1.25rem;margin-top:1rem;display:flex;align-items:center;gap:10px">
+      <span style="font-size:24px">✅</span>
+      <div>
+        <p style="font-weight:600;font-size:14px;color:#3C3489">請負済み</p>
+        <p style="font-size:13px;color:#534AB7">担当: ${p.assignee||'—'}</p>
+        ${p.acceptedAt?`<p style="font-size:12px;color:#7B72D4">受注日時: ${p.acceptedAt}</p>`:''}
+      </div>
+    </div>`:''}
     <div id="preview-area"></div>
   </div>`);
 }
 
-function row(label,icon,val){
-  return `<tr style="border-top:1px solid #f0f0f0">
-    <td style="padding:10px 8px 10px 0;color:#666;white-space:nowrap;width:150px;vertical-align:top">${icon} ${label}</td>
-    <td style="padding:10px 0;color:#1a1a1a;line-height:1.5">${val}</td>
-  </tr>`;
+// ===== チェックシート表示 =====
+function renderCheckSheet(projectId, type){
+  const items=checkTemplates[type]||[];
+  const key=`check_${projectId}_${type}`;
+  const saved=JSON.parse(localStorage.getItem(key)||'{}');
+  const canCheck=(type==='kantoku'&&currentUser.role==='kantoku')||(type==='planner'&&currentUser.role==='planner');
+  const typeLabel=type==='kantoku'?'監督':'プランナー';
+  // saved[i] = 'done'(完了) or 'na'(該当なし) or undefined
+  const done=items.filter((_,i)=>saved[i]==='done').length;
+  const na=items.filter((_,i)=>saved[i]==='na').length;
+
+  const rows=items.map((item,i)=>{
+    const state=saved[i]||'';
+    const isDone=state==='done';
+    const isNA=state==='na';
+    const labelStyle=isDone?'text-decoration:line-through;color:#1D9E75':isNA?'text-decoration:line-through;color:#bbb':'';
+    if(type==='kantoku'){
+      return `
+  <div class="check-item" style="gap:6px">
+    <button onclick="${canCheck?`toggleCheckState(${projectId},'${type}',${i},'done')`:'void(0)'}"
+      style="flex-shrink:0;width:28px;height:28px;border-radius:6px;border:1.5px solid ${isDone?'#1D9E75':'#ccc'};background:${isDone?'#1D9E75':'#fff'};color:${isDone?'#fff':'#ccc'};font-size:14px;cursor:${canCheck?'pointer':'default'};display:flex;align-items:center;justify-content:center">✓</button>
+    <button onclick="${canCheck?`toggleCheckState(${projectId},'${type}',${i},'na')`:'void(0)'}"
+      style="flex-shrink:0;width:28px;height:28px;border-radius:6px;border:1.5px solid ${isNA?'#999':'#ccc'};background:${isNA?'#999':'#fff'};color:${isNA?'#fff':'#ccc'};font-size:12px;cursor:${canCheck?'pointer':'default'};display:flex;align-items:center;justify-content:center;font-weight:600">－</button>
+    <span style="font-size:14px;${labelStyle}">${item}</span>
+  </div>`;
+    } else {
+      return `
+  <div class="check-item" style="gap:6px">
+    <button onclick="${canCheck?`toggleCheckState(${projectId},'${type}',${i},'done')`:'void(0)'}"
+      style="flex-shrink:0;width:28px;height:28px;border-radius:6px;border:1.5px solid ${isDone?'#1D9E75':'#ccc'};background:${isDone?'#1D9E75':'#fff'};color:${isDone?'#fff':'#ccc'};font-size:14px;cursor:${canCheck?'pointer':'default'};display:flex;align-items:center;justify-content:center">✓</button>
+    <button onclick="${canCheck?`toggleCheckState(${projectId},'${type}',${i},'na')`:'void(0)'}"
+      style="flex-shrink:0;width:28px;height:28px;border-radius:6px;border:1.5px solid ${isNA?'#999':'#ccc'};background:${isNA?'#999':'#fff'};color:${isNA?'#fff':'#ccc'};font-size:12px;cursor:${canCheck?'pointer':'default'};display:flex;align-items:center;justify-content:center;font-weight:600">－</button>
+    <span style="font-size:14px;${labelStyle}">${item}</span>
+  </div>`;
+    }
+  }).join('');
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="font-size:13px;color:#666">${typeLabel}用チェックシート　<span style="font-weight:600;color:#1D9E75">${done}/${items.length} 完了</span>${na>0?` <span style="color:#999;font-size:12px">/ ${na}件 該当なし</span>`:''}</div>
+    <div style="width:120px;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
+      <div style="width:${items.length?Math.round((done+na)/items.length*100):0}%;height:100%;background:#1D9E75;border-radius:4px;transition:width 0.3s"></div>
+    </div>
+  </div>
+  ${rows||'<p style="font-size:13px;color:#888">チェック項目がありません</p>'}
+  ${!canCheck?'<p style="font-size:12px;color:#aaa;margin-top:8px">※ このシートは'+typeLabel+'のみチェックできます</p>':''}`;
 }
 
-// ===== ファイル追加（IndexedDB） =====
+function switchTab(type, projectId){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+type)?.classList.add('active');
+  document.getElementById('check-content').innerHTML=renderCheckSheet(projectId,type);
+}
+
+function toggleCheckState(projectId, type, idx, state){
+  const key=`check_${projectId}_${type}`;
+  const saved=JSON.parse(localStorage.getItem(key)||'{}');
+  // 同じボタンを押したらリセット
+  if(saved[idx]===state) saved[idx]='';
+  else saved[idx]=state;
+  localStorage.setItem(key,JSON.stringify(saved));
+  const items=checkTemplates[type]||[];
+  const done=items.filter((_,i)=>saved[i]==='done').length;
+  const na=items.filter((_,i)=>saved[i]==='na').length;
+  toast(`完了: ${done}件 / 該当なし: ${na}件`);
+  // チェックシート部分だけ再描画
+  const content=document.getElementById('check-content');
+  if(content) content.innerHTML=renderCheckSheet(projectId,type);
+}
+
+// ===== チェック項目管理（管理者用） =====
+function showCheckTemplateManager(){
+  render(`
+  <div style="max-width:800px;margin:0 auto;padding:1rem">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="showList()">← 戻る</button>
+      <span style="font-size:13px;color:#888">チェック項目管理</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      ${renderCheckTemplatePanel('kantoku','📋 監督用チェック項目')}
+      ${renderCheckTemplatePanel('planner','📋 プランナー用チェック項目')}
+    </div>
+  </div>`);
+}
+
+function renderCheckTemplatePanel(type, title){
+  const items=checkTemplates[type]||[];
+  const rows=items.map((item,i)=>`
+  <div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+    <span style="font-size:13px;flex:1">${item}</span>
+    <button class="btn btn-sm" onclick="editCheckItem('${type}',${i})">編集</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteCheckItem('${type}',${i})">削除</button>
+  </div>`).join('');
+  return `
+  <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <h3 style="font-size:15px;font-weight:600">${title}</h3>
+      <button class="btn btn-primary btn-sm" onclick="addCheckItem('${type}')">＋ 追加</button>
+    </div>
+    ${rows||'<p style="font-size:13px;color:#888">項目がありません</p>'}
+  </div>`;
+}
+
+function addCheckItem(type){
+  const text=prompt('新しいチェック項目を入力してください');
+  if(!text||!text.trim())return;
+  checkTemplates[type].push(text.trim());
+  saveCheckTemplates();
+  toast('追加しました');
+  showCheckTemplateManager();
+}
+
+function editCheckItem(type,idx){
+  const text=prompt('チェック項目を編集してください',checkTemplates[type][idx]);
+  if(!text||!text.trim())return;
+  checkTemplates[type][idx]=text.trim();
+  saveCheckTemplates();
+  toast('更新しました');
+  showCheckTemplateManager();
+}
+
+function deleteCheckItem(type,idx){
+  if(!confirm('このチェック項目を削除しますか？'))return;
+  checkTemplates[type].splice(idx,1);
+  saveCheckTemplates();
+  toast('削除しました');
+  showCheckTemplateManager();
+}
+
+// ===== 依頼を請ける =====
+async function acceptProject(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  if(!confirm(`「${p.name}」の依頼を請けますか？`))return;
+  p.status='請負済み';p.assignee=currentUser.name;p.acceptedAt=new Date().toLocaleString('ja-JP');
+  await saveProjects();toast('✅ 請け負いました');
+  setTimeout(()=>showDetail(id),600);
+}
+
+// ===== ファイル操作 =====
 async function addFiles(id,input){
   const p=projects.find(x=>x.id===id);if(!p)return;
-  const files=Array.from(input.files);
-  for(const f of files){
-    const data=await new Promise(res=>{
-      const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);
-    });
+  for(const f of Array.from(input.files)){
+    const data=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(f);});
     const fileId='file_'+Date.now()+'_'+Math.random().toString(36).slice(2);
     await dbPut('files',fileId,{name:f.name,type:f.type,data});
-    p.files=p.files||[];
-    p.files.push({name:f.name,type:f.type,fileId});
+    p.files=p.files||[];p.files.push({name:f.name,type:f.type,fileId});
   }
-  await saveProjects();
-  toast('ファイルを追加しました');
-  showDetail(id);
+  await saveProjects();toast('ファイルを追加しました');showDetail(id);
 }
-
-// ===== ファイル削除 =====
 async function removeFile(pid,idx){
   if(!confirm('このファイルを削除しますか？'))return;
   const p=projects.find(x=>x.id===pid);
-  const f=p.files[idx];
-  if(f.fileId) await dbDelete('files',f.fileId);
-  p.files.splice(idx,1);
-  await saveProjects();
-  toast('削除しました');
-  showDetail(pid);
+  const f=p.files[idx];if(f.fileId)await dbDelete('files',f.fileId);
+  p.files.splice(idx,1);await saveProjects();toast('削除しました');showDetail(pid);
 }
-
-// ===== ファイルプレビュー =====
 async function previewFile(pid,idx){
-  const p=projects.find(x=>x.id===pid);
-  const meta=p.files[idx];
+  const p=projects.find(x=>x.id===pid);const meta=p.files[idx];
   const area=document.getElementById('preview-area');if(!area)return;
   area.innerHTML='<div style="margin-top:1rem;padding:1rem;text-align:center;color:#888;font-size:13px">読み込み中...</div>';
   const f=await dbGet('files',meta.fileId);
@@ -330,41 +471,17 @@ async function previewFile(pid,idx){
   area.scrollIntoView({behavior:'smooth'});
 }
 
-// ===== 依頼を請ける =====
-async function acceptProject(id){
-  const p=projects.find(x=>x.id===id);if(!p)return;
-  if(!confirm(`「${p.name}」の依頼を請けますか？\nizumo@takezofarm.co.jp へ通知メールが送信されます。`))return;
-  const btn=document.getElementById('accept-btn');
-  if(btn){btn.disabled=true;btn.textContent='送信中...⏳';}
-  const body=`【外構工事 請負通知】\n\n■ 物件名：${p.name}\n■ 担当職人：${currentUser.name}\n■ 主な工事内容：${p.work}\n■ 工事場所：${p.place}\n■ 予定工期：${p.start} 〜 ${p.end}\n■ 希望工事金額：¥${p.amount}\n■ コメント：${p.comment||'なし'}\n■ 受注日時：${new Date().toLocaleString('ja-JP')}`;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
-        mcp_servers:[{type:'url',url:'https://gmailmcp.googleapis.com/mcp/v1',name:'gmail'}],
-        messages:[{role:'user',content:`Gmailで以下のメールを送信してください。完了したら「送信完了」とだけ答えてください。\n宛先: izumo@takezofarm.co.jp\n件名: 【請負確定】${p.name}（担当：${currentUser.name}）\n本文:\n${body}`}]})
-    });
-    const data=await res.json();
-    const txt=(data.content||[]).map(c=>c.text||'').join('');
-    if(txt.includes('送信完了')||txt.includes('sent')||txt.includes('送信')){
-      p.status='請負済み';p.assignee=currentUser.name;
-      await saveProjects();
-      toast('✅ メール送信・ステータス更新しました');
-      setTimeout(()=>showDetail(id),900);
-    }else{
-      toast('⚠️ メール送信に問題が発生しました',false);
-      if(btn){btn.disabled=false;btn.textContent='✅ 依頼を請ける';}
-    }
-  }catch(e){
-    toast('❌ 通信エラー: '+e.message,false);
-    if(btn){btn.disabled=false;btn.textContent='✅ 依頼を請ける';}
-  }
+// ===== テーブル行 =====
+function row(label,icon,val){
+  return `<tr style="border-top:1px solid #f0f0f0">
+    <td style="padding:10px 8px 10px 0;color:#666;white-space:nowrap;width:150px;vertical-align:top">${icon} ${label}</td>
+    <td style="padding:10px 0;color:#1a1a1a;line-height:1.5">${val}</td>
+  </tr>`;
 }
 
 // ===== 物件フォーム =====
 function showAddForm(){renderForm(null);}
 function showEdit(id){renderForm(projects.find(x=>x.id===id));}
-
 function renderForm(p){
   const isEdit=!!p;
   render(`
@@ -383,11 +500,11 @@ function renderForm(p){
           <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">担当者名 <span style="color:#E24B4A">*</span></label>
           <select id="f-tantou">
             <option value="">-- 選択してください --</option>
-            <option value="岡田/田中" \${p?.tantou==='岡田/田中'?'selected':''}>岡田/田中</option>
-            <option value="竹田晶彦" \${p?.tantou==='竹田晶彦'?'selected':''}>竹田晶彦</option>
-            <option value="曽田良治" \${p?.tantou==='曽田良治'?'selected':''}>曽田良治</option>
-            <option value="土江徹郎" \${p?.tantou==='土江徹郎'?'selected':''}>土江徹郎</option>
-            <option value="竹田和彦" \${p?.tantou==='竹田和彦'?'selected':''}>竹田和彦</option>
+            <option value="岡田/田中" ${p?.tantou==='岡田/田中'?'selected':''}>岡田/田中</option>
+            <option value="竹田晶彦" ${p?.tantou==='竹田晶彦'?'selected':''}>竹田晶彦</option>
+            <option value="曽田良治" ${p?.tantou==='曽田良治'?'selected':''}>曽田良治</option>
+            <option value="土江徹郎" ${p?.tantou==='土江徹郎'?'selected':''}>土江徹郎</option>
+            <option value="竹田和彦" ${p?.tantou==='竹田和彦'?'selected':''}>竹田和彦</option>
           </select>
         </div>
         ${field('工事開始日 <span style="color:#E24B4A">*</span>','start','date',p?.start||'')}
@@ -409,14 +526,12 @@ function renderForm(p){
     </div>
   </div>`);
 }
-
 function field(label,id,type,val){
   return `<div>
     <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">${label}</label>
     <input id="f-${id}" type="${type}" value="${val}">
   </div>`;
 }
-
 async function saveForm(editId){
   const get=id=>document.getElementById('f-'+id)?.value.trim()||'';
   const tantou=document.getElementById('f-tantou')?.value||'';
@@ -433,44 +548,41 @@ async function saveForm(editId){
     await saveProjects();showList();
   }
 }
-
 async function deleteProject(id){
   if(!confirm('この物件を削除しますか？'))return;
   const p=projects.find(x=>x.id===id);
   for(const f of (p.files||[])){if(f.fileId)await dbDelete('files',f.fileId);}
-  projects=projects.filter(x=>x.id!==id);
-  await saveProjects();showList();
+  projects=projects.filter(x=>x.id!==id);await saveProjects();showList();
 }
 
-// ===== 職人管理 =====
+// ===== ユーザー管理 =====
 function showUsers(){
-  const workers=USERS.filter(u=>u.role==='worker');
-  const rows=workers.map(u=>`
+  const roleOrder=['admin','kantoku','planner','worker'];
+  const sorted=[...USERS].sort((a,b)=>roleOrder.indexOf(a.role)-roleOrder.indexOf(b.role));
+  const rows=sorted.map(u=>`
   <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid #f0f0f0;flex-wrap:wrap">
-    <span style="font-size:18px">👷</span>
+    <span style="font-size:12px;padding:2px 8px;border-radius:12px;${roleBadgeStyle(u.role)}">${roleLabel(u.role)}</span>
     <div style="flex:1">
       <div style="font-size:14px;font-weight:600">${u.name}</div>
-      <div style="font-size:12px;color:#888">ID: ${u.id}　パスワード: ${u.pass}</div>
+      <div style="font-size:12px;color:#888">ID: ${u.id}　PW: ${u.pass}</div>
     </div>
-    <button class="btn btn-sm" onclick="showUserForm('${u.id}')">編集</button>
-    <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">削除</button>
+    ${u.role!=='admin'?`<button class="btn btn-sm" onclick="showUserForm('${u.id}')">編集</button><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">削除</button>`:''}
   </div>`).join('');
   render(`
   <div style="max-width:600px;margin:0 auto;padding:1rem">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
       <button class="btn btn-sm" onclick="showList()">← 戻る</button>
-      <span style="font-size:13px;color:#888">職人管理</span>
+      <span style="font-size:13px;color:#888">ユーザー管理</span>
     </div>
     <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <h2 style="font-size:16px;font-weight:600">👷 登録済み職人</h2>
-        <button class="btn btn-primary btn-sm" onclick="showUserForm(null)">＋ 職人を追加</button>
+        <h2 style="font-size:16px;font-weight:600">👥 登録済みユーザー</h2>
+        <button class="btn btn-primary btn-sm" onclick="showUserForm(null)">＋ 追加</button>
       </div>
-      ${rows||'<p style="font-size:13px;color:#888;padding:12px 0">職人が登録されていません</p>'}
+      ${rows}
     </div>
   </div>`);
 }
-
 function showUserForm(editId){
   const u=editId?USERS.find(x=>x.id===editId):null;
   const isEdit=!!u;
@@ -478,10 +590,9 @@ function showUserForm(editId){
   <div style="max-width:500px;margin:0 auto;padding:1rem">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
       <button class="btn btn-sm" onclick="showUsers()">← 戻る</button>
-      <span style="font-size:13px;color:#888">${isEdit?'職人を編集':'職人を追加'}</span>
     </div>
     <div style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:1.25rem">
-      <h2 style="font-size:16px;font-weight:600;margin-bottom:1rem">${isEdit?(u.name+' を編集'):'新しい職人を追加'}</h2>
+      <h2 style="font-size:16px;font-weight:600;margin-bottom:1rem">${isEdit?(u.name+' を編集'):'新しいユーザーを追加'}</h2>
       <div style="display:flex;flex-direction:column;gap:14px">
         <div>
           <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">名前</label>
@@ -489,12 +600,20 @@ function showUserForm(editId){
         </div>
         <div>
           <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">ログインID</label>
-          <input id="u-id" type="text" value="${u?.id||''}" placeholder="例: takezo2" ${isEdit?'readonly style="background:#f5f5f5;cursor:not-allowed"':''}>
+          <input id="u-id" type="text" value="${u?.id||''}" ${isEdit?'readonly style="background:#f5f5f5;cursor:not-allowed"':''}>
           ${isEdit?'<p style="font-size:11px;color:#aaa;margin-top:3px">IDは変更できません</p>':''}
         </div>
         <div>
           <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">パスワード</label>
-          <input id="u-pass" type="text" value="${u?.pass||''}" placeholder="例: yamada123">
+          <input id="u-pass" type="text" value="${u?.pass||''}">
+        </div>
+        <div>
+          <label style="font-size:13px;color:#555;display:block;margin-bottom:4px">役割</label>
+          <select id="u-role" ${isEdit?'disabled style="background:#f5f5f5"':''}>
+            <option value="kantoku" ${u?.role==='kantoku'?'selected':''}>現場監督</option>
+            <option value="planner" ${u?.role==='planner'?'selected':''}>プランナー</option>
+            <option value="worker" ${u?.role==='worker'?'selected':''}>職人</option>
+          </select>
         </div>
         <div id="u-err" style="color:#E24B4A;font-size:13px;display:none"></div>
         <button class="btn btn-primary" onclick="saveUser('${editId||''}')" style="padding:10px;font-size:15px">${isEdit?'更新する':'追加する'}</button>
@@ -502,27 +621,25 @@ function showUserForm(editId){
     </div>
   </div>`);
 }
-
 function saveUser(editId){
   const name=document.getElementById('u-name').value.trim();
   const uid=document.getElementById('u-id').value.trim();
   const pass=document.getElementById('u-pass').value.trim();
+  const role=document.getElementById('u-role').value;
   const err=document.getElementById('u-err');
   if(!name||!uid||!pass){err.textContent='すべての項目を入力してください';err.style.display='block';return;}
   if(!editId){
     if(USERS.find(u=>u.id===uid)){err.textContent='このIDはすでに使われています';err.style.display='block';return;}
-    USERS.push({id:uid,name,pass,role:'worker'});
+    USERS.push({id:uid,name,pass,role});
   }else{
     const u=USERS.find(x=>x.id===editId);
     if(u){u.name=name;u.pass=pass;}
   }
-  saveUsers();toast('職人情報を保存しました');showUsers();
+  saveUsers();toast('保存しました');showUsers();
 }
-
 function deleteUser(uid){
-  if(!confirm('この職人を削除しますか？'))return;
-  USERS=USERS.filter(u=>u.id!==uid);
-  saveUsers();toast('削除しました');showUsers();
+  if(!confirm('このユーザーを削除しますか？'))return;
+  USERS=USERS.filter(u=>u.id!==uid);saveUsers();toast('削除しました');showUsers();
 }
 
 // ===== 起動 =====
