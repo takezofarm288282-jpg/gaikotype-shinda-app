@@ -203,7 +203,7 @@ function showList(){
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span style="font-size:12px;padding:3px 8px;border-radius:12px;${roleBadgeStyle(currentUser.role)}">${roleLabel(currentUser.role)}</span>
         <span style="font-size:13px;color:#666">${currentUser.name}</span>
-        ${isAdmin?`<button class="btn btn-primary btn-sm" onclick="showAddForm()">＋ 物件追加</button>`:''}
+        ${(isAdmin||currentUser.role==='planner')?`<button class="btn btn-primary btn-sm" onclick="showAddForm()">＋ 物件追加</button>`:''}
         ${isAdmin?`<button class="btn btn-sm" onclick="showUsers()">👥 ユーザー管理</button>`:''}
         ${isAdmin?`<button class="btn btn-sm" onclick="showCheckTemplateManager()">📋 チェック項目管理</button>`:''}
         <button class="btn btn-sm" onclick="showLogin()">ログアウト</button>
@@ -398,7 +398,13 @@ function showCheckTemplateManager(){
 function renderCheckTemplatePanel(type, title){
   const items=checkTemplates[type]||[];
   const rows=items.map((item,i)=>`
-  <div style="display:flex;align-items:center;gap:6px;padding:8px 0;border-bottom:1px solid #f0f0f0">
+  <div draggable="true" data-type="${type}" data-idx="${i}"
+    ondragstart="dragStart(event,${i})"
+    ondragover="dragOver(event)"
+    ondrop="dragDrop(event,'${type}',${i})"
+    ondragend="dragEnd(event)"
+    style="display:flex;align-items:center;gap:6px;padding:8px 4px;border-bottom:1px solid #f0f0f0;cursor:grab;background:#fff;transition:background 0.1s">
+    <span style="font-size:16px;color:#ccc;padding:0 4px">☰</span>
     <span style="font-size:13px;flex:1">${item}</span>
     <button class="btn btn-sm" onclick="editCheckItem('${type}',${i})">編集</button>
     <button class="btn btn-danger btn-sm" onclick="deleteCheckItem('${type}',${i})">削除</button>
@@ -409,8 +415,35 @@ function renderCheckTemplatePanel(type, title){
       <h3 style="font-size:15px;font-weight:600">${title}</h3>
       <button class="btn btn-primary btn-sm" onclick="addCheckItem('${type}')">＋ 追加</button>
     </div>
+    <p style="font-size:11px;color:#aaa;margin-bottom:8px">☰ をドラッグして順番を変更できます</p>
     ${rows||'<p style="font-size:13px;color:#888">項目がありません</p>'}
   </div>`;
+}
+
+let dragSrcIdx=null;
+function dragStart(e,idx){
+  dragSrcIdx=idx;
+  e.target.style.opacity='0.4';
+  e.dataTransfer.effectAllowed='move';
+}
+function dragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect='move';
+  e.currentTarget.style.background='#f0faf5';
+}
+function dragEnd(e){
+  e.target.style.opacity='1';
+  document.querySelectorAll('[data-idx]').forEach(el=>el.style.background='#fff');
+}
+function dragDrop(e,type,toIdx){
+  e.preventDefault();
+  if(dragSrcIdx===null||dragSrcIdx===toIdx) return;
+  const items=checkTemplates[type];
+  const moved=items.splice(dragSrcIdx,1)[0];
+  items.splice(toIdx,0,moved);
+  saveCheckTemplates();
+  toast('順番を変更しました');
+  showCheckTemplateManager();
 }
 
 function addCheckItem(type){
