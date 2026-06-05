@@ -304,7 +304,18 @@ function renderCheckSheet(projectId, type){
   const items=checkTemplates[type]||[];
   const key=`check_${projectId}_${type}`;
   const saved=JSON.parse(localStorage.getItem(key)||'{}');
-  const canCheck=(type==='kantoku'&&currentUser.role==='kantoku')||(type==='planner'&&currentUser.role==='planner');
+  // 監督：自分が請け負った物件のみチェック可
+  // プランナー：担当者名が自分の物件のみチェック可（岡田/田中は岡田望・田中桃香両方OK）
+  const p_obj=projects.find(x=>x.id===projectId);
+  const kantokuOK=currentUser.role==='kantoku' && p_obj && p_obj.assignee===currentUser.name;
+  const plannerMatch=(tantou)=>{
+    if(!tantou) return false;
+    if(tantou===currentUser.name) return true;
+    if(tantou==='岡田/田中' && (currentUser.name==='岡田 望'||currentUser.name==='田中 桃香')) return true;
+    return false;
+  };
+  const plannerOK=currentUser.role==='planner' && p_obj && plannerMatch(p_obj.tantou);
+  const canCheck=(type==='kantoku'&&kantokuOK)||(type==='planner'&&plannerOK);
   const typeLabel=type==='kantoku'?'監督':'プランナー';
   // saved[i] = 'done'(完了) or 'na'(該当なし) or undefined
   const done=items.filter((_,i)=>saved[i]==='done').length;
@@ -344,7 +355,7 @@ function renderCheckSheet(projectId, type){
     </div>
   </div>
   ${rows||'<p style="font-size:13px;color:#888">チェック項目がありません</p>'}
-  ${!canCheck?'<p style="font-size:12px;color:#aaa;margin-top:8px">※ このシートは'+typeLabel+'のみチェックできます</p>':''}`;
+  ${!canCheck?`<p style="font-size:12px;color:#aaa;margin-top:8px">※ ${type==='kantoku'?'請け負った物件の監督':'担当プランナー'}のみチェックできます</p>`:''}`;
 }
 
 function switchTab(type, projectId){
