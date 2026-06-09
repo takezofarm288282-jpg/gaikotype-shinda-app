@@ -1,18 +1,19 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>外構スタイル診断 | タケゾーファーム</title>
-  <meta name="description" content="いくつかの質問に答えるだけで、あなたにぴったりの外構デザインスタイルが見つかります。タケゾーファームの外構スタイル診断。">
-</head>
-<body style="margin:0;padding:0;background:#fff;">
-<style>
-  #gaiko-diagnosis-app {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-</style>
+<?php
+/**
+ * Plugin Name: 外構スタイル診断
+ * Description: 質問に答えるだけで外構スタイルがわかる診断アプリをショートコードで設置できます。使い方: [gaiko_diagnosis]
+ * Version: 1.0.0
+ * Author: Takezo Farm
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+/* ============================================================
+   ショートコード登録
+   ============================================================ */
+function gaiko_diagnosis_shortcode() {
+    ob_start();
+    ?>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -51,6 +52,9 @@
 /* ---------- 画面共通 ---------- */
 #gaiko-diagnosis-app .gd-screen { display: none; }
 #gaiko-diagnosis-app .gd-screen.active { display: block; }
+/* スタート・ローディング画面は flex で中央配置を維持 */
+#gaiko-diagnosis-app .gd-start.active { display: flex; }
+#gaiko-diagnosis-app .gd-loading.active { display: flex; }
 
 @keyframes gdFadeInUp {
   from { opacity: 0; transform: translateY(18px); }
@@ -104,6 +108,8 @@
   width: 100%;
   text-align: center;
   padding: 40px 16px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #gaiko-diagnosis-app .gd-start-badge {
@@ -935,6 +941,12 @@
           <div class="gd-all-title">全スタイルのスコア</div>
           <div class="gd-all-scores" id="gd-all-scores"></div>
 
+          <!-- CTA -->
+          <div class="gd-cta">
+            <p>気に入ったスタイルが見つかりましたか？<br>プランナーへのご相談はこちらから</p>
+            <a class="gd-btn-consult" href="https://takezofarm.co.jp/contact/" target="_blank" rel="noopener">無料相談・お問い合わせ</a>
+          </div>
+
           <button class="gd-btn-restart" onclick="gdRestartDiagnosis()">🔄 もう一度診断する</button>
         </div>
       </div>
@@ -1147,5 +1159,7 @@
 })();
     </script>
 
-</body>
-</html>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode( 'gaiko_diagnosis', 'gaiko_diagnosis_shortcode' );
