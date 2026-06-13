@@ -111,9 +111,82 @@ header{background:linear-gradient(135deg,var(--gd),var(--gm));padding:16px 22px;
   .mhc{padding:12px 16px}.fps,.mbody{padding-left:14px;padding-right:14px}
   .fpg{gap:6px}
 }
+
+/* ===== 表紙ログイン ＋ 管理者編集 ===== */
+#cover{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1f4733,#2f6b48 60%,#3d8159);padding:20px}
+.cvbox{width:100%;max-width:340px;background:#fff;border-radius:18px;padding:32px 26px;
+  box-shadow:0 20px 50px rgba(0,0,0,.3);text-align:center}
+.cvlogo{font-size:1.5rem;font-weight:800;color:#22543d;letter-spacing:.04em}
+.cvsub{font-size:.72rem;color:#6b8a76;margin:4px 0 22px;letter-spacing:.08em}
+.cvfield{text-align:left;margin-bottom:14px}
+.cvfield label{display:block;font-size:.72rem;color:#4a6b56;font-weight:700;margin-bottom:5px}
+.cvfield input{width:100%;box-sizing:border-box;padding:11px 13px;border:1.5px solid #cfe3d6;
+  border-radius:10px;font-size:1rem;outline:none;transition:border .15s}
+.cvfield input:focus{border-color:#3d8159}
+.cverr{display:none;color:#c0392b;font-size:.78rem;margin:-4px 0 12px}
+.cvbtn{width:100%;padding:12px;margin-top:6px;border:none;border-radius:10px;cursor:pointer;
+  background:#2f6b48;color:#fff;font-size:1rem;font-weight:700;letter-spacing:.3em;transition:background .15s}
+.cvbtn:hover{background:#22543d}
+
+/* 管理者ボタン */
+#adminBtn{margin-left:10px;padding:6px 12px;border:1.5px solid #b7e4c7;background:transparent;color:#b7e4c7;
+  border-radius:8px;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap}
+#adminBtn:hover{background:rgba(183,228,199,.15)}
+body.admin #adminBtn{background:#ffd34d;border-color:#ffd34d;color:#5a4500}
+
+/* 編集ボタン（管理者時のみモーダル内に表示） */
+.ebtn{position:absolute;top:12px;left:12px;z-index:6;display:none;align-items:center;gap:4px;
+  padding:7px 13px;border:none;border-radius:20px;background:#ffd34d;color:#5a4500;
+  font-size:.8rem;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+body.admin .ebtn{display:inline-flex}
+
+/* 保存バー */
+#saveBar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:900;
+  align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;
+  padding:11px 16px;background:#22543d;color:#fff;box-shadow:0 -4px 16px rgba(0,0,0,.2)}
+.sbnote{font-size:.74rem;color:#cfe9d8;flex:1 1 240px;min-width:200px}
+#saveBar button{border:none;border-radius:9px;cursor:pointer;font-weight:800;padding:10px 16px;font-size:.86rem}
+.sbadd{background:#cfe9d8;color:#22543d}
+.sbsave{background:#ffd34d;color:#5a4500}
+#saveBar button:hover{opacity:.88}
+
+/* 編集フォーム オーバーレイ */
+.editM{position:fixed;inset:0;z-index:9500;display:none;align-items:flex-start;justify-content:center;
+  background:rgba(15,30,22,.55);padding:24px 14px;overflow-y:auto}
+.editM.open{display:flex}
+.edcard{width:100%;max-width:560px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.35);margin:auto}
+.edhd{background:#2f6b48;color:#fff;font-weight:800;font-size:1.05rem;padding:16px 22px}
+.edbody{padding:18px 22px;max-height:62vh;overflow-y:auto}
+.edrow{display:block;margin-bottom:14px}
+.edlbl{display:block;font-size:.76rem;font-weight:700;color:#3a5a47;margin-bottom:5px}
+.edrow input,.edrow textarea,.edrow select{width:100%;box-sizing:border-box;padding:9px 11px;
+  border:1.5px solid #cfe3d6;border-radius:9px;font-size:.95rem;outline:none;font-family:inherit}
+.edrow textarea{resize:vertical;line-height:1.5}
+.edrow input:focus,.edrow textarea:focus,.edrow select:focus{border-color:#3d8159}
+.edft{display:flex;gap:10px;flex-wrap:wrap;padding:16px 22px;background:#f4f8f5;border-top:1px solid #e2ece6}
+.edft button{border:none;border-radius:9px;cursor:pointer;font-weight:800;padding:11px 16px;font-size:.9rem}
+.edsave{background:#2f6b48;color:#fff;flex:1 1 auto}
+.eddel{background:#fbe3e0;color:#c0392b}
+.edcancel{background:#e6ece9;color:#4a6b56}
+.edft button:hover{opacity:.9}
+
 </style>
 </head>
 <body>
+
+<div id="cover">
+  <div class="cvbox">
+    <div class="cvlogo">人気の庭木図鑑</div>
+    <div class="cvsub">Takezo 植栽提案ガイド 2026</div>
+    <div class="cvfield"><label>ID</label><input id="loginId" type="text" autocomplete="off" onkeydown="loginKey(event)" placeholder="ID を入力"></div>
+    <div class="cvfield"><label>パスコード</label><input id="loginPw" type="password" onkeydown="loginKey(event)" placeholder="パスコードを入力"></div>
+    <div id="loginErr" class="cverr">ID またはパスコードが違います</div>
+    <button class="cvbtn" onclick="doLogin()">入　室</button>
+  </div>
+</div>
+<div id="editM" class="editM"></div>
+
 
 <div id="loading">
   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#b7e4c7" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/><path d="M17 8c0-2.76-2.24-5-5-5S7 5.24 7 8"/></svg>
@@ -128,6 +201,7 @@ header{background:linear-gradient(135deg,var(--gd),var(--gm));padding:16px 22px;
       <input type="text" id="si" placeholder="樹木名・科名・特徴で検索…" oninput="flt()">
     </div>
     <div id="cntbadge">読込中</div>
+      <button id="adminBtn" onclick="adminLogin()">管理者</button>
   </div>
 </header>
 
@@ -174,6 +248,7 @@ header{background:linear-gradient(135deg,var(--gd),var(--gm));padding:16px 22px;
       <button class="cbtn" onclick="closeM()">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
+      <button class="ebtn" onclick="openEdit()">✏ 編集</button>
       <div id="mmain"></div>
       <div class="mgrd"></div>
       <div class="mhc">
@@ -197,6 +272,7 @@ header{background:linear-gradient(135deg,var(--gd),var(--gm));padding:16px 22px;
   <img id="lbimg" src="" alt="">
 </div>
 
+<script src="imgmap.js"></script>
 <script>
 var PD = [];
 var cache = {};
@@ -228,6 +304,13 @@ var WP = 'https://ja.wikipedia.org/w/api.php';
 
 async function fetchImgs(name) {
   if (cache[name]) return cache[name];
+  // ── ローカル写真（Excel由来）を優先 ──
+  if (typeof IMGMAP !== "undefined" && IMGMAP[name]) {
+    var lm = IMGMAP[name];
+    var res = { m: lm.m || "", x: (lm.f || []).concat(["","",""]).slice(0,3) };
+    cache[name] = res;
+    return res;
+  }
 
   // Step 1: Get main image + article image list
   var enc = encodeURIComponent(name);
@@ -529,7 +612,133 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeLB();c
 function openLB(url){document.getElementById('lbimg').src=url;document.getElementById('lb').classList.add('open');}
 function closeLB(){document.getElementById('lb').classList.remove('open');}
 
+
+/* ===== 表紙ログイン ＋ 管理者編集 ＋ 保存(ダウンロード) ===== */
+var ADMIN=false;
+var VIEW_ID="takezofarm", VIEW_PW="8282", ADMIN_PW="8282";
+
+function doLogin(){
+  var id=(document.getElementById("loginId").value||"").trim();
+  var pw=(document.getElementById("loginPw").value||"").trim();
+  if(id===VIEW_ID && pw===VIEW_PW){
+    document.getElementById("cover").style.display="none";
+  }else{
+    document.getElementById("loginErr").style.display="block";
+  }
+}
+function loginKey(e){ if(e.key==="Enter") doLogin(); }
+
+function adminLogin(){
+  if(ADMIN){
+    ADMIN=false; document.body.classList.remove("admin");
+    document.getElementById("adminBtn").textContent="管理者";
+    document.getElementById("saveBar").style.display="none";
+    return;
+  }
+  var pw=prompt("管理者パスワードを入力してください");
+  if(pw===null) return;
+  if(pw===ADMIN_PW){
+    ADMIN=true; document.body.classList.add("admin");
+    document.getElementById("adminBtn").textContent="管理者モード ON（クリックで解除）";
+    document.getElementById("saveBar").style.display="flex";
+  }else{
+    alert("パスワードが違います");
+  }
+}
+
+var EDIT_FIELDS=[
+ ["n","樹木名","text"],["f","科名","text"],["t","種別","select"],
+ ["fl","開花時期（月）　例: 3～5","text"],["h","樹高(m)　例: 1～2","text"],
+ ["su","日照（◎/〇/△ など）","text"],["w","灌水（多/中/少）","text"],
+ ["c","耐寒性","text"],["dw","乾湿耐性","text"],["td","耐潮性","text"],
+ ["al","紅葉","text"],["pr","剪定","text"],["so","土壌","text"],
+ ["p","病害虫（1行に1つ書く）","textarea"],["d","説明","textarea"],["nt","備考","textarea"]
+];
+var TYPE_OPTS=["常緑広葉樹","落葉広葉樹","常緑針葉樹","宿根","竹笹類","常緑多年草","常緑ツル性","芝類",""];
+var editName=null;
+
+function escAttr(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+
+function openEdit(name){
+  name = name || cur;
+  var p = PD.find(function(x){return x.n===name;});
+  if(!p) return;
+  editName = name;
+  var h='<div class="edcard"><div class="edhd">植物の編集：'+escAttr(p.n)+'</div><div class="edbody">';
+  EDIT_FIELDS.forEach(function(f){
+    var key=f[0], label=f[1], type=f[2], val=(p[key]||"");
+    h+='<label class="edrow"><span class="edlbl">'+label+'</span>';
+    if(type==="textarea"){
+      h+='<textarea id="ed_'+key+'" rows="3">'+escAttr(val)+'</textarea>';
+    }else if(type==="select"){
+      h+='<select id="ed_'+key+'">';
+      TYPE_OPTS.forEach(function(o){
+        h+='<option value="'+escAttr(o)+'"'+(o===val?" selected":"")+'>'+(o||"（種別なし）")+'</option>';
+      });
+      h+='</select>';
+    }else{
+      h+='<input type="text" id="ed_'+key+'" value="'+escAttr(val)+'">';
+    }
+    h+='</label>';
+  });
+  h+='</div><div class="edft">'
+    +'<button class="edsave" onclick="applyEdit()">この内容を反映</button>'
+    +'<button class="eddel" onclick="deletePlant()">削除</button>'
+    +'<button class="edcancel" onclick="closeEdit()">キャンセル</button>'
+    +'</div></div>';
+  var em=document.getElementById("editM");
+  em.innerHTML=h;
+  em.classList.add("open");
+}
+function closeEdit(){document.getElementById("editM").classList.remove("open");}
+
+function applyEdit(){
+  var p=PD.find(function(x){return x.n===editName;});
+  if(!p){closeEdit();return;}
+  EDIT_FIELDS.forEach(function(f){
+    var el=document.getElementById("ed_"+f[0]);
+    if(el) p[f[0]]=el.value;
+  });
+  if(typeof cache!=="undefined"){ delete cache[editName]; delete cache[p.n]; }
+  closeEdit();
+  closeM();
+  flt();
+  alert("反映しました。\n最後に画面下の「保存（plants.jsをダウンロード）」を押し、GitHubに上げ直すと全員に反映されます。");
+}
+
+function deletePlant(){
+  if(!confirm("この植物を削除しますか？（保存してGitHubに上げ直すまでは元に戻せます）")) return;
+  var i=PD.findIndex(function(x){return x.n===editName;});
+  if(i>=0) PD.splice(i,1);
+  closeEdit(); closeM(); flt();
+}
+
+function addPlant(){
+  var name=prompt("新しい植物の名前を入力してください");
+  if(!name) return;
+  name=name.trim();
+  if(!name) return;
+  if(PD.some(function(x){return x.n===name;})){ alert("同じ名前の植物が既にあります"); return; }
+  var np={}; EDIT_FIELDS.forEach(function(f){np[f[0]]="";}); np.n=name;
+  PD.unshift(np); flt(); openEdit(name);
+}
+
+function downloadPlantsJS(){
+  var js="var PD="+JSON.stringify(PD)+";";
+  var blob=new Blob([js],{type:"text/javascript;charset=utf-8"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="plants.js";
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},1000);
+}
+
 loadData();
 </script>
+
+<div id="saveBar">
+  <span class="sbnote">編集したら「保存」を押し、ダウンロードされた plants.js を GitHub に上げ直すと、全員に反映されます。</span>
+  <button class="sbadd" onclick="addPlant()">＋ 新規追加</button>
+  <button class="sbsave" onclick="downloadPlantsJS()">💾 保存（plants.jsをダウンロード）</button>
+</div>
 </body>
 </html>
