@@ -36,7 +36,7 @@ header{background:#f8f3ea;border-bottom:1px solid #e8dcc8;padding:16px 22px;posi
 .card{background:var(--ww);border-radius:var(--r);box-shadow:var(--sh);cursor:pointer;transition:transform .2s,box-shadow .2s;overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(74,58,40,.06)}
 .card:hover{transform:translateY(-3px);box-shadow:0 7px 28px rgba(74,58,40,.18)}
 .cimg{position:relative;width:100%;height:160px;overflow:hidden;background:linear-gradient(135deg,#f8f1e7,#ece0cd);flex-shrink:0}
-.ci{width:100%;height:100%;object-fit:cover;transition:transform .4s;display:none;position:absolute;inset:0}
+.ci{width:100%;height:100%;object-fit:contain;transition:transform .4s;display:none;position:absolute;inset:0;cursor:zoom-in}
 .card:hover .ci{transform:scale(1.06)}
 .cph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--gm);opacity:.4;position:absolute;inset:0}
 .cph svg{width:32px;height:32px}.cph span{font-size:.68rem}
@@ -67,7 +67,7 @@ header{background:#f8f3ea;border-bottom:1px solid #e8dcc8;padding:16px 22px;posi
 .modal{background:var(--ww);border-radius:22px;max-width:760px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 70px rgba(0,0,0,.35);animation:su .24s ease;scrollbar-width:thin;scrollbar-color:var(--gp) transparent}
 @keyframes su{from{transform:translateY(28px);opacity:0}to{transform:translateY(0);opacity:1}}
 .mhero{position:relative}
-.mmi{width:100%;height:260px;object-fit:cover;border-radius:22px 22px 0 0;display:block}
+.mmi{width:100%;height:260px;object-fit:contain;border-radius:22px 22px 0 0;display:block;background:linear-gradient(135deg,#f8f1e7,#ece0cd);cursor:zoom-in}
 .mph{width:100%;height:260px;border-radius:22px 22px 0 0;background:linear-gradient(135deg,#6e5942,#9a805d);display:flex;align-items:center;justify-content:center}
 .mph .sp{width:40px;height:40px;border-color:rgba(255,255,255,.2);border-top-color:#fff}
 .mgrd{position:absolute;inset:0;background:linear-gradient(to top,rgba(38,28,18,.88) 0%,rgba(38,28,18,.12) 58%,transparent 100%);border-radius:22px 22px 0 0}
@@ -81,7 +81,7 @@ header{background:#f8f3ea;border-bottom:1px solid #e8dcc8;padding:16px 22px;posi
 .fpt{font-size:.7rem;font-weight:600;color:var(--gm);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .fpg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .fpw{position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:linear-gradient(135deg,#f8f1e7,#ece0cd);cursor:pointer}
-.fpimg{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.fpimg{width:100%;height:100%;object-fit:contain;display:block;transition:transform .3s;background:linear-gradient(135deg,#f8f1e7,#ece0cd)}
 .fpw:hover .fpimg{transform:scale(1.05)}
 .fplbl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.68),transparent);padding:14px 6px 5px;font-size:.6rem;color:#fff;text-align:center;font-weight:500}
 .fph{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
@@ -422,7 +422,7 @@ function renderGrid() {
     return '<div class="card" onclick="openM(this)" data-name="'+nm+'">'
       +'<div class="cimg" data-plant="'+en+'">'
         +'<div class="cld"><div class="sp"></div></div>'
-        +'<img class="ci" src="" alt="'+en+'">'
+        +'<img class="ci" src="" alt="'+en+'" onclick="event.stopPropagation();if(this.src)openLB(this.src);">'
         +'<div class="cph" style="display:none">'
           +'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 0 1 10 10c0 4-2.5 8-7 10l-3-4-3 4c-4.5-2-7-6-7-10A10 10 0 0 1 12 2z"/><circle cx="12" cy="10" r="3"/></svg>'
           +'<span>'+en+'</span>'
@@ -468,7 +468,7 @@ async function openM(cardEl) {
   var mmain = document.getElementById('mmain');
   var cached = cache[name];
   if(cached && cached.m) {
-    mmain.innerHTML = '<img class="mmi" src="'+cached.m+'" alt="'+esc(name)+'" onerror="this.style.display=\'none\'">'+'';
+    mmain.innerHTML = '<img class="mmi" src="'+cached.m+'" alt="'+esc(name)+'" onclick="openLB(\''+cached.m.replace(/'/g,"\\'")+'\')" onerror="this.style.display=\'none\'">'+'';
   } else {
     mmain.innerHTML = '<div class="mph"><div class="sp"></div></div>';
   }
@@ -512,7 +512,7 @@ async function openM(cardEl) {
 
   // Update main
   if(imgs.m) {
-    mmain.innerHTML='<img class="mmi" src="'+imgs.m+'" alt="'+esc(name)+'" onerror="this.style.display=\'none\'">'+'';
+    mmain.innerHTML='<img class="mmi" src="'+imgs.m+'" alt="'+esc(name)+'" onclick="openLB(\''+imgs.m.replace(/'/g,"\\'")+'\')" onerror="this.style.display=\'none\'">'+'';
   } else {
     mmain.innerHTML='<div class="mph"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:54px;height:54px;color:rgba(255,255,255,.2)"><path d="M12 2a10 10 0 0 1 10 10c0 4-2.5 8-7 10l-3-4-3 4c-4.5-2-7-6-7-10A10 10 0 0 1 12 2z"/><circle cx="12" cy="10" r="3"/></svg></div>';
   }
