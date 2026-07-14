@@ -171,6 +171,14 @@ body.admin .ebtn{display:inline-flex}
 .edcancel{background:#f1e9dc;color:#857260}
 .edft button:hover{opacity:.9}
 
+
+.edsec{font-size:.82rem;font-weight:800;color:#5e4c38;margin:16px 0 10px;padding-top:14px;border-top:1px solid #e8dcc8}
+.edphwrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.edthumb{width:74px;height:74px;object-fit:cover;border-radius:8px;border:1px solid #e3d7c2;background:#faf6ee}
+.ednoimg{width:74px;height:74px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px dashed #cdbf9e;color:#a89c87;font-size:.68rem;background:#faf6ee}
+.edphbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.edpick{background:#9a805d;color:#fff;padding:8px 13px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;display:inline-block}
+.edphdel{background:#efe5d4;color:#6f5d49;border:none;padding:8px 12px;border-radius:8px;font-size:.8rem;cursor:pointer}
 </style>
 </head>
 <body>
@@ -544,12 +552,12 @@ function closeLB(){document.getElementById('lb').classList.remove('open');}
 
 /* ===== 表紙ログイン ＋ 管理者編集 ＋ 保存(ダウンロード) ===== */
 var ADMIN=false;
-var VIEW_ID="takezofarm", VIEW_PW="8282", ADMIN_PW="8282";
+var VIEW_IDS=["nozomi","aki","kazu","momoka"], VIEW_PW="8282", ADMIN_PW="828282";
 
 function doLogin(){
   var id=(document.getElementById("loginId").value||"").trim();
   var pw=(document.getElementById("loginPw").value||"").trim();
-  if(id===VIEW_ID && pw===VIEW_PW){
+  if(VIEW_IDS.indexOf(id.toLowerCase())>=0 && pw===VIEW_PW){
     document.getElementById("cover").style.display="none";
   }else{
     document.getElementById("loginErr").style.display="block";
@@ -588,11 +596,58 @@ var editName=null;
 
 function escAttr(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
+var editImgs={m:"",f:["","",""]};
+function fileToDataURL(file,maxw,q,cb){
+  var rd=new FileReader();
+  rd.onload=function(ev){
+    var im=new Image();
+    im.onload=function(){
+      var w=im.width,hh=im.height;
+      if(w>maxw){hh=Math.round(hh*maxw/w);w=maxw;}
+      var cv=document.createElement("canvas");cv.width=w;cv.height=hh;
+      cv.getContext("2d").drawImage(im,0,0,w,hh);
+      cb(cv.toDataURL("image/jpeg",q));
+    };
+    im.src=ev.target.result;
+  };
+  rd.readAsDataURL(file);
+}
+function photoRow(label,key,src){
+  return '<div class="edrow"><span class="edlbl">'+label+'</span><div class="edphwrap">'
+    +'<img class="edthumb" id="edimg_'+key+'" src="'+(src||"")+'" alt=""'+(src?"":' style="display:none"')+'>'
+    +'<span class="ednoimg" id="edno_'+key+'"'+(src?' style="display:none"':"")+'>写真なし</span>'
+    +'<div class="edphbtns"><label class="edpick"><input type="file" accept="image/*" id="edfile_'+key+'" onchange="pickImg(\''+key+'\')" style="display:none">写真を選ぶ</label>'
+    +'<button type="button" class="edphdel" onclick="clearImg(\''+key+'\')">消す</button></div></div></div>';
+}
+function pickImg(key){
+  var inp=document.getElementById("edfile_"+key);
+  if(!inp||!inp.files||!inp.files[0])return;
+  var isM=(key==="m");
+  fileToDataURL(inp.files[0],isM?360:160,isM?0.55:0.45,function(durl){
+    if(key==="m")editImgs.m=durl; else editImgs.f[parseInt(key.slice(1),10)]=durl;
+    var img=document.getElementById("edimg_"+key); if(img){img.src=durl;img.style.display="";}
+    var no=document.getElementById("edno_"+key); if(no)no.style.display="none";
+  });
+}
+function clearImg(key){
+  if(key==="m")editImgs.m=""; else editImgs.f[parseInt(key.slice(1),10)]="";
+  var img=document.getElementById("edimg_"+key); if(img){img.src="";img.style.display="none";}
+  var no=document.getElementById("edno_"+key); if(no)no.style.display="";
+}
+function downloadImgmapJS(){
+  var js="var IMGMAP="+JSON.stringify(typeof IMGMAP!=="undefined"?IMGMAP:{})+";";
+  var blob=new Blob([js],{type:"text/javascript;charset=utf-8"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="imgmap.js";
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);
+}
 function openEdit(name){
   name = name || cur;
   var p = PD.find(function(x){return x.n===name;});
   if(!p) return;
   editName = name;
+  var im=(typeof IMGMAP!=="undefined" && IMGMAP[name])?IMGMAP[name]:{m:"",f:[]};
+  editImgs={m:im.m||"",f:[(im.f&&im.f[0])||"",(im.f&&im.f[1])||"",(im.f&&im.f[2])||""]};
   var h='<div class="edcard"><div class="edhd">植物の編集：'+escAttr(p.n)+'</div><div class="edbody">';
   EDIT_FIELDS.forEach(function(f){
     var key=f[0], label=f[1], type=f[2], val=(p[key]||"");
@@ -610,6 +665,11 @@ function openEdit(name){
     }
     h+='</label>';
   });
+  h+='<div class="edsec">写真（「写真を選ぶ」でメイン・特徴を差し替え）</div>';
+  h+=photoRow("メイン写真","m",editImgs.m);
+  h+=photoRow("特徴写真1","f0",editImgs.f[0]);
+  h+=photoRow("特徴写真2","f1",editImgs.f[1]);
+  h+=photoRow("特徴写真3","f2",editImgs.f[2]);
   h+='</div><div class="edft">'
     +'<button class="edsave" onclick="applyEdit()">この内容を反映</button>'
     +'<button class="eddel" onclick="deletePlant()">削除</button>'
@@ -628,11 +688,16 @@ function applyEdit(){
     var el=document.getElementById("ed_"+f[0]);
     if(el) p[f[0]]=el.value;
   });
+  if(typeof window.IMGMAP==="undefined") window.IMGMAP={};
+  var feats=editImgs.f.filter(function(x){return x;});
+  if(editImgs.m || feats.length){ IMGMAP[p.n]={m:editImgs.m||"",f:feats}; }
+  else if(IMGMAP[p.n]){ delete IMGMAP[p.n]; }
+  if(editName!==p.n && IMGMAP[editName]){ delete IMGMAP[editName]; }
   if(typeof cache!=="undefined"){ delete cache[editName]; delete cache[p.n]; }
   closeEdit();
   closeM();
   flt();
-  alert("反映しました。\n最後に画面下の「保存（plants.jsをダウンロード）」を押し、GitHubに上げ直すと全員に反映されます。");
+  alert("反映しました。\n画面下の『文章を保存(plants.js)』と、写真を変えたら『写真を保存(imgmap.js)』をダウンロードし、GitHubに上げ直すと全員に反映されます。");
 }
 
 function deletePlant(){
@@ -665,9 +730,10 @@ loadData();
 </script>
 
 <div id="saveBar">
-  <span class="sbnote">編集したら「保存」を押し、ダウンロードされた plants.js を GitHub に上げ直すと、全員に反映されます。</span>
+  <span class="sbnote">編集後は「文章を保存(plants.js)」を、写真を変えたら「写真を保存(imgmap.js)」もダウンロードし、GitHubに上げ直すと全員に反映されます。</span>
   <button class="sbadd" onclick="addPlant()">＋ 新規追加</button>
-  <button class="sbsave" onclick="downloadPlantsJS()">💾 保存（plants.jsをダウンロード）</button>
+  <button class="sbsave" onclick="downloadPlantsJS()">💾 文章を保存（plants.js）</button>
+  <button class="sbsave" onclick="downloadImgmapJS()">🖼 写真を保存（imgmap.js）</button>
 </div>
 </body>
 </html>
